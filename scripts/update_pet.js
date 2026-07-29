@@ -17,6 +17,9 @@
  *   node scripts/update_pet.js                      # normal run (hits the API)
  *   node scripts/update_pet.js --dry-run            # print the summary, write nothing
  *   node scripts/update_pet.js --days 4             # pretend it has been 4 days
+ *
+ * --days and --mood are simulations: they render but never persist, so a test
+ * run cannot backdate lastCommitDate and starve the pet off fictional data.
  *   node scripts/update_pet.js --apology            # pretend HEAD says "i'm sorry"
  *   node scripts/update_pet.js --offline            # skip the API, use cached state
  *   node scripts/update_pet.js --include-private    # let private repos feed it
@@ -1062,6 +1065,7 @@ async function main() {
 
   // --mood is a preview override: render as if the pet were in that state
   // without letting it touch the real saved state.
+  const isPreview = Boolean(OPTS.forceMood) || source === 'simulated';
   const renderState = OPTS.forceMood ? Object.assign({}, state, { mood: OPTS.forceMood, alive: OPTS.forceMood !== 'deceased' }) : state;
   const tier = revived ? 'revived' : renderState.mood;
   const line = pickLine(tier, renderState, now);
@@ -1087,6 +1091,15 @@ async function main() {
     return;
   }
 
+  // A simulation aimed at the real assets directory writes nothing at all —
+  // otherwise `--days 4` leaves feral cards next to a thriving state file, and
+  // the mismatch gets committed. Point it somewhere else to actually see them.
+  if (isPreview && path.resolve(OPTS.outDir) === ASSETS_DIR) {
+    console.log('\n-- simulation, nothing written --');
+    console.log('   re-run with --outdir <dir> to write these previews somewhere safe');
+    return;
+  }
+
   fs.mkdirSync(OPTS.outDir, { recursive: true });
   const written = [];
   for (const [n, svg] of rendered) {
@@ -1094,8 +1107,10 @@ async function main() {
     written.push(`${n}.svg`);
   }
 
-  // A preview render (--outdir elsewhere, or --mood) must not rewrite real state.
-  if (path.resolve(OPTS.outDir) === ASSETS_DIR && !OPTS.forceMood) {
+  // A preview render must never rewrite real state. --mood and --days are both
+  // simulations: persisting them would backdate lastCommitDate and starve the
+  // pet off fictional data. Only a genuine run touches the state file.
+  if (path.resolve(OPTS.outDir) === ASSETS_DIR && !isPreview) {
     fs.writeFileSync(STATE_PATH, `${JSON.stringify(state, null, 2)}\n`);
     written.push('pet-state.json');
     if (updateReadmeCaption(state, days)) written.push('README.md');

@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       simulate_days:
-        description: 'Pretend this many days have passed (blank = ask the real API)'
+        description: 'Pretend this many days have passed (renders only, never saved)'
         required: false
         default: ''
       force_apology:

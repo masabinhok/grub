@@ -66,8 +66,15 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
 
 Streaks come from the contribution calendar, so **private work counts** when
-`PET_INCLUDE_PRIVATE` is on. See [`PROFILE-README.md`](./PROFILE-README.md) for a
-ready-to-paste layout using all of them.
+`PET_INCLUDE_PRIVATE` is on. Embed any of them by raw URL:
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/grub/main/assets/streak.svg" width="420">
+```
+
+The two 420-wide cards sit side by side on one line, and `banner`/`divider` are
+sized to span both. [`PROFILE-README.md`](./PROFILE-README.md) is a working
+layout using them.
 
 Preview any mood without touching real state:
 
@@ -87,7 +94,7 @@ a generated graphic.
 scripts/update_pet.js       # everything: API calls, state machine, SVG renderers
 pet-state.json              # the only persistence layer. no database.
 assets/*.svg                # generated output, committed by CI
-PROFILE-README.md           # paste-ready profile layout
+PROFILE-README.md           # a working profile layout using the components
 .github/workflows/pet.yml   # daily cron + manual trigger
 ```
 
