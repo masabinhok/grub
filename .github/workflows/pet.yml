@@ -1,0 +1,78 @@
+name: Tamagotchi of Shame
+
+on:
+  schedule:
+    # Daily at midnight UTC. GitHub's scheduler is best-effort and often runs
+    # late on busy hours; that is fine, the script works in whole UTC days.
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      simulate_days:
+        description: 'Pretend this many days have passed (blank = ask the real API)'
+        required: false
+        default: ''
+      force_apology:
+        description: 'Force a resurrection, ignoring commit messages'
+        type: boolean
+        required: false
+        default: false
+      dry_run:
+        description: 'Render and log only — write and commit nothing'
+        type: boolean
+        required: false
+        default: false
+
+  # Optional: uncomment to make the pet react the moment you push an apology
+  # instead of waiting for the next midnight run. Safe against loops because the
+  # bot's own commit carries [skip ci], which GitHub honours for push events.
+  # push:
+  #   branches: [main]
+
+permissions:
+  contents: write
+
+# Never let a manual run and the cron run fight over the same push.
+concurrency:
+  group: tamagotchi
+  cancel-in-progress: false
+
+jobs:
+  feed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      # No actions/setup-node: ubuntu-latest ships Node 20+, and the script has
+      # zero dependencies, so there is nothing to install. Keeps the job ~15s.
+      - uses: actions/checkout@v4
+
+      - name: Update the creature
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional: a classic PAT with `repo` scope, stored as a repo secret.
+          # Without it the script sees public activity only.
+          PET_TOKEN: ${{ secrets.PET_TOKEN }}
+          # ON: private repo work feeds the pet. Requires the PET_TOKEN secret
+          # above — without it this silently sees public activity only, and the
+          # script will warn you in the job log.
+          # Trade-off: private activity is only datable through the contribution
+          # calendar, which also counts issues/PRs/reviews — not just commits.
+          PET_INCLUDE_PRIVATE: '1'
+          PET_USERNAME: ${{ github.repository_owner }}
+          PET_SIMULATE_DAYS: ${{ github.event.inputs.simulate_days }}
+        run: |
+          node scripts/update_pet.js \
+            ${{ github.event.inputs.force_apology == 'true' && '--apology' || '' }} \
+            ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+
+      - name: Commit if anything changed
+        if: github.event.inputs.dry_run != 'true'
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing changed — no commit."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add pet-state.json assets/pet.svg README.md
+          git commit -m 'chore: update pet state [skip ci]'
+          git push
