@@ -124,14 +124,22 @@ commits to default branches, pull requests, issues, reviews. Turning this on
 means opening an issue also feeds the pet. If you want the creature to be a
 strict commit detector, leave it off.
 
-To enable:
+To enable, set `PET_INCLUDE_PRIVATE: '1'` in `.github/workflows/pet.yml` — then
+check the job log before doing anything else.
+
+**You may not need a token at all.** If you have *Include private contributions on
+my profile* enabled in your GitHub profile settings, the calendar exposes your
+private contribution counts to the Action's built-in `GITHUB_TOKEN`, and it just
+works. The job log prints `counting private work: N restricted contribution(s)`
+when this is the case.
+
+If instead the log warns that no private contributions are visible, add a token:
 
 1. Create a **classic PAT** with `repo` scope
    ([github.com/settings/tokens](https://github.com/settings/tokens)). Fine-grained
    tokens do not reliably serve `contributionsCollection`.
 2. Add it as a repo secret named `PET_TOKEN`
    (Settings → Secrets and variables → Actions).
-3. In `.github/workflows/pet.yml`, flip `PET_INCLUDE_PRIVATE` to `'1'`.
 
 Locally:
 

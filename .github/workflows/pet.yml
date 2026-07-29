@@ -49,11 +49,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Optional: a classic PAT with `repo` scope, stored as a repo secret.
-          # Without it the script sees public activity only.
+          # Only needed if the job log warns that private work is invisible —
+          # with "Include private contributions on my profile" enabled, the
+          # built-in GITHUB_TOKEN already sees the counts.
           PET_TOKEN: ${{ secrets.PET_TOKEN }}
-          # ON: private repo work feeds the pet. Requires the PET_TOKEN secret
-          # above — without it this silently sees public activity only, and the
-          # script will warn you in the job log.
+          # ON: private repo work feeds the pet. If it cannot see any private
+          # contributions, the script says so loudly in the job log rather than
+          # letting the pet starve for the wrong reason.
           # Trade-off: private activity is only datable through the contribution
           # calendar, which also counts issues/PRs/reviews — not just commits.
           PET_INCLUDE_PRIVATE: '1'
