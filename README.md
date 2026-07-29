@@ -50,12 +50,44 @@ Case-insensitive. On the next run GRUB comes back with a burst of rotating light
 `resurrections` goes up by one, and that number stays in the image permanently.
 That's the whole point — the shame is cumulative and public.
 
+## The components
+
+The pet is the centrepiece, but the same state file themes a whole set of cards.
+Every one of them reads GRUB's mood, so when he starves the entire README
+desaturates together — and when he dies, **nothing on the page animates at all.**
+
+| File | Size | What it shows |
+| --- | --- | --- |
+| `assets/banner.svg` | 840×120 | Name, location, mood-reactive status pips |
+| `assets/pet.svg` | 540×300 | GRUB himself |
+| `assets/streak.svg` | 420×180 | Current + longest streak, 30-day sparkline |
+| `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
+| `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
+| `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
+
+Streaks come from the contribution calendar, so **private work counts** when
+`PET_INCLUDE_PRIVATE` is on. See [`PROFILE-README.md`](./PROFILE-README.md) for a
+ready-to-paste layout using all of them.
+
+Preview any mood without touching real state:
+
+```bash
+node scripts/update_pet.js --mood feral --outdir /tmp/preview --offline
+node scripts/update_pet.js --only streak      # render just one component
+```
+
+One limitation worth knowing: SVGs embedded via `<img>` cannot contain working
+hyperlinks, so anything clickable has to be markdown around the image (or an
+`<a>` wrapping the whole card). That is why the project list is a table and not
+a generated graphic.
+
 ## What's in here
 
 ```
-scripts/update_pet.js       # everything: API calls, state machine, SVG renderer
+scripts/update_pet.js       # everything: API calls, state machine, SVG renderers
 pet-state.json              # the only persistence layer. no database.
-assets/pet.svg              # generated output, committed by CI
+assets/*.svg                # generated output, committed by CI
+PROFILE-README.md           # paste-ready profile layout
 .github/workflows/pet.yml   # daily cron + manual trigger
 ```
 

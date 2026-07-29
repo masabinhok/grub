@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 12" width="840" height="12" role="img" aria-label="section divider">
+<style>
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
+    .dash{animation:slide 6s linear infinite}
+    @keyframes slide{to{transform:translateX(24px)}}
+</style>
+<rect width="840" height="12" fill="none"/>
+<g class="dash"><line x1="-24" y1="6" x2="864" y2="6" stroke="#5fd99a" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="6 18" stroke-linecap="round"/></g>
+</svg>
