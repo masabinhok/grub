@@ -21,6 +21,8 @@ function defaultState(now) {
     lastPettedAt: null,
     // login -> UTC date of that login's last pet, for the one-a-day limit.
     feedLog: {},
+    // Repo-wide pets today, for the global cap.
+    feedDay: { date: null, count: 0 },
     cache: {},
   };
 }

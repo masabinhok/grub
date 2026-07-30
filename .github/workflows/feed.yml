@@ -1,17 +1,26 @@
 name: Pet GRUB
 
 # Petting is cosmetic by design. This workflow can bump a counter and put a heart
-# on the card; it cannot feed the pet, change its mood, or resurrect it. See
-# scripts/feed_grub.js — it asserts that before saving.
+# on the card; it cannot feed the pet, change its mood, or resurrect it.
+# scripts/feed_grub.js asserts that before it will save.
 #
-# WORTH KNOWING: adding a label to an issue requires write access to the repo, so
-# as written this is a maintainer-only button. If you want strangers to be able to
-# pet him — which is the point of the LURKERS/FED split on the counter card —
-# change the types below to `[labeled, opened]` and enable the guard marked (A).
-# Anyone opening an issue titled "pet ..." or "feed ..." then triggers a run.
+# THIS IS A PUBLIC WRITE PATH. Anyone can open an issue titled "pet ..." or
+# "feed ..." and cause a commit to this repo. What keeps that boring:
+#
+#   - the script can only touch cosmetic counters, and asserts it
+#   - one pet per person per UTC day
+#   - MAX_PETS_PER_DAY across the whole repo (see scripts/lib/constants.js)
+#   - nothing here checks out or runs untrusted code; an issue carries none
+#   - the login and the title arrive as env vars and are validated in JS, never
+#     interpolated into a shell command
+#
+# An opened issue that is *not* a pet request is left completely alone — no reply
+# and, importantly, no auto-close. That gate lives in the script rather than in
+# `if:` below because Actions expressions cannot lowercase a string, so a YAML
+# startsWith would miss "Pet GRUB".
 on:
   issues:
-    types: [labeled]
+    types: [opened, labeled]
   repository_dispatch:
     types: [feed-grub]
 
@@ -27,12 +36,9 @@ concurrency:
 
 jobs:
   pet:
-    # (A) With the `opened` trigger enabled, add:
-    #   || (github.event.action == 'opened' &&
-    #       (startsWith(github.event.issue.title, 'pet') ||
-    #        startsWith(github.event.issue.title, 'feed')))
     if: >-
       github.event_name == 'repository_dispatch' ||
+      github.event.action == 'opened' ||
       github.event.label.name == 'feed-grub'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -42,13 +48,15 @@ jobs:
       - name: Pet the creature
         id: pet
         env:
-          # Never interpolated into the shell directly — a GitHub login is
-          # attacker-controlled text, and ${{ }} inside `run` would be a script
-          # injection. It goes in as an env var and the script re-validates it.
+          # Never interpolated into the shell directly — a login and an issue
+          # title are attacker-controlled text, and ${{ }} inside `run` would be
+          # a script injection. They go in as env vars and the script validates.
           ACTOR: >-
             ${{ github.event_name == 'repository_dispatch'
                 && (github.event.client_payload.actor || github.actor)
                 || github.event.issue.user.login }}
+          FEED_EVENT: ${{ github.event_name == 'issues' && github.event.action || github.event_name }}
+          FEED_TITLE: ${{ github.event.issue.title }}
         run: node scripts/feed_grub.js --actor "$ACTOR"
 
       # Redraws every card from the state file. --offline on purpose: this path is
@@ -71,8 +79,15 @@ jobs:
           git commit -m 'chore: pet GRUB [skip ci]'
           git push
 
+      # Only replies to outcomes that were actually about the pet. A plain bug
+      # report yields `ignored` and is never touched; a hard failure before the
+      # script emitted anything yields an empty result and is also left alone,
+      # so a crash can never close somebody's issue.
       - name: Reply and close
-        if: always() && github.event_name == 'issues'
+        if: >-
+          always() && github.event_name == 'issues' &&
+          contains(fromJSON('["fed","rate-limited","daily-cap","invalid-actor"]'),
+                   steps.pet.outputs.result)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}

@@ -229,29 +229,40 @@ not you. The insult pool itself lives in `scripts/lib/copy.js`.
 
 ## Petting
 
-Anyone can be *told* about GRUB. Making them able to help is a separate thing, and
-deliberately a useless one.
-
-Label an issue `feed-grub` (or send a `repository_dispatch` of type `feed-grub`)
-and `.github/workflows/feed.yml` bumps a pet counter, records who did it, puts a
+**Anyone can pet GRUB.** [Open an issue](../../issues/new?title=pet%20GRUB)
+whose title starts with `pet` or `feed` — any capitalisation — and
+`.github/workflows/feed.yml` bumps a pet counter, records who you are, puts a
 heart on the pet card for 24 hours, and closes the issue with a reply.
 
-What it explicitly **cannot** do is feed him. Petting never touches `hunger`,
+Maintainers can also label an existing issue `feed-grub`, or send a
+`repository_dispatch` of type `feed-grub`.
+
+What petting explicitly **cannot** do is feed him. It never touches `hunger`,
 `mood`, `alive`, `diedOn`, `resurrections` or `lastCommitDate` —
 `scripts/feed_grub.js` asserts all six are unchanged and refuses to save if they
 aren't. Only commits feed GRUB; only `i'm sorry` revives him. A stranger's
 sympathy is not an apology.
 
-Guards: one pet per person per UTC day, logins validated before being stored,
-and the daily job's concurrency group reused so a pet and a cron run can't race
-each other's push.
+That is the point of the `LURKERS` vs `FED` split on the counter card: the gap is
+how many people looked at a starving worm and did nothing.
 
-> **Heads up:** adding a label to an issue requires **write access**, so as
-> shipped this is a maintainer-only button. To let strangers pet him — which is
-> the entire point of the `LURKERS` vs `FED` split — change `types: [labeled]` to
-> `[labeled, opened]` in `feed.yml` and enable the guard marked `(A)`. Anyone
-> opening an issue titled "pet ..." or "feed ..." then triggers a run, which also
-> means anyone can cause a commit to your repo.
+### Because it's a public write path
+
+An issue from a stranger can cause a commit to this repo, so:
+
+- **One pet per person per UTC day.** Repeats get a reply and no state change.
+- **A repo-wide ceiling of 25 pets a day** (`MAX_PETS_PER_DAY`), so a pile of
+  throwaway accounts is still only a pile of one commit each up to the cap.
+- **Logins are validated** against GitHub's own rules before being stored or
+  echoed anywhere.
+- **No untrusted code ever runs.** An issue carries none, and the login and title
+  arrive as environment variables rather than being interpolated into a shell
+  command.
+- **The daily job's concurrency group is reused**, so a pet and a cron run can't
+  race each other's push.
+- **Issues that aren't about the pet are left completely alone** — no reply and,
+  importantly, no auto-close. If the script fails before deciding anything, the
+  issue is also left alone, so a crash can't close someone's bug report.
 
 ### What the counter actually counts
 
