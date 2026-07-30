@@ -1,18 +1,22 @@
 {
-  "lastCommitDate": "2026-07-30T07:00:00Z",
-  "lastCheckedDate": "2026-07-30T04:32:57.484Z",
+  "lastCommitDate": "2026-07-30T04:35:45.492Z",
+  "lastCheckedDate": "2026-07-30T04:35:45.492Z",
   "hunger": 0,
   "mood": "thriving",
   "alive": true,
   "diedOn": null,
   "resurrections": 0,
-  "pets": 0,
-  "feeders": [],
-  "lastPettedAt": null,
-  "feedLog": {},
+  "pets": 1,
+  "feeders": [
+    "masabinhok"
+  ],
+  "lastPettedAt": "2026-07-30T04:35:45.405Z",
+  "feedLog": {
+    "masabinhok": "2026-07-30"
+  },
   "feedDay": {
-    "date": null,
-    "count": 0
+    "date": "2026-07-30",
+    "count": 1
   },
   "cache": {
     "streak": {
