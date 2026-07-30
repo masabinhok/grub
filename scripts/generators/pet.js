@@ -1,10 +1,25 @@
 'use strict';
 
 const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
-const { SPRITES, HEART } = require('../lib/sprites');
+const { SPRITES, HEART, BERRY, SPARKLE } = require('../lib/sprites');
 const { isoDate } = require('../lib/dates');
 
 const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
+const SPRITE_MID = SPRITE_X + 8 * CELL;   // 118 — the creature's centre line
+
+// The placard above his head: the plea when nobody has fed him, the feeder's
+// name when somebody has. Same box either way, so the card does not jump.
+const PLEA_X = 34, PLEA_Y = 52, PLEA_W = 168, PLEA_H = 48;
+
+/**
+ * Largest font size at which `chars` characters of mono fit `width`, allowing for
+ * the letter-spacing on that class. Labels are configurable, so a long one has to
+ * shrink rather than run off the card.
+ */
+const fitFont = (chars, width, max, min, tracking = 0) => {
+  const n = Math.max(1, chars);
+  return Math.max(min, Math.min(max, (width - tracking * (n - 1)) / (n * 0.62)));
+};
 
 module.exports = function renderPet(state, ctx) {
   const mood = state.mood;
@@ -13,9 +28,10 @@ module.exports = function renderPet(state, ctx) {
   const lbl = ctx.cfg.labels.pet;
   const dead = mood === 'deceased';
   const animated = !dead;
-  // Petting is cosmetic and expires on its own — a dead pet shows nothing,
+  // A snack is cosmetic and expires on its own — a dead pet shows nothing,
   // because a stranger's sympathy is not an apology.
-  const petted = Boolean(ctx.petted) && !dead;
+  const fed = Boolean(ctx.fed) && !dead;
+  const feeder = fed && ctx.feeder ? String(ctx.feeder) : null;
   const bubbleLines = wrap(ctx.line, 34);
   const bubbleH = 26 + bubbleLines.length * 19;
 
@@ -25,7 +41,11 @@ module.exports = function renderPet(state, ctx) {
     .sub{font-size:10px;letter-spacing:1px;fill:${pal.dim}}
     .say{font-size:12.5px;fill:${pal.ink}}
     .stat{font-size:11px;fill:${pal.dim}}
-    .val{font-size:11px;fill:${pal.ink};font-weight:700}`;
+    .val{font-size:11px;fill:${pal.ink};font-weight:700}
+    .call{font-size:16px;font-weight:700;letter-spacing:2.5px;fill:${pal.accent}}
+    .callsub{font-size:9px;letter-spacing:0.8px;fill:${pal.dim}}
+    .who{font-weight:700;fill:${pal.accent}}
+    .howto{font-size:9.5px;fill:${pal.dim}}`;
 
   const style = dead
     ? `${petBase}
@@ -37,7 +57,21 @@ module.exports = function renderPet(state, ctx) {
     .meter{animation:meterpulse 2.6s ease-in-out infinite}
     ${mood === 'feral' ? '.glitch{animation:tear 1.1s steps(1) infinite}.shell{animation:desat 2.3s ease-in-out infinite}' : ''}
     ${mood === 'thriving' ? '.spark{animation:twinkle 1.9s ease-in-out infinite}' : ''}
-    ${ctx.revived ? '.flash{animation:flash 2.4s ease-out infinite}.ray{animation:spin 9s linear infinite;transform-box:fill-box;transform-origin:center}' : ''}${petted ? '\n    .heart{animation:rise 2.8s ease-out infinite}\n    @keyframes rise{0%{opacity:0;transform:translateY(6px)}18%{opacity:1}72%{opacity:.9}100%{opacity:0;transform:translateY(-16px)}}' : ''}
+    ${ctx.revived ? '.flash{animation:flash 2.4s ease-out infinite}.ray{animation:spin 9s linear infinite;transform-box:fill-box;transform-origin:center}' : ''}
+    ${fed ? `
+    .munch{animation:munch 2.9s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+    .crumb{animation:drop 2.9s cubic-bezier(.35,0,.85,1) infinite}
+    .heart{animation:rise 2.9s ease-out infinite}
+    .pop{animation:pop 2.9s ease-out infinite;transform-box:fill-box;transform-origin:center}
+    @keyframes munch{0%,100%{transform:scale(1,1)}8%{transform:scale(1.08,.9)}17%{transform:scale(.94,1.07)}26%{transform:scale(1.05,.96)}36%{transform:scale(1,1)}}
+    @keyframes drop{0%{opacity:0;transform:translateY(-132px)}12%{opacity:1}55%,100%{opacity:1;transform:translateY(0)}}
+    @keyframes rise{0%{opacity:0;transform:translateY(10px) scale(.7)}20%{opacity:1}72%{opacity:.85}100%{opacity:0;transform:translateY(-30px) scale(1.1)}}
+    @keyframes pop{0%,34%{opacity:0;transform:scale(.2)}44%{opacity:.95;transform:scale(1)}72%,100%{opacity:0;transform:scale(1.6)}}`
+    : `
+    .plea{animation:bob 2.1s ease-in-out infinite}
+    .beat{animation:beat 2.1s ease-in-out infinite}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+    @keyframes beat{0%,100%{opacity:1}50%{opacity:.25}}`}
     @keyframes blink{0%,93%{opacity:0}94%,97%{opacity:1}98%,100%{opacity:0}}
     @keyframes breathe{0%,100%{opacity:1}50%{opacity:.86}}
     @keyframes meterpulse{0%,100%{opacity:1}50%{opacity:.6}}
@@ -89,10 +123,69 @@ module.exports = function renderPet(state, ctx) {
       '<rect class="flash" x="-60" y="-60" width="264" height="264" fill="#ffffff" opacity="0"/>'
     : '';
 
+  // The chew lives on its own wrapper: the inner group already carries the idle
+  // animateTransform, and a CSS transform on the same element would replace it.
   const spriteGroup =
-    `<g transform="translate(${SPRITE_X} ${SPRITE_Y})"><g${mood === 'feral' ? ' class="shell"' : ''}><g>` +
+    `<g transform="translate(${SPRITE_X} ${SPRITE_Y})"><g${mood === 'feral' ? ' class="shell"' : ''}>` +
+    `<g${fed ? ' class="munch"' : ''}><g>` +
     spriteAnim + rays + pixelRects(SPRITES[mood], pal) + eyeLids + tombText + glitch + sparks +
-    '</g></g></g>';
+    '</g></g></g></g>';
+
+  // --- the feeding theatre ------------------------------------------------
+  // Food rains down, he chews, hearts go up, sparkles go off. All of it is on
+  // the same 2.9s loop as the munch, so the bites land with the food.
+  const at = (x, y, cls, delay, inner) =>
+    `<g transform="translate(${x} ${y})"><g class="${cls}"${delay ? ` style="animation-delay:${delay}s"` : ''}>${inner}</g></g>`;
+
+  // Each berry is placed where it lands, and the animation lifts it back up to
+  // fall again — so the frame a non-animating renderer draws is three crumbs on
+  // the ground rather than three berries stuck in mid-air over his face.
+  const berry = (tint) => pixelRects(BERRY, { '#': tint, o: pal.w }, 3);
+  const food = fed
+    ? at(64, 248, 'crumb', 0, berry(pal.m)) +
+      at(112, 250, 'crumb', 0.55, berry(pal.t)) +
+      at(164, 246, 'crumb', 1.15, berry(pal.m))
+    : '';
+
+  const hearts = fed
+    ? at(196, 152, 'heart', 0, pixelRects(HEART, { '#': pal.m }, 3)) +
+      at(196, 194, 'heart', 0.9, pixelRects(HEART, { '#': pal.m }, 2)) +
+      at(24, 172, 'heart', 1.6, pixelRects(HEART, { '#': pal.m }, 2))
+    : '';
+
+  const sparkle = (tint) => pixelRects(SPARKLE, { '#': tint }, 2);
+  const burst = fed
+    ? at(58, 196, 'pop', 0.1, sparkle(pal.t)) +
+      at(176, 178, 'pop', 0.5, sparkle(pal.w)) +
+      at(92, 236, 'pop', 0.8, sparkle(pal.t)) +
+      at(162, 232, 'pop', 1.3, sparkle(pal.m)) +
+      `<circle class="pop" cx="${SPRITE_MID}" cy="206" r="30" fill="none" stroke="${pal.t}" stroke-width="2" opacity="0"/>`
+    : '';
+
+  // --- the placard --------------------------------------------------------
+  const placardBox = (inner, cls) =>
+    `<g${cls ? ` class="${cls}"` : ''}>` +
+    `<rect x="${PLEA_X}" y="${PLEA_Y}" width="${PLEA_W}" height="${PLEA_H}" rx="9" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.55" stroke-width="1.5"/>` +
+    `<path d="M${SPRITE_MID - 9} ${PLEA_Y + PLEA_H} L${SPRITE_MID + 9} ${PLEA_Y + PLEA_H} L${SPRITE_MID} ${PLEA_Y + PLEA_H + 12} Z" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.55" stroke-width="1.5"/>` +
+    `<rect x="${SPRITE_MID - 8}" y="${PLEA_Y + PLEA_H - 2}" width="16" height="4" fill="${pal.bg1}"/>` +
+    inner + '</g>';
+
+  let placard = '';
+  if (fed && feeder) {
+    // Long logins shrink to fit rather than running off the card.
+    const shown = feeder.length > 26 ? `${feeder.slice(0, 25)}…` : feeder;
+    const fs = fitFont(shown.length + 1, PLEA_W - 24, 15, 8);
+    placard = placardBox(
+      `<text class="mono callsub" x="${SPRITE_MID}" y="${PLEA_Y + 20}" text-anchor="middle">${esc(lbl.fedBy)}</text>` +
+      `<text class="mono who" x="${SPRITE_MID}" y="${PLEA_Y + 38}" text-anchor="middle" font-size="${fs.toFixed(1)}">@${esc(shown)}</text>`);
+  } else if (!dead) {
+    const call = String(lbl.feedMe);
+    const sub = String(lbl.feedMeSub);
+    placard = placardBox(
+      `<text class="mono call" x="${SPRITE_MID}" y="${PLEA_Y + 22}" text-anchor="middle" font-size="${fitFont(call.length, PLEA_W - 26, 16, 9, 2.5).toFixed(1)}">${esc(call)}</text>` +
+      `<text class="mono callsub beat" x="${SPRITE_MID}" y="${PLEA_Y + 38}" text-anchor="middle" font-size="${fitFont(sub.length, PLEA_W - 26, 9, 6, 0.8).toFixed(1)}">${esc(sub)}</text>`,
+      'plea');
+  }
 
   const BX = 222, BY = 54, BW = 292;
   const bubble =
@@ -115,29 +208,31 @@ module.exports = function renderPet(state, ctx) {
     [lbl.daysSinceCommit, String(ctx.days)],
     [lbl.mood, mood.toUpperCase()],
     [lbl.resurrections, String(state.resurrections)],
+    [lbl.timesFed, String(state.pets || 0)],
   ].map(([k, v], i) =>
-    `<text class="mono stat" x="${MX}" y="${214 + i * 19}">${esc(k)}</text>` +
-    `<text class="mono val" x="${MX + 180}" y="${214 + i * 19}">${esc(v)}</text>`).join('');
+    `<text class="mono stat" x="${MX}" y="${208 + i * 19}">${esc(k)}</text>` +
+    `<text class="mono val" x="${MX + 180}" y="${208 + i * 19}">${esc(v)}</text>`).join('');
 
-  // Sits in the gap between the creature and the speech bubble, so it never
-  // collides with either.
-  const hearts = petted
-    ? `<g class="heart" transform="translate(194 98)">${pixelRects(HEART, { '#': pal.m }, 3)}</g>`
-    : '';
-
-  const petCount = state.pets > 0 ? ` · petted ${state.pets}x` : '';
-  const footer = `<text class="mono stat" x="${MX}" y="277" opacity="0.7">checked ${esc(isoDate(state.lastCheckedDate))} UTC${state.alive ? '' : ` · died ${esc(state.diedOn || '?')}`}${esc(petCount)}</text>`;
+  // The one line on the card that tells a visitor what to actually do. It is the
+  // whole reason the placard is worth having, so it never gets crowded out.
+  // Both hints fall back rather than printing an empty line: a card that asks to
+  // be fed and then does not say how is the one failure mode worth avoiding.
+  const howTo = dead
+    ? (lbl.reviveHint || '→ push a commit that says: i\'m sorry')
+    : (lbl.feedHint || `→ open an issue titled "feed ${petName}"`);
+  const footer = `<text class="mono howto" x="${MX}" y="288">${esc(howTo)}</text>`;
 
   const body =
     `<text class="mono brand" x="26" y="32">${esc(petName)}</text>` +
     `<text class="mono sub" x="${26 + petName.length * 13}" y="32">${esc(ctx.cfg.tagline)}</text>` +
     `<line x1="26" y1="44" x2="${W - 26}" y2="44" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
     `<rect x="30" y="262" width="176" height="4" rx="2" fill="${pal.ground}"/>` +
-    spriteGroup + hearts + bubble + meter + statBlock + footer;
+    placard + spriteGroup + food + burst + hearts + bubble + meter + statBlock + footer;
 
   return svgDoc({
     w: W, h: H, pal, id: 'pet', style,
-    title: `${petName} is ${dead ? 'dead' : mood} — ${ctx.days} day(s) since the last commit, ${state.resurrections} resurrection(s)`,
+    title: `${petName} is ${dead ? 'dead' : mood} — ${ctx.days} day(s) since the last commit, ${state.resurrections} resurrection(s)` +
+      (feeder ? `, last fed by @${feeder}` : ''),
     desc: ctx.line,
     body,
   });

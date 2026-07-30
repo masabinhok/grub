@@ -10,6 +10,8 @@
     "banner": true,
     "pet": true,
     "streak": true,
+    "eye": true,
+    "star": true,
     "stats": true,
     "languages": true,
     "divider": true,
@@ -38,14 +40,27 @@
       "hunger": "HUNGER",
       "daysSinceCommit": "DAYS SINCE COMMIT",
       "mood": "MOOD",
-      "resurrections": "RESURRECTIONS"
+      "resurrections": "RESURRECTIONS",
+      "timesFed": "TIMES FED",
+      "feedMe": "FEED ME",
+      "feedMeSub": "strangers only",
+      "fedBy": "FED BY",
+      "feedHint": null,
+      "reviveHint": "→ push a commit that says: i'm sorry"
     },
     "streak": {
       "current": "CURRENT STREAK",
       "days": "days",
       "longest": "LONGEST",
-      "activeDays": "ACTIVE DAYS",
-      "spark": "LAST 30 DAYS"
+      "activeDays": "ACTIVE DAYS"
+    },
+    "eye": {
+      "title": "VIEWS",
+      "unique": "UNIQUE"
+    },
+    "star": {
+      "title": "STARS EARNED",
+      "repos": "REPOS"
     },
     "stats": {
       "title": "BY THE NUMBERS",
@@ -68,8 +83,7 @@
       "dead": "SIGNAL LOST"
     },
     "inventory": {
-      "title": "EQUIPPED SKILLS",
-      "footer": "loadout defined in grub.config.json"
+      "title": "EQUIPPED SKILLS"
     }
   },
   "taglines": {},

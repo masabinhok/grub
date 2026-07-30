@@ -25,14 +25,14 @@ module.exports = function renderLanguages(state, ctx) {
   let x = 24;
   const segs = langs.map(([name, n], i) => {
     const w = Math.max(6, Math.round((n / total) * 372));
-    const r = `<rect x="${x}" y="52" width="${w}" height="14" fill="${colourFor(name, i)}" rx="${i === 0 || i === langs.length - 1 ? 3 : 0}"/>`;
+    const r = `<rect x="${x}" y="58" width="${w}" height="14" fill="${colourFor(name, i)}" rx="${i === 0 || i === langs.length - 1 ? 3 : 0}"/>`;
     x += w + 2;
     return r;
   }).join('');
 
   const legend = langs.map(([name, n], i) => {
     const col = 24 + (i % 2) * 200;
-    const row = 96 + Math.floor(i / 2) * 22;
+    const row = 106 + Math.floor(i / 2) * 26;
     return `<rect x="${col}" y="${row - 8}" width="9" height="9" rx="2" fill="${colourFor(name, i)}"/>` +
            `<text class="mono sm" x="${col + 15}" y="${row}">${esc(name)}</text>` +
            `<text class="mono dim" x="${col + 15 + name.length * 6.6 + 8}" y="${row}">${Math.round((n / total) * 100)}%</text>`;
@@ -41,8 +41,7 @@ module.exports = function renderLanguages(state, ctx) {
   const body =
     `<text class="mono lbl" x="24" y="26">${esc(lbl.title)}</text>` +
     `<line x1="24" y1="36" x2="396" y2="36" stroke="${pal.accent}" stroke-opacity="0.25"/>` +
-    (langs.length ? segs + legend : `<text class="mono dim" x="24" y="60">no language data</text>`) +
-    `<text class="mono dim" x="24" y="168" font-size="9.5">by primary language across ${(ctx.profile && ctx.profile.publicRepos) || 0} public repos</text>`;
+    (langs.length ? segs + legend : '<text class="mono dim" x="24" y="60">no language data</text>');
 
   return svgDoc({
     w: 420, h: 180, pal, id: 'lng', style: baseStyle(pal, dead),

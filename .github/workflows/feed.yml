@@ -1,23 +1,24 @@
-name: Pet GRUB
+name: Feed GRUB
 
-# Petting is cosmetic by design. This workflow can bump a counter and put a heart
-# on the card; it cannot feed the pet, change its mood, or resurrect it.
+# A snack from a visitor is cosmetic by design. This workflow can bump a counter
+# and make the pet card chew and credit the feeder for a day; it cannot feed the
+# pet in the sense that keeps it alive, change its mood, or resurrect it.
 # scripts/feed_grub.js asserts that before it will save.
 #
-# THIS IS A PUBLIC WRITE PATH. Anyone can open an issue titled "pet ..." or
-# "feed ..." and cause a commit to this repo. What keeps that boring:
+# THIS IS A PUBLIC WRITE PATH. Anyone can open an issue titled "feed ..." or
+# "pet ..." and cause a commit to this repo. What keeps that boring:
 #
 #   - the script can only touch cosmetic counters, and asserts it
-#   - one pet per person per UTC day
+#   - one snack per person per UTC day
 #   - MAX_PETS_PER_DAY across the whole repo (see scripts/lib/constants.js)
 #   - nothing here checks out or runs untrusted code; an issue carries none
 #   - the login and the title arrive as env vars and are validated in JS, never
 #     interpolated into a shell command
 #
-# An opened issue that is *not* a pet request is left completely alone — no reply
+# An opened issue that is *not* a feed request is left completely alone — no reply
 # and, importantly, no auto-close. That gate lives in the script rather than in
 # `if:` below because Actions expressions cannot lowercase a string, so a YAML
-# startsWith would miss "Pet GRUB".
+# startsWith would miss "Feed GRUB".
 on:
   issues:
     types: [opened, labeled]
@@ -28,14 +29,14 @@ permissions:
   contents: write
   issues: write
 
-# Shares the daily job's group so a pet and a scheduled run can never race each
-# other's push. Queued, not cancelled — dropping a pet would lose the counter bump.
+# Shares the daily job's group so a feed and a scheduled run can never race each
+# other's push. Queued, not cancelled — dropping one would lose the counter bump.
 concurrency:
   group: tamagotchi
   cancel-in-progress: false
 
 jobs:
-  pet:
+  feed:
     if: >-
       github.event_name == 'repository_dispatch' ||
       github.event.action == 'opened' ||
@@ -45,8 +46,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Pet the creature
-        id: pet
+      - name: Feed the creature
+        id: feed
         env:
           # Never interpolated into the shell directly — a login and an issue
           # title are attacker-controlled text, and ${{ }} inside `run` would be
@@ -63,11 +64,11 @@ jobs:
       # user-triggered, so it must not spend API quota or need a token. The next
       # scheduled run refreshes the streak and traffic numbers.
       - name: Re-render the cards
-        if: steps.pet.outputs.result == 'fed'
+        if: steps.feed.outputs.result == 'fed'
         run: node scripts/update_pet.js --offline
 
       - name: Commit if anything changed
-        if: steps.pet.outputs.result == 'fed'
+        if: steps.feed.outputs.result == 'fed'
         run: |
           if [ -z "$(git status --porcelain)" ]; then
             echo "Nothing changed — no commit."
@@ -76,7 +77,7 @@ jobs:
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add pet-state.json assets README.md
-          git commit -m 'chore: pet GRUB [skip ci]'
+          git commit -m 'chore: feed GRUB [skip ci]'
           git push
 
       # Only replies to outcomes that were actually about the pet. A plain bug
@@ -87,12 +88,12 @@ jobs:
         if: >-
           always() && github.event_name == 'issues' &&
           contains(fromJSON('["fed","rate-limited","daily-cap","invalid-actor"]'),
-                   steps.pet.outputs.result)
+                   steps.feed.outputs.result)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ISSUE: ${{ github.event.issue.number }}
           # Written by feed_grub.js, so it is our text rather than the user's.
-          BODY: ${{ steps.pet.outputs.message }}
+          BODY: ${{ steps.feed.outputs.message }}
         run: |
-          gh issue comment "$ISSUE" --body "${BODY:-GRUB could not be petted. Check the job log.}"
+          gh issue comment "$ISSUE" --body "${BODY:-GRUB could not be fed. Check the job log.}"
           gh issue close "$ISSUE"

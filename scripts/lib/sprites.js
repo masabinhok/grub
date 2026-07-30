@@ -30,8 +30,11 @@ const SPRITES = {
 };
 
 /**
- * Shown briefly after someone pets him. Not 16x16 and not mood-keyed, so it sits
- * outside SPRITES and skips the validation below.
+ * The feeding theatre. None of these are 16x16 or mood-keyed, so they sit outside
+ * SPRITES and skip the validation below. Every one of them is drawn at a small
+ * cell size — they are props, not characters.
+ *
+ * '#' takes the tint the caller passes; 'o' is the highlight.
  */
 const HEART = [
   '.##.##.',
@@ -42,10 +45,27 @@ const HEART = [
   '...#...',
 ];
 
+/** What visitors throw at him. He does not ask what is in it. */
+const BERRY = [
+  '.##.',
+  '#o##',
+  '####',
+  '.##.',
+];
+
+/** The little burst of delight, four-pointed and unsubtle. */
+const SPARKLE = [
+  '..#..',
+  '..#..',
+  '#####',
+  '..#..',
+  '..#..',
+];
+
 for (const [name, grid] of Object.entries(SPRITES)) {
   if (grid.length !== 16 || grid.some((r) => r.length !== 16)) {
     throw new Error(`sprite "${name}" is not 16x16`);
   }
 }
 
-module.exports = { SPRITES, HEART };
+module.exports = { SPRITES, HEART, BERRY, SPARKLE };

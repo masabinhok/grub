@@ -6,6 +6,7 @@ const W = 420;
 const ROW_H = 30;
 const TOP = 58;              // first row baseline, clear of the header rule
 const SWATCH = 9;
+const FOOT = 18;             // breathing room under the last row
 
 /**
  * An RPG equipment screen. Slots come from grub.config.json, so the card grows
@@ -21,7 +22,7 @@ module.exports = function renderInventory(state, ctx) {
   const petName = ctx.cfg.petName;
 
   const slots = (ctx.cfg.inventory.slots || []).filter((s) => s && s.slot);
-  const h = TOP + Math.max(1, slots.length) * ROW_H + 26;
+  const h = TOP + Math.max(1, slots.length) * ROW_H + FOOT;
 
   const rows = slots.map((s, i) => {
     const y = TOP + i * ROW_H;
@@ -46,8 +47,7 @@ module.exports = function renderInventory(state, ctx) {
     `<text class="mono lbl" x="24" y="26">${esc(lbl.title)}</text>` +
     `<text class="mono lbl" x="${W - 24}" y="26" text-anchor="end" opacity="0.7">${slots.length}/${slots.length}</text>` +
     `<line x1="24" y1="36" x2="${W - 24}" y2="36" stroke="${pal.accent}" stroke-opacity="0.25"/>` +
-    rows + empty +
-    `<text class="mono dim" x="24" y="${h - 12}" font-size="9.5">${esc(dead ? 'companion slot empty. it starved.' : lbl.footer)}</text>`;
+    rows + empty;
 
   return svgDoc({
     w: W, h, pal, id: 'inv', style: baseStyle(pal, dead),

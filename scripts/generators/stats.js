@@ -17,7 +17,7 @@ module.exports = function renderStats(state, ctx) {
   ];
   const grid = cells.map(([k, v], i) => {
     const x = 24 + (i % 2) * 200;
-    const y = 66 + Math.floor(i / 2) * 62; // clears the rule at y=36
+    const y = 72 + Math.floor(i / 2) * 66; // clears the rule at y=36
     return `<text class="mono lbl" x="${x}" y="${y - 20}">${esc(k)}</text>` +
            `<text class="mono" x="${x}" y="${y + 4}" font-size="26" font-weight="700" fill="${pal.ink}">${v}</text>`;
   }).join('');
@@ -25,8 +25,7 @@ module.exports = function renderStats(state, ctx) {
   const body =
     `<text class="mono lbl" x="24" y="26">${esc(lbl.title)}</text>` +
     `<line x1="24" y1="36" x2="396" y2="36" stroke="${pal.accent}" stroke-opacity="0.25"/>` +
-    grid +
-    `<text class="mono dim" x="24" y="168" font-size="9.5">${esc(dead ? 'no longer accepting new numbers' : 'public repos only · updated daily')}</text>`;
+    grid;
 
   return svgDoc({
     w: 420, h: 180, pal, id: 'sts', style: baseStyle(pal, dead),
