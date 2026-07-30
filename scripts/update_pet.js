@@ -8,7 +8,8 @@
  * pet state, so when GRUB starves the entire README desaturates and stops
  * animating with him. When he dies, nothing moves anywhere.
  *
- * Components: banner, pet, streak, stats, languages, divider
+ * Components: banner, pet, streak, stats, languages, divider, counter, marquee,
+ * inventory
  *
  * This file is the entrypoint only — CLI parsing, the state machine, and writing
  * files. The pieces live in:
@@ -38,8 +39,10 @@
  *                        for the full set of defaults.
  *
  * Environment:
- *   PET_TOKEN            Classic PAT with `repo` scope. Only needed if the log
- *                        warns private work is invisible. Falls back to GITHUB_TOKEN.
+ *   PET_TOKEN            Classic PAT with `repo` scope. Needed for the counter
+ *                        card (the traffic API requires push access), and if the
+ *                        log warns private work is invisible. Falls back to
+ *                        GITHUB_TOKEN.
  *   PET_INCLUDE_PRIVATE  "1" to count private contributions.
  *   PET_USERNAME         GitHub login to track. Defaults to the repo owner in CI.
  */
@@ -57,9 +60,10 @@ const { moodForDays, hungerForDays } = require('./lib/mood');
 const { pickLine } = require('./lib/copy');
 const { captionFor, updateReadmeCaption } = require('./lib/readme');
 const {
-  resolveUsername, fetchActivity, fetchProfileData, computeStreaks,
-  normalize, APOLOGY_NORM, localHeadMessage,
+  resolveUsername, resolveRepo, fetchActivity, fetchProfileData, fetchTraffic,
+  computeStreaks, normalize, APOLOGY_NORM, localHeadMessage,
 } = require('./lib/github');
+const { mergeTraffic, trafficTotal, firstSampleDate } = require('./lib/traffic');
 const COMPONENTS = require('./generators');
 
 const OPTS = parseArgs();
@@ -88,6 +92,7 @@ async function main() {
   let source = 'state';
   let contrib = null;
   let profile = null;
+  let trafficViews = null;
 
   if (OPTS.simulateDays !== null && OPTS.simulateDays !== undefined) {
     days = parseInt(OPTS.simulateDays, 10);
@@ -119,6 +124,23 @@ async function main() {
 
     try { profile = await fetchProfileData(username); }
     catch (err) { console.warn(`! profile API failed: ${err.message}`); }
+
+    // The counter is the only component that needs push access, so a missing or
+    // under-scoped token degrades to the stored total instead of failing the run.
+    if (cfg.components.counter !== false) {
+      const repo = resolveRepo({ repo: cfg.github.repo });
+      if (!repo) {
+        console.warn('! cannot determine repo for traffic — set github.repo in grub.config.json');
+      } else {
+        try { trafficViews = await fetchTraffic(repo); }
+        catch (err) {
+          console.warn(
+            `! traffic API failed for ${repo} (${err.message}) — reusing the stored lurker total.` +
+            ' It needs push access: a classic PAT with `repo` scope, or fine-grained with Administration: read.',
+          );
+        }
+      }
+    }
   }
 
   let revived = false;
@@ -154,13 +176,30 @@ async function main() {
   if (profile) state.cache = Object.assign({}, state.cache, { profile });
   const profileData = profile || (state.cache && state.cache.profile) || {};
 
+  // Lurkers accumulate: the API only shows a 14-day window, so the days it can
+  // still see get overwritten and everything older is kept. Nothing is dropped,
+  // which is what keeps the total monotonic even as people feed him.
+  const storedDaily = (state.cache && state.cache.traffic && state.cache.traffic.daily) || {};
+  const daily = trafficViews ? mergeTraffic(storedDaily, trafficViews) : storedDaily;
+  if (trafficViews) {
+    state.cache = Object.assign({}, state.cache, { traffic: { daily } });
+  }
+  const counter = {
+    lurkers: trafficTotal(daily),
+    fed: (state.feeders || []).length,
+    since: firstSampleDate(daily),
+  };
+
   // --mood is a preview override: render as if the pet were in that state
   // without letting it touch the real saved state.
   const isPreview = Boolean(OPTS.forceMood) || source === 'simulated';
   const renderState = OPTS.forceMood ? Object.assign({}, state, { mood: OPTS.forceMood, alive: OPTS.forceMood !== 'deceased' }) : state;
   const tier = revived ? 'revived' : renderState.mood;
   const line = pickLine(tier, renderState, now);
-  const ctx = { days, line, revived, streak, profile: profileData, cfg, palettes: resolvePalettes(cfg) };
+  const ctx = {
+    days, line, revived, streak, profile: profileData, counter,
+    cfg, palettes: resolvePalettes(cfg),
+  };
 
   const names = OPTS.only ? [OPTS.only] : enabledComponents(cfg, COMPONENTS);
   for (const n of names) if (!COMPONENTS[n]) throw new Error(`unknown component "${n}" (have: ${Object.keys(COMPONENTS).join(', ')})`);
@@ -173,6 +212,7 @@ async function main() {
   if (streak.current !== undefined) {
     console.log(`  streak=${streak.current} longest=${streak.longest} contributions=${streak.totalContributions || 0}`);
   }
+  console.log(`  lurkers=${counter.lurkers} fed=${counter.fed}${counter.since ? ` since=${counter.since}` : ' (no traffic sampled yet)'}`);
 
   if (OPTS.dryRun) {
     console.log('\n-- dry run, nothing written --');

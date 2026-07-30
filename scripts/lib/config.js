@@ -24,6 +24,9 @@ const DEFAULTS = {
     // git remote. Set it explicitly if you render for someone else's profile.
     username: null,
     includePrivate: false,
+    // "owner/name" whose traffic feeds the counter. null resolves from
+    // GITHUB_REPOSITORY, then the git remote.
+    repo: null,
   },
 
   // Which cards get written. Order is irrelevant; each SVG stands alone.
@@ -34,6 +37,28 @@ const DEFAULTS = {
     stats: true,
     languages: true,
     divider: true,
+    counter: true,
+    marquee: true,
+    inventory: true,
+  },
+
+  // The scrolling CRT line. `text` accepts a string or an array of strings; null
+  // falls back to the mood tagline, so it says something sensible untouched.
+  marquee: {
+    text: null,
+    mode: 'scroll',       // "scroll" or "type"
+    separator: '   ·   ',
+  },
+
+  // The RPG equipment screen. Any number of slots; the one whose item matches
+  // petName is drawn as the live companion.
+  inventory: {
+    slots: [
+      { slot: 'Primary', item: 'NestJS' },
+      { slot: 'Database', item: 'Postgres' },
+      { slot: 'Language', item: 'TypeScript' },
+      { slot: 'Companion', item: 'GRUB' },
+    ],
   },
 
   // Every fixed string on a card, in one place.
@@ -60,6 +85,20 @@ const DEFAULTS = {
       contributions: 'CONTRIBUTIONS',
     },
     languages: { title: 'MOST USED LANGUAGES' },
+    counter: {
+      title: "WHO'S BEEN WATCHING",
+      lurkers: 'LURKERS',
+      fed: 'FED',
+    },
+    marquee: {
+      title: 'NOW BROADCASTING',
+      live: 'ON AIR',
+      dead: 'SIGNAL LOST',
+    },
+    inventory: {
+      title: 'EQUIPPED SKILLS',
+      footer: 'loadout defined in grub.config.json',
+    },
   },
 
   // Per-mood banner subtitle. Merged over the built-ins, so overriding one mood

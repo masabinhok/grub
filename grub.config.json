@@ -3,7 +3,8 @@
   "tagline": "// THE TAMAGOTCHI OF SHAME",
   "github": {
     "username": null,
-    "includePrivate": false
+    "includePrivate": false,
+    "repo": null
   },
   "components": {
     "banner": true,
@@ -11,7 +12,23 @@
     "streak": true,
     "stats": true,
     "languages": true,
-    "divider": true
+    "divider": true,
+    "counter": true,
+    "marquee": true,
+    "inventory": true
+  },
+  "marquee": {
+    "text": null,
+    "mode": "scroll",
+    "separator": "   ·   "
+  },
+  "inventory": {
+    "slots": [
+      { "slot": "Primary", "item": "NestJS" },
+      { "slot": "Database", "item": "Postgres" },
+      { "slot": "Language", "item": "TypeScript" },
+      { "slot": "Companion", "item": "GRUB" }
+    ]
   },
   "labels": {
     "banner": {
@@ -39,6 +56,20 @@
     },
     "languages": {
       "title": "MOST USED LANGUAGES"
+    },
+    "counter": {
+      "title": "WHO'S BEEN WATCHING",
+      "lurkers": "LURKERS",
+      "fed": "FED"
+    },
+    "marquee": {
+      "title": "NOW BROADCASTING",
+      "live": "ON AIR",
+      "dead": "SIGNAL LOST"
+    },
+    "inventory": {
+      "title": "EQUIPPED SKILLS",
+      "footer": "loadout defined in grub.config.json"
     }
   },
   "taglines": {},

@@ -27,6 +27,23 @@ function resolveUsername({ user = null, configUsername = null } = {}) {
   return null;
 }
 
+/**
+ * Which repo's traffic are we counting? "owner/name", from config, then CI, then
+ * the git remote.
+ */
+function resolveRepo({ repo = null } = {}) {
+  if (repo) return repo;
+  if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
+  try {
+    const remote = execSync('git config --get remote.origin.url', {
+      encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const m = remote.match(/github\.com[:/]([^/]+)\/(.+?)(?:\.git)?\s*$/);
+    if (m) return `${m[1]}/${m[2]}`;
+  } catch (_) { /* not a git repo, or no remote */ }
+  return null;
+}
+
 async function gh(pathname) {
   const headers = {
     Accept: 'application/vnd.github+json',
@@ -287,6 +304,21 @@ async function fetchActivity(username, { includePrivate = false } = {}) {
   return result;
 }
 
+/**
+ * Repo traffic. Unlike everything else here this endpoint needs *push* access —
+ * a classic PAT with `repo` scope, or a fine-grained one with Administration:
+ * read. Without it the call 403s, which the caller treats as "reuse the last
+ * known total" rather than an error.
+ */
+async function fetchTraffic(nameWithOwner) {
+  const [owner, repo] = String(nameWithOwner).split('/');
+  if (!owner || !repo) throw new Error(`cannot parse repo "${nameWithOwner}"`);
+  const data = await gh(
+    `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/traffic/views?per=day`,
+  );
+  return (data && data.views) || [];
+}
+
 function localHeadMessage() {
   try {
     return execSync('git log -1 --pretty=%B', { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
@@ -296,6 +328,8 @@ function localHeadMessage() {
 module.exports = {
   authToken,
   resolveUsername,
+  resolveRepo,
+  fetchTraffic,
   gh,
   ghGraphQL,
   isBotCommit,

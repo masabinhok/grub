@@ -14,6 +14,10 @@ function defaultState(now) {
     alive: true,
     diedOn: null,
     resurrections: 0,
+    // Cosmetic only. Feeding is a real commit — these two never touch hunger,
+    // mood or lastCommitDate. See the feed workflow.
+    pets: 0,
+    feeders: [],
     cache: {},
   };
 }
