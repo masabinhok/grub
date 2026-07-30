@@ -1,22 +1,30 @@
 {
   "lastCommitDate": "2026-07-30T07:00:00Z",
-  "lastCheckedDate": "2026-07-30T01:45:40.460Z",
+  "lastCheckedDate": "2026-07-30T04:32:57.484Z",
   "hunger": 0,
   "mood": "thriving",
   "alive": true,
   "diedOn": null,
   "resurrections": 0,
+  "pets": 0,
+  "feeders": [],
+  "lastPettedAt": null,
+  "feedLog": {},
+  "feedDay": {
+    "date": null,
+    "count": 0
+  },
   "cache": {
     "streak": {
       "current": 10,
       "longest": 27,
-      "activeDays": 159,
+      "activeDays": 158,
       "spark": [
         0,
         1,
         2,
-        5,
-        5,
+        4,
+        6,
         0,
         0,
         0,
@@ -27,8 +35,8 @@
         3,
         0,
         0,
-        7,
-        3,
+        6,
+        4,
         2,
         3,
         0,
@@ -41,9 +49,9 @@
         1,
         12,
         14,
-        5
+        10
       ],
-      "totalContributions": 1125
+      "totalContributions": 1130
     },
     "profile": {
       "name": "Sabin Shrestha",
@@ -89,6 +97,24 @@
           1
         ]
       ]
+    },
+    "traffic": {
+      "daily": {
+        "2026-07-17": 0,
+        "2026-07-18": 0,
+        "2026-07-19": 0,
+        "2026-07-20": 0,
+        "2026-07-21": 0,
+        "2026-07-22": 0,
+        "2026-07-23": 0,
+        "2026-07-24": 0,
+        "2026-07-25": 0,
+        "2026-07-26": 0,
+        "2026-07-27": 0,
+        "2026-07-28": 0,
+        "2026-07-29": 0,
+        "2026-07-30": 0
+      }
     }
   }
 }
