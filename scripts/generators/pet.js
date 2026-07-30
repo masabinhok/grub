@@ -1,0 +1,134 @@
+'use strict';
+
+const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
+const { SPRITES } = require('../lib/sprites');
+const { isoDate } = require('../lib/dates');
+
+const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
+
+module.exports = function renderPet(state, ctx) {
+  const mood = state.mood;
+  const pal = ctx.palettes[mood];
+  const petName = ctx.cfg.petName;
+  const lbl = ctx.cfg.labels.pet;
+  const dead = mood === 'deceased';
+  const animated = !dead;
+  const bubbleLines = wrap(ctx.line, 34);
+  const bubbleH = 26 + bubbleLines.length * 19;
+
+  const petBase = `
+    .mono{font-family:${FONT}}
+    .brand{font-size:17px;font-weight:700;letter-spacing:2px;fill:${pal.ink}}
+    .sub{font-size:10px;letter-spacing:1px;fill:${pal.dim}}
+    .say{font-size:12.5px;fill:${pal.ink}}
+    .stat{font-size:11px;fill:${pal.dim}}
+    .val{font-size:11px;fill:${pal.ink};font-weight:700}`;
+
+  const style = dead
+    ? `${petBase}
+    .rip{font-size:21px;font-weight:700;letter-spacing:3px;fill:${pal.g}}
+    .ripsub{font-size:9.5px;letter-spacing:1px;fill:${pal.g}}`
+    : `${petBase}
+    .lid{opacity:0;animation:blink ${mood === 'feral' ? '1.7s' : '5.4s'} steps(1) infinite}
+    .bubble{animation:breathe ${mood === 'thriving' ? '3.2s' : '5s'} ease-in-out infinite}
+    .meter{animation:meterpulse 2.6s ease-in-out infinite}
+    ${mood === 'feral' ? '.glitch{animation:tear 1.1s steps(1) infinite}.shell{animation:desat 2.3s ease-in-out infinite}' : ''}
+    ${mood === 'thriving' ? '.spark{animation:twinkle 1.9s ease-in-out infinite}' : ''}
+    ${ctx.revived ? '.flash{animation:flash 2.4s ease-out infinite}.ray{animation:spin 9s linear infinite;transform-box:fill-box;transform-origin:center}' : ''}
+    @keyframes blink{0%,93%{opacity:0}94%,97%{opacity:1}98%,100%{opacity:0}}
+    @keyframes breathe{0%,100%{opacity:1}50%{opacity:.86}}
+    @keyframes meterpulse{0%,100%{opacity:1}50%{opacity:.6}}
+    @keyframes tear{0%,100%{opacity:0;transform:translateX(0)}12%{opacity:.55;transform:translateX(-4px)}18%{opacity:0}61%{opacity:.4;transform:translateX(5px)}67%{opacity:0}}
+    @keyframes desat{0%,100%{filter:saturate(.35)}50%{filter:saturate(0) contrast(1.25)}}
+    @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:1}}
+    @keyframes flash{0%{opacity:.8}100%{opacity:0}}
+    @keyframes spin{to{transform:rotate(360deg)}}`;
+
+  let spriteAnim = '';
+  if (mood === 'thriving') {
+    spriteAnim = '<animateTransform attributeName="transform" type="translate" values="0 0; 0 -7; 0 0" keyTimes="0;0.5;1" dur="1.5s" repeatCount="indefinite" calcMode="spline" keySplines="0.4 0 0.2 1; 0.4 0 0.2 1" additive="sum"/>';
+  } else if (mood === 'hungry') {
+    spriteAnim = '<animateTransform attributeName="transform" type="translate" values="0 0; 0 -3; 0 0" dur="4.2s" repeatCount="indefinite" additive="sum"/>';
+  } else if (mood === 'feral') {
+    spriteAnim = '<animateTransform attributeName="transform" type="translate" values="0 0;2 -1;-3 1;0 0;1 2;-1 0;0 0" dur="0.55s" repeatCount="indefinite" calcMode="discrete" additive="sum"/>';
+  }
+
+  const eyeLids = animated
+    ? `<rect class="lid" x="${3 * CELL}" y="${5 * CELL}" width="${3 * CELL}" height="${3 * CELL}" fill="${pal.x}"/>` +
+      `<rect class="lid" x="${10 * CELL}" y="${5 * CELL}" width="${3 * CELL}" height="${3 * CELL}" fill="${pal.x}"/>`
+    : '';
+
+  const tombText = dead
+    ? '<text class="mono rip" x="72" y="52" text-anchor="middle">R.I.P.</text>' +
+      `<line x1="30" y1="62" x2="114" y2="62" stroke="${pal.g}" stroke-opacity="0.6"/>` +
+      `<text class="mono ripsub" x="72" y="80" text-anchor="middle">${esc(petName)}</text>` +
+      `<text class="mono ripsub" x="72" y="97" text-anchor="middle">${esc(state.diedOn || isoDate(Date.now()))}</text>` +
+      '<text class="mono ripsub" x="72" y="112" text-anchor="middle">STARVED</text>'
+    : '';
+
+  const glitch = mood === 'feral'
+    ? `<g class="glitch"><rect x="0" y="${5 * CELL}" width="144" height="${2 * CELL}" fill="${pal.accent}" opacity="0.5"/>` +
+      `<rect x="0" y="${10 * CELL}" width="144" height="${CELL}" fill="${pal.w}" opacity="0.35"/></g>` +
+      `<rect x="0" y="${8 * CELL}" width="144" height="${CELL}" fill="${pal.b}" opacity="0">` +
+      '<animate attributeName="opacity" values="0;0;0.7;0;0;0.45;0" dur="1.3s" repeatCount="indefinite"/>' +
+      '<animate attributeName="x" values="0;-6;7;0;4;0;0" dur="1.3s" repeatCount="indefinite"/></rect>'
+    : '';
+
+  const sparks = mood === 'thriving'
+    ? `<g class="spark"><rect x="-14" y="18" width="6" height="6" fill="${pal.t}"/>` +
+      `<rect x="150" y="40" width="5" height="5" fill="${pal.t}"/>` +
+      `<rect x="140" y="6" width="4" height="4" fill="${pal.ink}"/></g>`
+    : '';
+
+  const rays = ctx.revived
+    ? `<g class="ray" opacity="0.35">${[0, 45, 90, 135]
+        .map((a) => `<rect x="-40" y="70" width="224" height="4" fill="${pal.t}" transform="rotate(${a} 72 72)"/>`).join('')}</g>` +
+      '<rect class="flash" x="-60" y="-60" width="264" height="264" fill="#ffffff" opacity="0"/>'
+    : '';
+
+  const spriteGroup =
+    `<g transform="translate(${SPRITE_X} ${SPRITE_Y})"><g${mood === 'feral' ? ' class="shell"' : ''}><g>` +
+    spriteAnim + rays + pixelRects(SPRITES[mood], pal) + eyeLids + tombText + glitch + sparks +
+    '</g></g></g>';
+
+  const BX = 222, BY = 54, BW = 292;
+  const bubble =
+    `<g${animated ? ' class="bubble"' : ''}>` +
+    `<rect x="${BX}" y="${BY}" width="${BW}" height="${bubbleH}" rx="10" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.55" stroke-width="1.5"/>` +
+    `<path d="M${BX + 22} ${BY + bubbleH} L${BX + 2} ${BY + bubbleH + 21} L${BX + 54} ${BY + bubbleH} Z" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.55" stroke-width="1.5"/>` +
+    `<rect x="${BX + 24}" y="${BY + bubbleH - 2}" width="28" height="4" fill="${pal.bg1}"/>` +
+    bubbleLines.map((l, i) => `<text class="mono say" x="${BX + 16}" y="${BY + 27 + i * 19}">${esc(l)}</text>`).join('') +
+    '</g>';
+
+  const MX = 222, MY = 186, MW = 200;
+  const filled = Math.round((state.hunger / 100) * MW);
+  const meter =
+    `<text class="mono stat" x="${MX}" y="${MY - 6}">${esc(lbl.hunger)}</text>` +
+    `<rect x="${MX}" y="${MY}" width="${MW}" height="10" rx="3" fill="${pal.bg1}" stroke="${pal.dim}" stroke-opacity="0.4"/>` +
+    (filled > 2 ? `<rect${animated && state.hunger >= 60 ? ' class="meter"' : ''} x="${MX + 1}" y="${MY + 1}" width="${filled - 2}" height="8" rx="2" fill="${dead ? pal.dim : pal.accent}"/>` : '') +
+    `<text class="mono val" x="${MX + MW + 10}" y="${MY + 9}">${state.hunger}%</text>`;
+
+  const statBlock = [
+    [lbl.daysSinceCommit, String(ctx.days)],
+    [lbl.mood, mood.toUpperCase()],
+    [lbl.resurrections, String(state.resurrections)],
+  ].map(([k, v], i) =>
+    `<text class="mono stat" x="${MX}" y="${214 + i * 19}">${esc(k)}</text>` +
+    `<text class="mono val" x="${MX + 180}" y="${214 + i * 19}">${esc(v)}</text>`).join('');
+
+  const footer = `<text class="mono stat" x="${MX}" y="277" opacity="0.7">checked ${esc(isoDate(state.lastCheckedDate))} UTC${state.alive ? '' : ` · died ${esc(state.diedOn || '?')}`}</text>`;
+
+  const body =
+    `<text class="mono brand" x="26" y="32">${esc(petName)}</text>` +
+    `<text class="mono sub" x="${26 + petName.length * 13}" y="32">${esc(ctx.cfg.tagline)}</text>` +
+    `<line x1="26" y1="44" x2="${W - 26}" y2="44" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
+    `<rect x="30" y="262" width="176" height="4" rx="2" fill="${pal.ground}"/>` +
+    spriteGroup + bubble + meter + statBlock + footer;
+
+  return svgDoc({
+    w: W, h: H, pal, id: 'pet', style,
+    title: `${petName} is ${dead ? 'dead' : mood} — ${ctx.days} day(s) since the last commit, ${state.resurrections} resurrection(s)`,
+    desc: ctx.line,
+    body,
+  });
+};

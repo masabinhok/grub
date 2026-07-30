@@ -1,0 +1,46 @@
+{
+  "petName": "GRUB",
+  "tagline": "// THE TAMAGOTCHI OF SHAME",
+  "github": {
+    "username": null,
+    "includePrivate": false
+  },
+  "components": {
+    "banner": true,
+    "pet": true,
+    "streak": true,
+    "stats": true,
+    "languages": true,
+    "divider": true
+  },
+  "labels": {
+    "banner": {
+      "status": "PET STATUS"
+    },
+    "pet": {
+      "hunger": "HUNGER",
+      "daysSinceCommit": "DAYS SINCE COMMIT",
+      "mood": "MOOD",
+      "resurrections": "RESURRECTIONS"
+    },
+    "streak": {
+      "current": "CURRENT STREAK",
+      "days": "days",
+      "longest": "LONGEST",
+      "activeDays": "ACTIVE DAYS",
+      "spark": "LAST 30 DAYS"
+    },
+    "stats": {
+      "title": "BY THE NUMBERS",
+      "repos": "PUBLIC REPOS",
+      "stars": "STARS EARNED",
+      "followers": "FOLLOWERS",
+      "contributions": "CONTRIBUTIONS"
+    },
+    "languages": {
+      "title": "MOST USED LANGUAGES"
+    }
+  },
+  "taglines": {},
+  "palette": {}
+}
