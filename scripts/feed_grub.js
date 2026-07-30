@@ -2,20 +2,22 @@
 'use strict';
 
 /**
- * Pet GRUB — the cosmetic half of the state file.
+ * Feed GRUB — the cosmetic half of the state file.
  *
- * The premise of this repo is that only a real commit feeds him and only a commit
- * reading exactly "i'm sorry" brings him back, so a button anyone can press must
- * not be able to shortcut either. Petting is deliberately powerless: it bumps a
- * counter, records who did it, and puts a heart on the card for a day. It cannot
+ * Anyone can hand him a snack. The premise of this repo is that only a real
+ * commit keeps him alive and only a commit reading exactly "i'm sorry" brings him
+ * back, so a button anyone can press must not be able to shortcut either. A snack
+ * is deliberately powerless: it bumps a counter, records who did it, and makes
+ * the pet card chew, sparkle and credit the feeder by name for a day. It cannot
  * change hunger, mood, whether he is alive, or when he last ate — and the script
  * asserts that on the way out rather than trusting itself.
  *
  * This runs on a PUBLIC trigger: anyone can open an issue and reach it. Three
- * things keep that boring — the protected-field assertion, one pet per person per
- * UTC day, and MAX_PETS_PER_DAY across the whole repo. Every attacker-controlled
- * string (the login, the issue title) arrives as an environment variable and is
- * validated here; none of it is ever interpolated into a shell command.
+ * things keep that boring — the protected-field assertion, one snack per person
+ * per UTC day, and MAX_PETS_PER_DAY across the whole repo. Every
+ * attacker-controlled string (the login, the issue title) arrives as an
+ * environment variable and is validated here; none of it is ever interpolated
+ * into a shell command.
  *
  * Rendering is not this script's job. It mutates state and exits; the workflow
  * then runs `update_pet.js --offline`, which redraws every card from the state
@@ -29,6 +31,7 @@
  *   FEED_EVENT   "opened" gates on the issue title; "labeled" and
  *                "repository_dispatch" are taken as intentional.
  *   FEED_TITLE   The issue title, when FEED_EVENT is "opened".
+ *   GITHUB_REPOSITORY  Only used to link the pet card in the reply.
  *
  * Writes result=fed|ignored|rate-limited|daily-cap|invalid-actor plus a comment
  * body to $GITHUB_OUTPUT when running under Actions. Only "fed" should lead to a
@@ -40,11 +43,7 @@ const fs = require('fs');
 const { loadState, saveState } = require('./lib/state');
 const { isoDate } = require('./lib/dates');
 const { loadConfig } = require('./lib/config');
-const { MAX_PETS_PER_DAY } = require('./lib/constants');
-
-// Anything that reaches this script came from a stranger, so the login is
-// validated against GitHub's own rules before it is stored or echoed anywhere.
-const LOGIN_RE = /^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$/;
+const { MAX_PETS_PER_DAY, LOGIN_RE } = require('./lib/constants');
 
 /**
  * What counts as asking to pet him. Checked here rather than in the workflow's
@@ -124,15 +123,15 @@ function main() {
     : { date: today, count: 0 };
 
   if (state.feedLog[actor] === today) {
-    console.log(`${petName}: @${actor} already petted him today — nothing to do`);
+    console.log(`${petName}: @${actor} already fed him today — nothing to do`);
     emit({
       result: 'rate-limited',
       pets: state.pets || 0,
       feeders: state.feeders.length,
       message:
-        `You already petted ${petName} today, @${actor}. He is flattered and unmoved.\n\n` +
-        'One pet per person per day. Come back tomorrow, or write some code — ' +
-        'that is the only thing that actually feeds him.',
+        `You already fed ${petName} today, @${actor}. He is flattered and unmoved.\n\n` +
+        'One snack per person per day. Come back tomorrow, or write some code — ' +
+        'that is the only thing that actually keeps him alive.',
     });
     return;
   }
@@ -144,8 +143,8 @@ function main() {
       pets: state.pets || 0,
       feeders: state.feeders.length,
       message:
-        `${petName} has been petted ${MAX_PETS_PER_DAY} times today and is now ` +
-        'overstimulated. He is done for the day.\n\nTry again tomorrow.',
+        `${petName} has been fed ${MAX_PETS_PER_DAY} times today and is now ` +
+        'visibly bloated. He is done for the day.\n\nTry again tomorrow.',
     });
     return;
   }
@@ -155,6 +154,9 @@ function main() {
   state.feedLog[actor] = today;
   state.feedDay.count += 1;
   state.lastPettedAt = now.toISOString();
+  // Credited on the pet card until the reaction expires. Validated above, and
+  // re-validated by the renderer before it is drawn.
+  state.lastFedBy = actor;
   if (firstTime) state.feeders.push(actor);
 
   // The whole point of this script is what it does *not* change.
@@ -162,20 +164,29 @@ function main() {
     throw new Error(`petting altered protected state (${PROTECTED.join(', ')}) — refusing to save`);
   }
 
+  // Relative links are not reliably resolved inside issue comments, so the card
+  // is only linked when CI tells us the full repo name. Locally there is no link.
+  const repo = process.env.GITHUB_REPOSITORY || '';
+  const cardLink = /^[\w.-]+\/[\w.-]+$/.test(repo)
+    ? ` [Go look.](https://github.com/${repo}/blob/main/assets/pet.svg)`
+    : '';
+
   const dead = state.alive === false;
   const message = dead
-    ? `@${actor} pets ${petName}. ${petName} is dead, so nothing happens.\n\n` +
-      'Petting is cosmetic — it has never fed him and it cannot raise him. ' +
-      'That takes a commit whose message is exactly `i\'m sorry`, pushed by the ' +
-      'person who let him starve.\n\n' +
-      `Pet count: **${state.pets}** · people who have tried: **${state.feeders.length}**`
-    : `@${actor} pets ${petName}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
-      `He is **${state.mood}** and that has not changed, because petting does not ` +
-      'feed him. Only commits do. He did enjoy it, allegedly.\n\n' +
-      `Pet count: **${state.pets}** · people who have pet him: **${state.feeders.length}**`;
+    ? `@${actor} offers ${petName} a snack. ${petName} is dead, so nothing happens.\n\n` +
+      'Snacks are cosmetic — they have never fed him properly and they cannot ' +
+      'raise him. That takes a commit whose message is exactly `i\'m sorry`, ' +
+      'pushed by the person who let him starve.\n\n' +
+      `Feed count: **${state.pets}** · people who have tried: **${state.feeders.length}**`
+    : `@${actor} fed ${petName}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
+      'He is chewing about it on the card right now, and your name is on it for ' +
+      `the next 24 hours.${cardLink}\n\n` +
+      `He is still **${state.mood}**, because a snack is not a meal — only commits ` +
+      'actually feed him. He did enjoy it, allegedly.\n\n' +
+      `Feed count: **${state.pets}** · people who have fed him: **${state.feeders.length}**`;
 
   console.log(
-    `${petName}: petted by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
+    `${petName}: fed by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
     `pets=${state.pets} feeders=${state.feeders.length} today=${state.feedDay.count}/${MAX_PETS_PER_DAY} ` +
     `mood=${state.mood} (unchanged)`);
 
@@ -190,7 +201,8 @@ function main() {
   if (OPTS.dryRun) {
     console.log('\n-- dry run, nothing written --');
     console.log(JSON.stringify({
-      pets: state.pets, feeders: state.feeders, lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
+      pets: state.pets, feeders: state.feeders, lastFedBy: state.lastFedBy,
+      lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
     }, null, 2));
     emit(outputs);
     return;

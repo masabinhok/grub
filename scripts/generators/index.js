@@ -13,6 +13,8 @@ module.exports = {
   banner: require('./banner'),
   pet: require('./pet'),
   streak: require('./streak'),
+  eye: require('./eye'),
+  star: require('./star'),
   stats: require('./stats'),
   languages: require('./languages'),
   divider: require('./divider'),

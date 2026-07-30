@@ -14,11 +14,13 @@ function defaultState(now) {
     alive: true,
     diedOn: null,
     resurrections: 0,
-    // Cosmetic only. Feeding is a real commit — these two never touch hunger,
-    // mood or lastCommitDate. See the feed workflow.
+    // Cosmetic only. A snack from a visitor never touches hunger, mood or
+    // lastCommitDate — only commits do. See the feed workflow.
     pets: 0,
     feeders: [],
     lastPettedAt: null,
+    // Whoever fed him last, credited by name on the pet card for a day.
+    lastFedBy: null,
     // login -> UTC date of that login's last pet, for the one-a-day limit.
     feedLog: {},
     // Repo-wide pets today, for the global cap.

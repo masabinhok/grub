@@ -6,7 +6,7 @@ const { glyphRects, groupDigits, textWidth, fitScale, GLYPH_H } = require('../li
 const W = 420, H = 180;
 const RULE_X = 210;          // the divider between the two stats
 const COL_W = 162;           // usable width inside each column
-const NUM_BOTTOM = 112;      // shared baseline for the pixel digits
+const NUM_BOTTOM = 128;      // shared baseline for the pixel digits
 
 /**
  * Two numbers, side by side: how many people came to look, and how many of them
@@ -47,10 +47,9 @@ module.exports = function renderCounter(state, ctx) {
     `<line x1="24" y1="36" x2="${W - 24}" y2="36" stroke="${pal.accent}" stroke-opacity="0.25"/>` +
     `<text class="mono lbl" x="24" y="60">${esc(lbl.lurkers)}</text>` +
     `<text class="mono lbl" x="234" y="60">${esc(lbl.fed)}</text>` +
-    `<line x1="${RULE_X}" y1="48" x2="${RULE_X}" y2="140" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
+    `<line x1="${RULE_X}" y1="48" x2="${RULE_X}" y2="152" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
     `<g${dead ? '' : ' class="pulse"'}>${stat(lurkers, 24, pal.accent)}</g>` +
-    stat(fed, 234, pal.ink) +
-    `<text class="mono dim" x="24" y="168" font-size="9.5">${esc(dead ? 'they watched. nobody helped.' : footnote)}</text>`;
+    stat(fed, 234, pal.ink);
 
   return svgDoc({
     w: W, h: H, pal, id: 'cnt', style: baseStyle(pal, dead),

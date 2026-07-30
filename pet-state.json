@@ -1,6 +1,6 @@
 {
   "lastCommitDate": "2026-07-30T04:35:45.492Z",
-  "lastCheckedDate": "2026-07-30T04:35:45.492Z",
+  "lastCheckedDate": "2026-07-30T14:49:46.522Z",
   "hunger": 0,
   "mood": "thriving",
   "alive": true,
@@ -11,6 +11,7 @@
     "masabinhok"
   ],
   "lastPettedAt": "2026-07-30T04:35:45.405Z",
+  "lastFedBy": "masabinhok",
   "feedLog": {
     "masabinhok": "2026-07-30"
   },
