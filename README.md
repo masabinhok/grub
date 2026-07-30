@@ -50,6 +50,8 @@ Case-insensitive. On the next run GRUB comes back with a burst of rotating light
 `resurrections` goes up by one, and that number stays in the image permanently.
 That's the whole point — the shame is cumulative and public.
 
+---
+
 ## The components
 
 The pet is the centrepiece, but the same state file themes a whole set of cards.
@@ -59,48 +61,238 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | File | Size | What it shows |
 | --- | --- | --- |
 | `assets/banner.svg` | 840×120 | Name, location, mood-reactive status pips |
+| `assets/marquee.svg` | 840×88 | CRT ticker — scrolls or types a line you configure |
+| `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
 | `assets/pet.svg` | 540×300 | GRUB himself |
 | `assets/streak.svg` | 420×180 | Current + longest streak, 30-day sparkline |
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
-| `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
+| `assets/counter.svg` | 420×180 | Lurkers vs. people who actually petted him |
+| `assets/inventory.svg` | 420×204 | Tech stack as an RPG equipment screen |
 
-Streaks come from the contribution calendar, so **private work counts** when
-`PET_INCLUDE_PRIVATE` is on. Embed any of them by raw URL:
+`inventory.svg` grows with your slot list — 204px at four slots, +30px each after.
+
+The 840-wide cards span a full row. The 420-wide ones pair up two to a line, and
+`pet.svg` sits comfortably next to nothing, so give it its own row.
+
+### Copy-paste blocks
+
+Replace `USERNAME/REPO` in each. Use the **raw** URL, not a relative path —
+relative paths only resolve inside the repo that holds the file, so they break the
+moment you paste them into your profile README.
+
+**Banner** — 840×120
 
 ```html
-<img src="https://raw.githubusercontent.com/USERNAME/grub/main/assets/streak.svg" width="420">
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/banner.svg" width="840" alt="Profile banner">
 ```
 
-The two 420-wide cards sit side by side on one line, and `banner`/`divider` are
-sized to span both. [`PROFILE-README.md`](./PROFILE-README.md) is a working
-layout using them.
+**Marquee** — 840×88
 
-Preview any mood without touching real state:
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/marquee.svg" width="840" alt="Status ticker">
+```
 
-```bash
-node scripts/update_pet.js --mood feral --outdir /tmp/preview --offline
-node scripts/update_pet.js --only streak      # render just one component
+**Divider** — 840×12
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/divider.svg" width="840" alt="">
+```
+
+**Pet** — 540×300
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/pet.svg" width="540" alt="GRUB, the tamagotchi of shame">
+```
+
+**Streak** — 420×180
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/streak.svg" width="420" alt="Commit streak">
+```
+
+**Stats** — 420×180
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/stats.svg" width="420" alt="Profile statistics">
+```
+
+**Languages** — 420×180
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/languages.svg" width="420" alt="Most used languages">
+```
+
+**Counter** — 420×180
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/counter.svg" width="420" alt="Lurkers versus feeders">
+```
+
+**Inventory** — 420×204
+
+```html
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/inventory.svg" width="420" alt="Equipped skills">
+```
+
+### A full layout
+
+Everything at once, laid out so the rows line up. Drop this straight into your
+profile README:
+
+```html
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/banner.svg" width="840" alt="Profile banner">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/marquee.svg" width="840" alt="Status ticker">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/pet.svg" width="540" alt="GRUB, the tamagotchi of shame">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/streak.svg" width="420" alt="Commit streak">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/stats.svg" width="420" alt="Profile statistics">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/languages.svg" width="420" alt="Most used languages">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/counter.svg" width="420" alt="Lurkers versus feeders">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/inventory.svg" width="420" alt="Equipped skills">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/divider.svg" width="840" alt="">
+</p>
 ```
 
 One limitation worth knowing: SVGs embedded via `<img>` cannot contain working
 hyperlinks, so anything clickable has to be markdown around the image (or an
-`<a>` wrapping the whole card). That is why the project list is a table and not
-a generated graphic.
+`<a>` wrapping the whole card). Same sandbox rules kill external fonts, external
+CSS and any JavaScript, which is why the pixel type is drawn as rectangles and the
+text uses a system monospace stack.
+
+---
+
+## Configuration
+
+`grub.config.json` holds everything you'd want to change. It is **read only** —
+the bot never writes it, so your edits survive every run. Delete the file and the
+built-in defaults produce byte-identical output.
+
+Abridged — see [`grub.config.json`](./grub.config.json) for every key:
+
+```json
+{
+  "petName": "GRUB",
+  "tagline": "// THE TAMAGOTCHI OF SHAME",
+  "github": { "username": null, "includePrivate": false, "repo": null },
+  "components": { "banner": true, "counter": true },
+  "marquee": { "text": null, "mode": "scroll", "separator": "   ·   " },
+  "inventory": {
+    "slots": [
+      { "slot": "Primary", "item": "NestJS" },
+      { "slot": "Companion", "item": "GRUB" }
+    ]
+  },
+  "labels": { "counter": { "lurkers": "LURKERS", "fed": "FED" } },
+  "taglines": {},
+  "palette": {}
+}
+```
+
+| Key | Effect |
+| --- | --- |
+| `petName` | Renames the creature everywhere, including the tombstone |
+| `tagline` | The `//` subtitle beside his name on the pet card |
+| `github.username` | Whose profile to track. `null` auto-detects from CI or the git remote |
+| `github.includePrivate` | Let private contributions feed him (see below) |
+| `github.repo` | `owner/name` whose traffic feeds the counter. `null` auto-detects |
+| `components.*` | Set any to `false` and that SVG is never written |
+| `marquee.text` | A string, or an array joined with `separator`. `null` falls back to the mood tagline |
+| `marquee.mode` | `"scroll"` or `"type"` |
+| `inventory.slots` | Any number of `{ slot, item }` rows. The one matching `petName` becomes the live companion |
+| `labels.*` | Every fixed string on every card |
+| `taglines` | Per-mood banner subtitle. Merged over the built-ins, so override one and the rest stay |
+| `palette` | Per-mood colour overrides, e.g. `{ "feral": { "accent": "#ff0000" } }` |
+
+Rename the pet and write your own insults — the defaults are calibrated for me,
+not you. The insult pool itself lives in `scripts/lib/copy.js`.
+
+---
+
+## Petting
+
+Anyone can be *told* about GRUB. Making them able to help is a separate thing, and
+deliberately a useless one.
+
+Label an issue `feed-grub` (or send a `repository_dispatch` of type `feed-grub`)
+and `.github/workflows/feed.yml` bumps a pet counter, records who did it, puts a
+heart on the pet card for 24 hours, and closes the issue with a reply.
+
+What it explicitly **cannot** do is feed him. Petting never touches `hunger`,
+`mood`, `alive`, `diedOn`, `resurrections` or `lastCommitDate` —
+`scripts/feed_grub.js` asserts all six are unchanged and refuses to save if they
+aren't. Only commits feed GRUB; only `i'm sorry` revives him. A stranger's
+sympathy is not an apology.
+
+Guards: one pet per person per UTC day, logins validated before being stored,
+and the daily job's concurrency group reused so a pet and a cron run can't race
+each other's push.
+
+> **Heads up:** adding a label to an issue requires **write access**, so as
+> shipped this is a maintainer-only button. To let strangers pet him — which is
+> the entire point of the `LURKERS` vs `FED` split — change `types: [labeled]` to
+> `[labeled, opened]` in `feed.yml` and enable the guard marked `(A)`. Anyone
+> opening an issue titled "pet ..." or "feed ..." then triggers a run, which also
+> means anyone can cause a commit to your repo.
+
+### What the counter actually counts
+
+Worth being precise, because it is easy to assume otherwise:
+
+- It counts **visitors to this repo**, from GitHub's traffic API — *not* views of
+  your profile README. Those are not measurable by anyone: the image is served
+  through a caching proxy that reports nothing back.
+- The API only returns a rolling **14-day window**, so the total is accumulated
+  locally in `pet-state.json`. It starts at zero on first run and there is **no
+  backfill** of history.
+- `uniques` is per-day, so one person visiting on three days counts three times.
+  It's a lurker index, not a headcount.
+- The traffic endpoint needs **push access**. Without a suitable token the card
+  reuses its last known total and the job log says so — it never zeroes out.
+
+---
 
 ## What's in here
 
 ```
-scripts/update_pet.js       # everything: API calls, state machine, SVG renderers
-pet-state.json              # the only persistence layer. no database.
-assets/*.svg                # generated output, committed by CI
-PROFILE-README.md           # a working profile layout using the components
-.github/workflows/pet.yml   # daily cron + manual trigger
+scripts/update_pet.js          # entrypoint: CLI, state machine, writing files
+scripts/feed_grub.js           # the pet counter, and nothing else
+scripts/lib/                   # state, github, palette, svg, glyphs, traffic, copy...
+scripts/generators/            # one module per card + index.js registry
+grub.config.json               # your settings. never written by the bot
+pet-state.json                 # the only persistence layer. no database
+assets/*.svg                   # generated output, committed by CI
+.github/workflows/pet.yml      # daily cron + manual trigger
+.github/workflows/feed.yml     # petting
 ```
 
-No backend, no database, no third-party services. Just the GitHub REST API with
-the Action's built-in `GITHUB_TOKEN`, and one file of state committed to the repo.
-The script has zero dependencies — no `npm install` step in CI.
+No backend, no database, no third-party services. Just the GitHub API and one
+file of state committed to the repo. **Zero dependencies** — no `package.json`, so
+no `npm install` step in CI and the whole job runs in about fifteen seconds.
+
+Adding a card is one file in `scripts/generators/` plus one line in its
+`index.js`. The key you register it under is both the `--only` argument and the
+output filename.
+
+---
 
 ## Fork this for your own profile
 
@@ -121,29 +313,45 @@ The script has zero dependencies — no `npm install` step in CI.
    }
    ```
 
-   (Use today's date. If you seed it with an old date, your pet starts dead.)
+   Use today's date — seed it with an old one and your pet starts dead. Any keys
+   you leave out are filled in from defaults.
 
 3. **Check Actions permissions.** Settings → Actions → General → Workflow
    permissions → **Read and write permissions**. Without this the bot can't push
-   the updated SVG back.
+   the updated SVGs back.
 
-4. **Run it once manually.** Actions tab → *Tamagotchi of Shame* → *Run workflow*.
+4. **Edit `grub.config.json`.** Rename the pet, set your inventory slots, turn off
+   any cards you don't want.
+
+5. **Add a `PET_TOKEN` secret** if you want the counter card, or if the job log
+   warns that your private work is invisible. See below.
+
+6. **Run it once manually.** Actions tab → *Tamagotchi of Shame* → *Run workflow*.
    Leave the inputs blank for a real run.
 
-5. **Embed it in your profile README** (the `username/username` repo):
+7. **Embed the cards** in your profile README using the blocks above.
 
-   ```markdown
-   <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/pet.svg" width="540">
-   ```
+---
 
-   Replace `USERNAME` and `REPO`. Use the raw URL, not a relative path — relative
-   paths only resolve inside the repo that contains the file.
+## Tokens
 
-6. **Rename the pet** by editing `PET_NAME` and the `LINES` object at the top of
-   `scripts/update_pet.js`. Write your own insults; the defaults are calibrated
-   for me, not you.
+Two features want more than the Action's built-in `GITHUB_TOKEN`:
 
-## Feeding it on private repos
+| Feature | Needs |
+| --- | --- |
+| `counter.svg` | Push access to read the traffic API |
+| Private contributions | A token that can see `contributionsCollection` |
+
+Both are served by a single **classic PAT with `repo` scope**
+([github.com/settings/tokens](https://github.com/settings/tokens)), stored as a
+repo secret named `PET_TOKEN` (Settings → Secrets and variables → Actions). A
+fine-grained token needs **Administration: read** for traffic, and does not
+reliably serve `contributionsCollection` at all.
+
+Without it: the counter reuses its stored total, and everything else works
+normally.
+
+### Feeding it on private repos
 
 If most of your work is private, the pet will starve while you are busy. Fixing
 that is not just a scope change — GitHub genuinely will not tell you *when* you
@@ -163,28 +371,16 @@ commits to default branches, pull requests, issues, reviews. Turning this on
 means opening an issue also feeds the pet. If you want the creature to be a
 strict commit detector, leave it off.
 
-To enable, set `PET_INCLUDE_PRIVATE: '1'` in `.github/workflows/pet.yml` — then
-check the job log before doing anything else.
+To enable, set `PET_INCLUDE_PRIVATE: '1'` in `.github/workflows/pet.yml` (or
+`github.includePrivate` in `grub.config.json`) — then check the job log before
+doing anything else.
 
 **You may not need a token at all.** If you have *Include private contributions on
 my profile* enabled in your GitHub profile settings, the calendar exposes your
-private contribution counts to the Action's built-in `GITHUB_TOKEN`, and it just
-works. The job log prints `counting private work: N restricted contribution(s)`
-when this is the case.
-
-If instead the log warns that no private contributions are visible, add a token:
-
-1. Create a **classic PAT** with `repo` scope
-   ([github.com/settings/tokens](https://github.com/settings/tokens)). Fine-grained
-   tokens do not reliably serve `contributionsCollection`.
-2. Add it as a repo secret named `PET_TOKEN`
-   (Settings → Secrets and variables → Actions).
-
-Locally:
-
-```bash
-PET_TOKEN=$(gh auth token) node scripts/update_pet.js --include-private --dry-run
-```
+private contribution counts to the built-in `GITHUB_TOKEN`, and it just works. The
+job log prints `counting private work: N restricted contribution(s)` when this is
+the case. If instead it warns that no private contributions are visible, add
+`PET_TOKEN` as above.
 
 Without `--include-private`, the script logs how many private contributions it
 can see but is ignoring, so you can tell the difference between "you did nothing"
@@ -194,26 +390,50 @@ Note the apology commit is deliberately unaffected: resurrection is detected fro
 the public event feed and this repo's `HEAD`. A public death demands a public
 apology.
 
+---
+
 ## Testing locally
 
 ```bash
-node scripts/update_pet.js --help          # usage
-node scripts/update_pet.js --days 3 --dry-run   # see 'feral' without writing anything
-node scripts/update_pet.js --days 5 --out /tmp/dead.svg   # render one state to a scratch file
+node scripts/update_pet.js --help                 # usage
+node scripts/update_pet.js --offline --dry-run    # render from cached state, write nothing
+node scripts/update_pet.js --only streak          # just one card
+node scripts/feed_grub.js --actor you --dry-run   # a pet, without saving it
 ```
 
-`--days N` skips the API entirely and pretends N days have passed. `--out` writes
-the SVG somewhere else and leaves `pet-state.json` untouched, which is the safe
-way to preview states without corrupting your real pet.
+Previewing a mood needs somewhere to put the output:
+
+```bash
+node scripts/update_pet.js --mood feral --outdir /tmp/preview --offline
+node scripts/update_pet.js --days 4 --outdir /tmp/preview
+```
+
+`--mood` and `--days` are **simulations**. Aimed at the real `assets/` directory
+they refuse to write anything at all, because a `--days 4` render would otherwise
+leave feral cards sitting next to a thriving state file and CI would commit the
+mismatch. Point them at `--outdir` and they never touch `pet-state.json`.
+
+`--config path.json` runs against a different config, which is the easy way to try
+a palette or a slot list without editing the live one.
+
+For the traffic-backed counter:
+
+```bash
+PET_TOKEN=$(gh auth token) node scripts/update_pet.js --dry-run
+```
+
+---
 
 ## Caveats
 
-- By default **private commits don't count** — see "Feeding it on private repos"
-  below, which is a genuine trade rather than a switch you just flip.
+- By default **private commits don't count** — see "Feeding it on private repos",
+  which is a genuine trade rather than a switch you just flip.
 - GitHub proxies README images through its `camo` cache, so a freshly updated
   pet can lag by a few minutes before it shows up on your profile.
 - The Action's own commits are filtered out by author and by `[skip ci]`, so the
   pet can never feed itself.
+- The counter starts at zero on the day you first run it and only counts repo
+  visitors. It is not a profile view counter, because no such thing is possible.
 
 ---
 
