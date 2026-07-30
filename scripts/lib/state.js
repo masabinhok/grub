@@ -18,6 +18,9 @@ function defaultState(now) {
     // mood or lastCommitDate. See the feed workflow.
     pets: 0,
     feeders: [],
+    lastPettedAt: null,
+    // login -> UTC date of that login's last pet, for the one-a-day limit.
+    feedLog: {},
     cache: {},
   };
 }

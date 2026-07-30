@@ -29,10 +29,23 @@ const SPRITES = {
   ],
 };
 
+/**
+ * Shown briefly after someone pets him. Not 16x16 and not mood-keyed, so it sits
+ * outside SPRITES and skips the validation below.
+ */
+const HEART = [
+  '.##.##.',
+  '#######',
+  '#######',
+  '.#####.',
+  '..###..',
+  '...#...',
+];
+
 for (const [name, grid] of Object.entries(SPRITES)) {
   if (grid.length !== 16 || grid.some((r) => r.length !== 16)) {
     throw new Error(`sprite "${name}" is not 16x16`);
   }
 }
 
-module.exports = { SPRITES };
+module.exports = { SPRITES, HEART };

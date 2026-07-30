@@ -18,8 +18,12 @@ const esc = (s) => String(s)
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-/** Collapse a char grid into horizontal runs of <rect>, one per colour change. */
-function pixelRects(grid, palette) {
+/**
+ * Collapse a char grid into horizontal runs of <rect>, one per colour change.
+ * `cell` defaults to the sprite grid size; pass a smaller one for incidental
+ * pixel art that should not be 9px per pixel.
+ */
+function pixelRects(grid, palette, cell = CELL) {
   const out = [];
   grid.forEach((row, y) => {
     let x = 0;
@@ -28,7 +32,7 @@ function pixelRects(grid, palette) {
       if (!palette[ch]) { x += 1; continue; }
       let w = 1;
       while (x + w < row.length && row[x + w] === ch) w += 1;
-      out.push(`<rect x="${x * CELL}" y="${y * CELL}" width="${w * CELL}" height="${CELL}" fill="${palette[ch]}"/>`);
+      out.push(`<rect x="${x * cell}" y="${y * cell}" width="${w * cell}" height="${cell}" fill="${palette[ch]}"/>`);
       x += w;
     }
   });

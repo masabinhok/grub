@@ -50,7 +50,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const { ASSETS_DIR, STATE_PATH, DEATH_THRESHOLD_DAYS, MOODS } = require('./lib/constants');
+const { ASSETS_DIR, STATE_PATH, DEATH_THRESHOLD_DAYS, PET_HEART_MS, MOODS } = require('./lib/constants');
 const { DAY_MS, startOfDayUTC, isoDate, daysBetween } = require('./lib/dates');
 const { parseArgs } = require('./lib/cli');
 const { loadConfig, enabledComponents } = require('./lib/config');
@@ -196,8 +196,15 @@ async function main() {
   const renderState = OPTS.forceMood ? Object.assign({}, state, { mood: OPTS.forceMood, alive: OPTS.forceMood !== 'deceased' }) : state;
   const tier = revived ? 'revived' : renderState.mood;
   const line = pickLine(tier, renderState, now);
+  // The heart expires on its own, so a normal scheduled run is what clears it —
+  // the feed workflow never has to schedule a follow-up to take it back down.
+  const pettedAt = state.lastPettedAt ? new Date(state.lastPettedAt).getTime() : NaN;
+  const petted = Number.isFinite(pettedAt) &&
+    pettedAt <= now.getTime() &&
+    now.getTime() - pettedAt < PET_HEART_MS;
+
   const ctx = {
-    days, line, revived, streak, profile: profileData, counter,
+    days, line, revived, streak, profile: profileData, counter, petted,
     cfg, palettes: resolvePalettes(cfg),
   };
 

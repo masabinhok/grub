@@ -1,7 +1,7 @@
 'use strict';
 
 const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
-const { SPRITES } = require('../lib/sprites');
+const { SPRITES, HEART } = require('../lib/sprites');
 const { isoDate } = require('../lib/dates');
 
 const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
@@ -13,6 +13,9 @@ module.exports = function renderPet(state, ctx) {
   const lbl = ctx.cfg.labels.pet;
   const dead = mood === 'deceased';
   const animated = !dead;
+  // Petting is cosmetic and expires on its own — a dead pet shows nothing,
+  // because a stranger's sympathy is not an apology.
+  const petted = Boolean(ctx.petted) && !dead;
   const bubbleLines = wrap(ctx.line, 34);
   const bubbleH = 26 + bubbleLines.length * 19;
 
@@ -34,7 +37,7 @@ module.exports = function renderPet(state, ctx) {
     .meter{animation:meterpulse 2.6s ease-in-out infinite}
     ${mood === 'feral' ? '.glitch{animation:tear 1.1s steps(1) infinite}.shell{animation:desat 2.3s ease-in-out infinite}' : ''}
     ${mood === 'thriving' ? '.spark{animation:twinkle 1.9s ease-in-out infinite}' : ''}
-    ${ctx.revived ? '.flash{animation:flash 2.4s ease-out infinite}.ray{animation:spin 9s linear infinite;transform-box:fill-box;transform-origin:center}' : ''}
+    ${ctx.revived ? '.flash{animation:flash 2.4s ease-out infinite}.ray{animation:spin 9s linear infinite;transform-box:fill-box;transform-origin:center}' : ''}${petted ? '\n    .heart{animation:rise 2.8s ease-out infinite}\n    @keyframes rise{0%{opacity:0;transform:translateY(6px)}18%{opacity:1}72%{opacity:.9}100%{opacity:0;transform:translateY(-16px)}}' : ''}
     @keyframes blink{0%,93%{opacity:0}94%,97%{opacity:1}98%,100%{opacity:0}}
     @keyframes breathe{0%,100%{opacity:1}50%{opacity:.86}}
     @keyframes meterpulse{0%,100%{opacity:1}50%{opacity:.6}}
@@ -116,14 +119,21 @@ module.exports = function renderPet(state, ctx) {
     `<text class="mono stat" x="${MX}" y="${214 + i * 19}">${esc(k)}</text>` +
     `<text class="mono val" x="${MX + 180}" y="${214 + i * 19}">${esc(v)}</text>`).join('');
 
-  const footer = `<text class="mono stat" x="${MX}" y="277" opacity="0.7">checked ${esc(isoDate(state.lastCheckedDate))} UTC${state.alive ? '' : ` · died ${esc(state.diedOn || '?')}`}</text>`;
+  // Sits in the gap between the creature and the speech bubble, so it never
+  // collides with either.
+  const hearts = petted
+    ? `<g class="heart" transform="translate(194 98)">${pixelRects(HEART, { '#': pal.m }, 3)}</g>`
+    : '';
+
+  const petCount = state.pets > 0 ? ` · petted ${state.pets}x` : '';
+  const footer = `<text class="mono stat" x="${MX}" y="277" opacity="0.7">checked ${esc(isoDate(state.lastCheckedDate))} UTC${state.alive ? '' : ` · died ${esc(state.diedOn || '?')}`}${esc(petCount)}</text>`;
 
   const body =
     `<text class="mono brand" x="26" y="32">${esc(petName)}</text>` +
     `<text class="mono sub" x="${26 + petName.length * 13}" y="32">${esc(ctx.cfg.tagline)}</text>` +
     `<line x1="26" y1="44" x2="${W - 26}" y2="44" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
     `<rect x="30" y="262" width="176" height="4" rx="2" fill="${pal.ground}"/>` +
-    spriteGroup + bubble + meter + statBlock + footer;
+    spriteGroup + hearts + bubble + meter + statBlock + footer;
 
   return svgDoc({
     w: W, h: H, pal, id: 'pet', style,

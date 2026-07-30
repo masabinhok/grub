@@ -14,6 +14,9 @@ module.exports = {
   CONFIG_PATH: path.join(ROOT, 'grub.config.json'),
 
   DEATH_THRESHOLD_DAYS: 5,
+  // How long the heart stays on the pet card after someone pets him. A day, so
+  // the next scheduled run is what clears it.
+  PET_HEART_MS: 24 * 60 * 60 * 1000,
   APOLOGY: "i'm sorry",
   MOODS: ['thriving', 'hungry', 'feral', 'deceased'],
 };
