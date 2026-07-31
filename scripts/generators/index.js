@@ -18,7 +18,6 @@ module.exports = {
   stats: require('./stats'),
   languages: require('./languages'),
   divider: require('./divider'),
-  counter: require('./counter'),
   marquee: require('./marquee'),
   inventory: require('./inventory'),
 };

@@ -8,8 +8,8 @@
  * pet state, so when GRUB starves the entire README desaturates and stops
  * animating with him. When he dies, nothing moves anywhere.
  *
- * Components: banner, pet, streak, stats, languages, divider, counter, marquee,
- * inventory, eye, star
+ * Components: banner, pet, streak, eye, star, stats, languages, divider,
+ * marquee, inventory
  *
  * This file is the entrypoint only — CLI parsing, the state machine, and writing
  * files. The pieces live in:
@@ -39,9 +39,9 @@
  *                        for the full set of defaults.
  *
  * Environment:
- *   PET_TOKEN            Classic PAT with `repo` scope. Needed for the counter
- *                        card (the traffic API requires push access), and if the
- *                        log warns private work is invisible. Falls back to
+ *   PET_TOKEN            Classic PAT with `repo` scope. Needed for the eye card
+ *                        (the traffic API requires push access), and if the log
+ *                        warns private work is invisible. Falls back to
  *                        GITHUB_TOKEN.
  *   PET_INCLUDE_PRIVATE  "1" to count private contributions.
  *   PET_USERNAME         GitHub login to track. Defaults to the repo owner in CI.
@@ -127,10 +127,9 @@ async function main() {
     try { profile = await fetchProfileData(username); }
     catch (err) { console.warn(`! profile API failed: ${err.message}`); }
 
-    // The counter and the eye are the only components that need push access, so a
-    // missing or under-scoped token degrades to the stored totals instead of
-    // failing the run.
-    if (cfg.components.counter !== false || cfg.components.eye !== false) {
+    // The eye is the only component that needs push access, so a missing or
+    // under-scoped token degrades to the stored totals instead of failing the run.
+    if (cfg.components.eye !== false) {
       const repo = resolveRepo({ repo: cfg.github.repo });
       if (!repo) {
         console.warn('! cannot determine repo for traffic — set github.repo in grub.config.json');
@@ -190,17 +189,15 @@ async function main() {
   if (trafficViews) {
     state.cache = Object.assign({}, state.cache, { traffic: { daily, views: dailyViews } });
   }
-  const counter = {
+  // What the eye is looking at. `lurkers` is unique visitors per day, summed:
+  // people who arrived at the repo, which from a profile README means they
+  // clicked the creature. `views` is every hit — kept because it costs nothing
+  // (same API response) and it is the honest number for the card's description.
+  const watchers = {
     lurkers: trafficTotal(daily),
     fed: (state.feeders || []).length,
-    since: firstSampleDate(daily),
-  };
-  // The eye watches every hit; the counter's lurker figure is one per visitor per
-  // day. Same samples, two different questions.
-  const views = {
-    total: trafficTotal(dailyViews),
-    uniques: counter.lurkers,
-    since: firstSampleDate(dailyViews) || counter.since,
+    views: trafficTotal(dailyViews),
+    since: firstSampleDate(daily) || firstSampleDate(dailyViews),
   };
 
   // --mood is a preview override: render as if the pet were in that state
@@ -228,7 +225,7 @@ async function main() {
   const line = pickLine(tier, renderState, now);
 
   const ctx = {
-    days, line, revived, streak, profile: profileData, counter, views, fed, feeder,
+    days, line, revived, streak, profile: profileData, watchers, fed, feeder, now,
     cfg, palettes: resolvePalettes(cfg),
   };
 
@@ -244,8 +241,8 @@ async function main() {
     console.log(`  streak=${streak.current} longest=${streak.longest} contributions=${streak.totalContributions || 0}`);
   }
   console.log(
-    `  views=${views.total} lurkers=${counter.lurkers} feeders=${counter.fed}` +
-    `${counter.since ? ` since=${counter.since}` : ' (no traffic sampled yet)'}` +
+    `  lurkers=${watchers.lurkers} fed=${watchers.fed} views=${watchers.views}` +
+    `${watchers.since ? ` since=${watchers.since}` : ' (no traffic sampled yet)'}` +
     `${feeder ? ` · last fed by @${feeder}` : ''}`);
 
   if (OPTS.dryRun) {

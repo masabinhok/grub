@@ -67,15 +67,14 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | File | Size | What it shows |
 | --- | --- | --- |
 | `assets/banner.svg` | 840×120 | Name, location, mood-reactive status pips |
-| `assets/marquee.svg` | 840×88 | CRT ticker — scrolls or types a line you configure |
+| `assets/marquee.svg` | 840×88 | CRT ticker — a new joke, quote or fact every day |
 | `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
 | `assets/pet.svg` | 540×300 | GRUB himself, asking to be fed |
 | `assets/streak.svg` | 420×180 | A fire the size of your streak, one coal per day |
-| `assets/eye.svg` | 420×180 | An eye that blinks, watches, and counts views |
+| `assets/eye.svg` | 420×180 | An eye that watches back. Lurkers vs. people who fed him |
 | `assets/star.svg` | 420×180 | One glazed star holding every star you've earned |
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
-| `assets/counter.svg` | 420×180 | Lurkers vs. people who actually fed him |
 | `assets/inventory.svg` | 420×196 | Tech stack as an RPG equipment screen |
 
 `inventory.svg` grows with your slot list — 196px at four slots, +30px each after.
@@ -85,7 +84,8 @@ supporting paragraph:
 
 - **The eye** blinks on a loop, drifts its pupil around like it is reading over
   your shoulder, and takes the iris colour from GRUB's mood. When he dies it
-  closes and stays closed. The number is repo views (see the caveat below).
+  closes and stays closed. Beside it: `LURKERS`, everyone who turned up, and
+  `FED`, the ones who did something about it. The gap is the point.
 - **The star** is a five-pointer under a highlight that sweeps across it on a
   loop, with rays turning slowly behind and sparkles firing off the points. Dead
   pet, dead star: grey metal, no sweep.
@@ -139,7 +139,7 @@ plea the card is making:
 **Eye** — 420×180
 
 ```html
-<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="View counter">
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Lurkers versus people who fed him">
 ```
 
 **Star** — 420×180
@@ -158,12 +158,6 @@ plea the card is making:
 
 ```html
 <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/languages.svg" width="420" alt="Most used languages">
-```
-
-**Counter** — 420×180
-
-```html
-<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/counter.svg" width="420" alt="Lurkers versus feeders">
 ```
 
 **Inventory** — 420×196
@@ -201,16 +195,12 @@ The bare layout, everything at once, with the rows lined up:
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="View counter">
-  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/counter.svg" width="420" alt="Lurkers versus feeders">
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/languages.svg" width="420" alt="Most used languages">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Lurkers versus people who fed him">
   <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/stats.svg" width="420" alt="Profile statistics">
 </p>
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/languages.svg" width="420" alt="Most used languages">
   <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/inventory.svg" width="420" alt="Equipped skills">
 </p>
 
@@ -240,7 +230,7 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
   "petName": "GRUB",
   "tagline": "// THE TAMAGOTCHI OF SHAME",
   "github": { "username": null, "includePrivate": false, "repo": null },
-  "components": { "banner": true, "eye": true, "star": true, "counter": true },
+  "components": { "banner": true, "eye": true, "star": true, "marquee": true },
   "marquee": { "text": null, "mode": "scroll", "separator": "   ·   " },
   "inventory": {
     "slots": [
@@ -248,7 +238,7 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
       { "slot": "Companion", "item": "GRUB" }
     ]
   },
-  "labels": { "counter": { "lurkers": "LURKERS", "fed": "FED" } },
+  "labels": { "eye": { "lurkers": "LURKERS", "fed": "FED" } },
   "taglines": {},
   "palette": {}
 }
@@ -260,19 +250,28 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
 | `tagline` | The `//` subtitle beside his name on the pet card |
 | `github.username` | Whose profile to track. `null` auto-detects from CI or the git remote |
 | `github.includePrivate` | Let private contributions feed him (see below) |
-| `github.repo` | `owner/name` whose traffic feeds the eye and the counter. `null` auto-detects |
+| `github.repo` | `owner/name` whose traffic the eye watches. `null` auto-detects |
 | `components.*` | Set any to `false` and that SVG is never written |
 | `labels.pet.feedMe` | The plea on the placard above his head. Long strings shrink to fit |
 | `labels.pet.fedBy` | What the placard says instead once somebody has fed him |
-| `marquee.text` | A string, or an array joined with `separator`. `null` falls back to the mood tagline |
+| `marquee.text` | A string, or an array joined with `separator`. `null` runs the daily quote rotation |
 | `marquee.mode` | `"scroll"` or `"type"` |
 | `inventory.slots` | Any number of `{ slot, item }` rows. The one matching `petName` becomes the live companion |
 | `labels.*` | Every fixed string on every card |
-| `taglines` | Per-mood banner subtitle. Merged over the built-ins, so override one and the rest stay |
+| `taglines` | The banner subtitle, per mood. All four say `what i do is art` out of the box; give one mood a different string and the others keep theirs |
 | `palette` | Per-mood colour overrides, e.g. `{ "feral": { "accent": "#ff0000" } }` |
 
 Rename the pet and write your own insults — the defaults are calibrated for me,
-not you. The insult pool itself lives in `scripts/lib/copy.js`.
+not you. Everything he says lives in `scripts/lib/copy.js`: the insult pool, the
+banner subtitle, and `QUOTES`, the marquee's rotation.
+
+### The daily quote
+
+Leave `marquee.text` at `null` and the ticker runs one line a day from `QUOTES` —
+jokes, a few genuinely-attributed quotes, and facts that are worth a second look.
+Thirty of them, indexed by whole UTC days, so it turns over at midnight and does
+not repeat inside a month. Add your own to the array; the ticker takes any length
+and scrolls it. Set `marquee.text` to a string or an array and yours wins instead.
 
 ---
 
@@ -293,7 +292,7 @@ What you get for it, for the next 24 hours:
   @you` — on the profile README, where everyone can see it.
 - **He reacts.** Food rains down, he squashes and stretches chewing it, hearts go
   up, sparkles go off, and there are crumbs on the ground when he is done.
-- **A tally.** The `FED` column on the counter card goes up, permanently.
+- **A tally.** The `FED` number on the eye card goes up, permanently.
 
 He does not thank you in the speech bubble. That belongs to his mood, and his
 mood is about whether *I* have committed. After 24 hours the placard goes back to
@@ -310,8 +309,8 @@ asserts all six are unchanged and refuses to save if they aren't. Only commits
 keep GRUB alive; only `i'm sorry` revives him. A stranger's sympathy is not an
 apology.
 
-That is the point of the `LURKERS` vs `FED` split on the counter card: the gap is
-how many people looked at a starving worm and did nothing.
+That is the point of the `LURKERS` vs `FED` split on the eye card: the gap is how
+many people looked at a starving worm and did nothing.
 
 ### Because it's a public write path
 
@@ -331,25 +330,40 @@ An issue from a stranger can cause a commit to this repo, so:
   importantly, no auto-close. If the script fails before deciding anything, the
   issue is also left alone, so a crash can't close someone's bug report.
 
-### What the eye and the counter actually count
+### What `LURKERS` actually counts
 
-Worth being precise, because it is easy to assume otherwise:
+The honest answer, because it is easy to assume otherwise.
 
-- Both read GitHub's traffic API for **this repository**. The eye shows every
-  view; the counter's `LURKERS` figure is unique visitors per day. Same samples,
-  two different questions.
-- Neither is a **profile README view counter**. Nobody's is: the image is served
-  through a caching proxy that reports nothing back to anyone. If you want the
-  number to be about your profile, point `github.repo` at your profile README
-  repository — you will be counting people who opened that repo, which is the
-  closest honest thing that exists.
-- The API only returns a rolling **14-day window**, so the totals are accumulated
-  locally in `pet-state.json`. They start at zero on first run and there is **no
+**`FED` is exact.** It is the number of distinct logins in `feeders`. Those people
+each opened an issue; there is nothing to estimate.
+
+**`LURKERS` is unique visitors to this repository**, from GitHub's traffic API,
+summed per day. On a profile README that is *almost exactly* "people who clicked
+GRUB", because the card is the only thing on the page linking here — but it also
+catches anyone who arrived from search, a link, or their own bookmarks.
+
+A literal click counter is not possible without a server. The image cannot run
+JavaScript, and the click itself is a plain navigation to GitHub that nobody gets
+told about. The closest strictly-clicks alternative would be pointing the card at
+a dedicated repo page and reading GitHub's *popular paths* endpoint — but that
+one only reports a rolling 14-day aggregate for the top ten paths, with no daily
+breakdown, so a running total off it could only ever be an estimate. Unique
+visitors is the number that accumulates correctly, so that is the number on the
+card.
+
+The rest of the small print:
+
+- Not a **profile README view counter**. Nobody's is: the image is served through
+  a caching proxy that reports nothing back to anyone.
+- The API only returns a rolling **14-day window**, so the total is accumulated
+  locally in `pet-state.json`. It starts at zero on first run and there is **no
   backfill** of history.
-- `uniques` is per-day, so one person visiting on three days counts three times.
-  It's a lurker index, not a headcount.
-- The traffic endpoint needs **push access**. Without a suitable token both cards
-  reuse their last known totals and the job log says so — they never zero out.
+- Uniques are counted per day, so one person visiting on three days counts three
+  times. It's a lurker index, not a headcount.
+- The traffic endpoint needs **push access**. Without a suitable token the card
+  reuses its last known total and the job log says so — it never zeroes out.
+- Total views are collected too, and stored, but not drawn — they live in the
+  card's `<desc>`, which is what a screen reader gets.
 
 ---
 
@@ -406,7 +420,7 @@ output filename.
 4. **Edit `grub.config.json`.** Rename the pet, set your inventory slots, turn off
    any cards you don't want.
 
-5. **Add a `PET_TOKEN` secret** if you want the counter card, or if the job log
+5. **Add a `PET_TOKEN` secret** if you want the eye's lurker count, or if the job log
    warns that your private work is invisible. See below.
 
 6. **Run it once manually.** Actions tab → *Tamagotchi of Shame* → *Run workflow*.
@@ -422,7 +436,7 @@ Two features want more than the Action's built-in `GITHUB_TOKEN`:
 
 | Feature | Needs |
 | --- | --- |
-| `eye.svg`, `counter.svg` | Push access to read the traffic API |
+| `eye.svg` (the `LURKERS` half) | Push access to read the traffic API |
 | Private contributions | A token that can see `contributionsCollection` |
 
 Both are served by a single **classic PAT with `repo` scope**
@@ -431,7 +445,7 @@ repo secret named `PET_TOKEN` (Settings → Secrets and variables → Actions). 
 fine-grained token needs **Administration: read** for traffic, and does not
 reliably serve `contributionsCollection` at all.
 
-Without it: the counter reuses its stored total, and everything else works
+Without it: the eye reuses its stored lurker total, and everything else works
 normally.
 
 ### Feeding it on private repos
@@ -506,7 +520,7 @@ mismatch. Point them at `--outdir` and they never touch `pet-state.json`.
 `--config path.json` runs against a different config, which is the easy way to try
 a palette or a slot list without editing the live one.
 
-For the traffic-backed eye and counter:
+For the traffic-backed lurker count:
 
 ```bash
 PET_TOKEN=$(gh auth token) node scripts/update_pet.js --dry-run
@@ -522,8 +536,8 @@ PET_TOKEN=$(gh auth token) node scripts/update_pet.js --dry-run
   pet can lag by a few minutes before it shows up on your profile.
 - The Action's own commits are filtered out by author and by `[skip ci]`, so the
   pet can never feed itself.
-- The eye and the counter start at zero on the day you first run them, and both
-  count repo traffic. Neither is a profile README view counter, because no such
+- The eye's `LURKERS` figure starts at zero on the day you first run it and
+  counts repo traffic. It is not a profile README view counter, because no such
   thing is possible for anyone.
 - Feeding him is cosmetic on purpose. If you were hoping the button would keep
   him alive, that is the joke.

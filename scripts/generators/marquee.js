@@ -1,13 +1,18 @@
 'use strict';
 
 const { esc, baseStyle, svgDoc } = require('../lib/svg');
-const { taglinesFor } = require('../lib/copy');
+const { quoteOfTheDay } = require('../lib/copy');
 
 const W = 840, H = 88;
 const PAD = 14;                       // inset of the CRT panel inside the card
 const IW = W - PAD * 2, IH = 46;      // the panel; the strip below it holds the status label
 const FS = 15;                        // monospace, so width is predictable
-const CHAR_W = FS * 0.6;
+const TRACK = 1;                      // .crt letter-spacing, below
+// Advance per character. The tracking has to be in here: it is applied after
+// every glyph, so leaving it out under-measures by a pixel a character — which a
+// short line absorbs into the loop gap and a long one does not, colliding with
+// its own next copy at the seam.
+const CHAR_W = FS * 0.6 + TRACK;
 const GAP = 6;                        // spaces between loop repetitions
 const BASELINE = Math.round(IH / 2 + FS / 3);
 
@@ -27,9 +32,12 @@ module.exports = function renderMarquee(state, ctx) {
   const cfg = ctx.cfg.marquee;
   const lbl = ctx.cfg.labels.marquee;
 
+  // Your own text always wins. Left at null, the ticker runs a joke, a quote or
+  // a fact from the pool in copy.js — a new one every UTC day, so the profile
+  // has something different on it tomorrow whether or not anything else changed.
   const raw = cfg.text;
   const text = (Array.isArray(raw) ? raw.filter(Boolean).join(cfg.separator) : raw) ||
-    taglinesFor(ctx.cfg)[state.mood];
+    quoteOfTheDay(ctx.now);
   const shown = String(text);
   const textW = Math.ceil(shown.length * CHAR_W);
 
@@ -76,7 +84,7 @@ module.exports = function renderMarquee(state, ctx) {
   }
 
   const style = `${baseStyle(pal, dead)}
-    .crt{font-size:${FS}px;fill:${pal.ink};letter-spacing:1px}
+    .crt{font-size:${FS}px;fill:${pal.ink};letter-spacing:${TRACK}px}
     ${dead ? '' : `.caret{animation:blip 1s steps(1) infinite}
     @keyframes blip{0%,49%{opacity:1}50%,100%{opacity:0}}
     .flicker{animation:flick 4.5s ease-in-out infinite}

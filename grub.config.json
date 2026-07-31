@@ -15,7 +15,6 @@
     "stats": true,
     "languages": true,
     "divider": true,
-    "counter": true,
     "marquee": true,
     "inventory": true
   },
@@ -52,8 +51,8 @@
       "activeDays": "ACTIVE DAYS"
     },
     "eye": {
-      "title": "VIEWS",
-      "unique": "UNIQUE"
+      "lurkers": "LURKERS",
+      "fed": "FED"
     },
     "star": {
       "title": "STARS EARNED",
@@ -68,11 +67,6 @@
     },
     "languages": {
       "title": "MOST USED LANGUAGES"
-    },
-    "counter": {
-      "title": "WHO'S BEEN WATCHING",
-      "lurkers": "LURKERS",
-      "fed": "FED"
     },
     "marquee": {
       "title": "NOW BROADCASTING",

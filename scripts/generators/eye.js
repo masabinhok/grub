@@ -11,29 +11,37 @@ const COL_W = 188;
 const LID = 104;             // how far the lids travel to get out of the way
 
 /**
- * The eye — a view counter that watches back.
+ * The eye — the watching card. Lurkers on one side of it, feeders on the other.
  *
  * It blinks, the pupil drifts, and the iris takes the mood accent, so it belongs
  * to the same creature as everything else on the page. When GRUB dies the eye
  * closes and stays closed.
  *
- * What it counts is repo traffic: every view of this repository, not views of a
- * profile README. Nobody can count those — GitHub serves README images through a
- * caching proxy that reports nothing back. Point `github.repo` at whichever repo
- * you want watched.
+ * LURKERS is repo traffic: people who arrived at this repository, which from a
+ * profile README means they clicked the creature. It is not a profile-README
+ * view count — nobody can measure those, because GitHub serves README images
+ * through a caching proxy that reports nothing back. FED is the number of
+ * distinct people who went the extra step and actually fed him. The gap between
+ * the two is the entire point of the card.
  */
 module.exports = function renderEye(state, ctx) {
   const pal = ctx.palettes[state.mood];
   const dead = state.mood === 'deceased';
   const lbl = ctx.cfg.labels.eye;
-  const v = ctx.views || {};
+  const v = ctx.watchers || {};
 
   // A quadratic control point twice the half-height puts the curve's apex
   // exactly RY away, so the opening is the size it says it is.
   const eye = `M${CX - RX} ${CY}Q${CX} ${CY - RY * 2} ${CX + RX} ${CY}Q${CX} ${CY + RY * 2} ${CX - RX} ${CY}Z`;
 
-  const total = groupDigits(v.total);
-  const scale = fitScale(total, COL_W, { min: 2, max: 5 });
+  const lurkers = groupDigits(v.lurkers);
+  const fed = groupDigits(v.fed);
+  // One scale for both, driven by the longer, so they read as a matched pair
+  // however many digits either one gains.
+  const scale = Math.min(
+    fitScale(lurkers, COL_W, { min: 2, max: 5 }),
+    fitScale(fed, COL_W, { min: 2, max: 5 }),
+  );
 
   const style = `${baseStyle(pal, dead)}
     ${dead ? '' : `
@@ -92,15 +100,18 @@ module.exports = function renderEye(state, ctx) {
     '</g>' +
     `<path d="${eye}" fill="none" stroke="${pal.accent}" stroke-opacity="0.75" stroke-width="2"/>` +
     lashes +
-    `<text class="mono lbl" x="${COL_X}" y="60">${esc(lbl.title)}</text>` +
-    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(total, { x: COL_X, y: 108 - GLYPH_H * scale, scale, fill: pal.accent })}</g>` +
-    `<text class="mono lbl" x="${COL_X}" y="140">${esc(lbl.unique)}</text>` +
-    `<text class="mono med" x="${COL_X + 104}" y="140">${groupDigits(v.uniques)}</text>`;
+    // Two rows, sharing the column beside the eye: who looked, who helped.
+    `<text class="mono lbl" x="${COL_X}" y="48">${esc(lbl.lurkers)}</text>` +
+    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(lurkers, { x: COL_X, y: 88 - GLYPH_H * scale, scale, fill: pal.accent })}</g>` +
+    `<line x1="${COL_X}" y1="102" x2="${W - 24}" y2="102" stroke="${pal.accent}" stroke-opacity="0.22"/>` +
+    `<text class="mono lbl" x="${COL_X}" y="122">${esc(lbl.fed)}</text>` +
+    glyphRects(fed, { x: COL_X, y: 162 - GLYPH_H * scale, scale, fill: pal.ink });
 
   return svgDoc({
     w: W, h: H, pal, id: 'eye', style,
-    title: `${total} repository views, ${groupDigits(v.uniques)} unique`,
-    desc: v.since ? `Counted since ${v.since}` : 'Awaiting the first traffic sample',
+    title: `${lurkers} ${String(lbl.lurkers).toLowerCase()}, ${fed} fed him`,
+    desc: (v.since ? `Counted since ${v.since}. ` : 'Awaiting the first traffic sample. ') +
+      `${groupDigits(v.views)} total repository views.`,
     body,
   });
 };

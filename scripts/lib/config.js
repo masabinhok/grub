@@ -39,13 +39,12 @@ const DEFAULTS = {
     stats: true,
     languages: true,
     divider: true,
-    counter: true,
     marquee: true,
     inventory: true,
   },
 
   // The scrolling CRT line. `text` accepts a string or an array of strings; null
-  // falls back to the mood tagline, so it says something sensible untouched.
+  // runs the daily joke/quote/fact rotation from lib/copy.js instead.
   marquee: {
     text: null,
     mode: 'scroll',       // "scroll" or "type"
@@ -84,8 +83,8 @@ const DEFAULTS = {
       activeDays: 'ACTIVE DAYS',
     },
     eye: {
-      title: 'VIEWS',
-      unique: 'UNIQUE',
+      lurkers: 'LURKERS',
+      fed: 'FED',
     },
     star: {
       title: 'STARS EARNED',
@@ -99,11 +98,6 @@ const DEFAULTS = {
       contributions: 'CONTRIBUTIONS',
     },
     languages: { title: 'MOST USED LANGUAGES' },
-    counter: {
-      title: "WHO'S BEEN WATCHING",
-      lurkers: 'LURKERS',
-      fed: 'FED',
-    },
     marquee: {
       title: 'NOW BROADCASTING',
       live: 'ON AIR',
