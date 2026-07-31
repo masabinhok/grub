@@ -14,7 +14,7 @@
  *
  * This runs on a PUBLIC trigger: anyone can open an issue and reach it. Three
  * things keep that boring — the protected-field assertion, one snack per person
- * per UTC day, and MAX_PETS_PER_DAY across the whole repo. Every
+ * per day, and MAX_PETS_PER_DAY across the whole repo. Every
  * attacker-controlled string (the login, the issue title) arrives as an
  * environment variable and is validated here; none of it is ever interpolated
  * into a shell command.
@@ -41,7 +41,7 @@
 
 const fs = require('fs');
 const { loadState, saveState } = require('./lib/state');
-const { isoDate } = require('./lib/dates');
+const { localDate } = require('./lib/dates');
 const { loadConfig } = require('./lib/config');
 const { MAX_PETS_PER_DAY, LOGIN_RE } = require('./lib/constants');
 
@@ -113,11 +113,13 @@ function main() {
   const now = new Date();
   const state = loadState(now);
   const before = pick(state, PROTECTED);
-  const today = isoDate(now);
+  // The same day the creature lives by, so "one a day" rolls over when his does
+  // rather than in the middle of his afternoon.
+  const today = localDate(now, cfg.timezone);
 
   state.feedLog = state.feedLog || {};
   state.feeders = Array.isArray(state.feeders) ? state.feeders : [];
-  // A new UTC day resets the repo-wide count.
+  // A new day, in the creature's timezone, resets the repo-wide count.
   state.feedDay = (state.feedDay && state.feedDay.date === today)
     ? state.feedDay
     : { date: today, count: 0 };

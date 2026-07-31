@@ -19,6 +19,13 @@ const DEFAULTS = {
   petName: 'GRUB',
   tagline: '// THE TAMAGOTCHI OF SHAME',
 
+  // Whose midnight the creature starves by. An IANA zone name — the day boundary
+  // for "days since the last commit", for the death date, and for the one-feed-
+  // per-person-per-day limit. Change this and change the cron in
+  // .github/workflows/pet.yml with it: the job should run at the end of *this*
+  // day, not at the end of UTC's.
+  timezone: 'Asia/Kathmandu',
+
   github: {
     // null means "work it out" — PET_USERNAME, then the CI repo owner, then the
     // git remote. Set it explicitly if you render for someone else's profile.

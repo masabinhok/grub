@@ -2,9 +2,19 @@ name: Tamagotchi of Shame
 
 on:
   schedule:
-    # Daily at midnight UTC. GitHub's scheduler is best-effort and often runs
-    # late on busy hours; that is fine, the script works in whole UTC days.
-    - cron: '0 0 * * *'
+    # 17:45 UTC = 23:30 in Kathmandu (UTC+5:45): the end of the day the creature
+    # actually lives in, which is what `timezone` in grub.config.json sets. The
+    # run has to land inside that local day — it is asking "did anything get
+    # committed today?", and asking after midnight asks about the wrong day.
+    #
+    # Hence the half-hour of headroom rather than 23:59, and a time that is not
+    # on the hour: GitHub's scheduler is best-effort and runs latest when every
+    # other repo in the world has also asked for :00.
+    #
+    # Moving zones? Convert the local time you want to UTC and change both this
+    # line and `timezone` in the config. Getting one without the other is how the
+    # day boundary ends up somewhere nobody lives.
+    - cron: '45 17 * * *'
   workflow_dispatch:
     inputs:
       simulate_days:

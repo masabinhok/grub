@@ -53,7 +53,7 @@ const path = require('path');
 const {
   ASSETS_DIR, STATE_PATH, DEATH_THRESHOLD_DAYS, FEED_REACTION_MS, MOODS, LOGIN_RE,
 } = require('./lib/constants');
-const { DAY_MS, startOfDayUTC, isoDate, daysBetween } = require('./lib/dates');
+const { DAY_MS, localDate, addDays, daysBetween, startOfLocalDay } = require('./lib/dates');
 const { parseArgs } = require('./lib/cli');
 const { loadConfig, enabledComponents } = require('./lib/config');
 const { resolvePalettes } = require('./lib/palette');
@@ -84,6 +84,9 @@ async function main() {
   const cfg = loadConfig(OPTS.config || undefined);
   const state = loadState(now);
   const petName = cfg.petName;
+  // Whose day it is. Every "how many days" question below is asked in this zone,
+  // so a late-night commit counts for the night it was made.
+  const tz = cfg.timezone;
 
   if (new Date(state.lastCommitDate).getTime() > now.getTime()) {
     state.lastCommitDate = now.toISOString();
@@ -99,10 +102,10 @@ async function main() {
   if (OPTS.simulateDays !== null && OPTS.simulateDays !== undefined) {
     days = parseInt(OPTS.simulateDays, 10);
     if (Number.isNaN(days)) throw new Error(`--days expects a number, got "${OPTS.simulateDays}"`);
-    state.lastCommitDate = new Date(startOfDayUTC(now) - days * DAY_MS).toISOString();
+    state.lastCommitDate = new Date(startOfLocalDay(now, tz) - days * DAY_MS).toISOString();
     source = 'simulated';
   } else if (OPTS.offline) {
-    days = daysBetween(state.lastCommitDate, now);
+    days = daysBetween(state.lastCommitDate, now, tz);
     source = 'offline';
   } else {
     const username = resolveUsername({ user: OPTS.user, configUsername: cfg.github.username });
@@ -121,7 +124,7 @@ async function main() {
       console.warn('! no activity data returned — decaying from stored state only');
       source = 'frozen';
     }
-    days = daysBetween(state.lastCommitDate, now);
+    days = daysBetween(state.lastCommitDate, now, tz);
     if (!apology && normalize(localHeadMessage()) === APOLOGY_NORM) apology = true;
 
     try { profile = await fetchProfileData(username); }
@@ -163,7 +166,7 @@ async function main() {
     state.hunger = hungerForDays(days);
     if (state.mood === 'deceased') {
       state.alive = false;
-      state.diedOn = isoDate(startOfDayUTC(new Date(state.lastCommitDate)) + DEATH_THRESHOLD_DAYS * DAY_MS);
+      state.diedOn = addDays(localDate(state.lastCommitDate, tz), DEATH_THRESHOLD_DAYS);
       state.hunger = 100;
     }
   }

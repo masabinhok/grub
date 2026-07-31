@@ -3,8 +3,8 @@
 **This creature dies if I stop coding.**
 
 Meet **GRUB**. It lives in this repo, it watches my commit history, and it is not
-supportive. Every day at midnight UTC a GitHub Action checks whether I committed
-anything. If I did, GRUB eats. If I didn't, GRUB starves — visibly, publicly, on
+supportive. At the end of every day in Kathmandu a GitHub Action checks whether I
+committed anything. If I did, GRUB eats. If I didn't, GRUB starves — visibly, publicly, on
 my profile — until it dies and leaves a tombstone with the date on it.
 
 It can only be brought back by pushing a commit whose message is exactly
@@ -41,6 +41,25 @@ It can only be brought back by pushing a commit whose message is exactly
 The stats — days since last commit, current mood, resurrection count — are
 rendered *inside* the SVG, not in the caption. You can't fake them without
 regenerating the image, and regenerating the image requires the real state file.
+
+### Whose day is it
+
+A day is a **calendar day in `timezone`** — `Asia/Kathmandu` out of the box — and
+the Action runs at **23:30 local**, near the end of it. Those two facts belong
+together: the job asks "was anything committed today?", so it has to ask while
+today is still happening.
+
+The upshot is the one you'd want. Commit at any point during a day and the count
+stays at 0 when the day closes. Let a whole day go by untouched and it reads 1.
+A commit at half past midnight counts for the day that just started — under a UTC
+day boundary that same commit would have been filed five and three quarter hours
+back, in yesterday, and the pet would have gone hungry over a commit that
+happened.
+
+Somewhere else in the world? Change `timezone` **and** the cron in
+`.github/workflows/pet.yml` together; there is a worked example in the comment
+above it. Only the creature's own clock moves — the traffic and contribution
+numbers stay on GitHub's UTC days, because they are GitHub's to bucket.
 
 ### Resurrection
 
@@ -229,6 +248,7 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
 {
   "petName": "GRUB",
   "tagline": "// THE TAMAGOTCHI OF SHAME",
+  "timezone": "Asia/Kathmandu",
   "github": { "username": null, "includePrivate": false, "repo": null },
   "components": { "banner": true, "eye": true, "star": true, "marquee": true },
   "marquee": { "text": null, "mode": "scroll", "separator": "   ·   " },
@@ -248,6 +268,7 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
 | --- | --- |
 | `petName` | Renames the creature everywhere, including the tombstone |
 | `tagline` | The `//` subtitle beside his name on the pet card |
+| `timezone` | IANA zone whose midnight ends a day. Change the cron in `pet.yml` to match |
 | `github.username` | Whose profile to track. `null` auto-detects from CI or the git remote |
 | `github.includePrivate` | Let private contributions feed him (see below) |
 | `github.repo` | `owner/name` whose traffic the eye watches. `null` auto-detects |
@@ -316,7 +337,8 @@ many people looked at a starving worm and did nothing.
 
 An issue from a stranger can cause a commit to this repo, so:
 
-- **One snack per person per UTC day.** Repeats get a reply and no state change.
+- **One snack per person per day**, on the creature's clock. Repeats get a reply
+  and no state change.
 - **A repo-wide ceiling of 25 a day** (`MAX_PETS_PER_DAY`), so a pile of
   throwaway accounts is still only a pile of one commit each up to the cap.
 - **Logins are validated** against GitHub's own rules — before being stored, and
@@ -418,7 +440,9 @@ output filename.
    the updated SVGs back.
 
 4. **Edit `grub.config.json`.** Rename the pet, set your inventory slots, turn off
-   any cards you don't want.
+   any cards you don't want, and set `timezone` to yours — then move the cron in
+   `.github/workflows/pet.yml` to match, so the daily check still lands at the end
+   of your day rather than somebody else's.
 
 5. **Add a `PET_TOKEN` secret** if you want the eye's lurker count, or if the job log
    warns that your private work is invisible. See below.

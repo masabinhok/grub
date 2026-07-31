@@ -19,7 +19,7 @@ module.exports = {
   FEED_REACTION_MS: 24 * 60 * 60 * 1000,
   // Petting is open to anyone, so the per-person daily limit is not enough on its
   // own — a pile of throwaway accounts would still be a pile of commits. This is
-  // the ceiling for the whole repo per UTC day.
+  // the ceiling for the whole repo per day, counted in the configured timezone.
   MAX_PETS_PER_DAY: 25,
   APOLOGY: "i'm sorry",
   MOODS: ['thriving', 'hungry', 'feral', 'deceased'],

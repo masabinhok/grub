@@ -9,7 +9,7 @@ name: Feed GRUB
 # "pet ..." and cause a commit to this repo. What keeps that boring:
 #
 #   - the script can only touch cosmetic counters, and asserts it
-#   - one snack per person per UTC day
+#   - one snack per person per day, on the creature's clock
 #   - MAX_PETS_PER_DAY across the whole repo (see scripts/lib/constants.js)
 #   - nothing here checks out or runs untrusted code; an issue carries none
 #   - the login and the title arrive as env vars and are validated in JS, never

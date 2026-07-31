@@ -1,6 +1,7 @@
 {
   "petName": "GRUB",
   "tagline": "// THE TAMAGOTCHI OF SHAME",
+  "timezone": "Asia/Kathmandu",
   "github": {
     "username": null,
     "includePrivate": false,

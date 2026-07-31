@@ -2,7 +2,7 @@
 
 const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
 const { SPRITES, HEART, BERRY, SPARKLE } = require('../lib/sprites');
-const { isoDate } = require('../lib/dates');
+const { localDate } = require('../lib/dates');
 
 const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
 const SPRITE_MID = SPRITE_X + 8 * CELL;   // 118 — the creature's centre line
@@ -98,7 +98,7 @@ module.exports = function renderPet(state, ctx) {
     ? '<text class="mono rip" x="72" y="52" text-anchor="middle">R.I.P.</text>' +
       `<line x1="30" y1="62" x2="114" y2="62" stroke="${pal.g}" stroke-opacity="0.6"/>` +
       `<text class="mono ripsub" x="72" y="80" text-anchor="middle">${esc(petName)}</text>` +
-      `<text class="mono ripsub" x="72" y="97" text-anchor="middle">${esc(state.diedOn || isoDate(Date.now()))}</text>` +
+      `<text class="mono ripsub" x="72" y="97" text-anchor="middle">${esc(state.diedOn || localDate(Date.now(), ctx.cfg.timezone))}</text>` +
       '<text class="mono ripsub" x="72" y="112" text-anchor="middle">STARVED</text>'
     : '';
 
