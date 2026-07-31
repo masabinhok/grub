@@ -21,7 +21,7 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <!-- pet:caption -->
-**hungry** · 1 day since the last commit · _Never died. Yet._
+**thriving** · 0 days since the last commit · _Never died. Yet._
 <!-- /pet:caption -->
 
 > The line above is rewritten by the Action on every run. Don't edit it by hand;
@@ -166,7 +166,7 @@ plea the card is making:
 <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/counter.svg" width="420" alt="Lurkers versus feeders">
 ```
 
-**Inventory** — 420×204
+**Inventory** — 420×196
 
 ```html
 <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/inventory.svg" width="420" alt="Equipped skills">
@@ -174,8 +174,11 @@ plea the card is making:
 
 ### A full layout
 
-Everything at once, laid out so the rows line up. Drop this straight into your
-profile README:
+[`PROFILE-README.md`](./PROFILE-README.md) is the finished version of this — a
+complete profile page with the feeding call-to-action, real URLs and every card
+in place. Copy it to `USERNAME/USERNAME/README.md` and change the two names.
+
+The bare layout, everything at once, with the rows lined up:
 
 ```html
 <p align="center">
