@@ -59,7 +59,7 @@ const { loadConfig, enabledComponents } = require('./lib/config');
 const { resolvePalettes } = require('./lib/palette');
 const { loadState, saveState } = require('./lib/state');
 const { moodForDays, hungerForDays } = require('./lib/mood');
-const { pickLine, feedLine } = require('./lib/copy');
+const { pickLine } = require('./lib/copy');
 const { captionFor, updateReadmeCaption } = require('./lib/readme');
 const {
   resolveUsername, resolveRepo, fetchActivity, fetchProfileData, fetchTraffic,
@@ -222,11 +222,10 @@ async function main() {
   // nonsense, and a state file from before feeders were recorded gets neither.
   const fed = Boolean(feeder) && renderState.mood !== 'deceased';
 
+  // The bubble is the mood's, always. A snack shows up as the placard and the
+  // reaction on the card; it does not get to interrupt what he was saying.
   const tier = revived ? 'revived' : renderState.mood;
-  // A snack takes over the speech bubble for its 24 hours: someone turned up, and
-  // that is the most interesting thing to have happened to him all day. Coming
-  // back from the dead still outranks it.
-  const line = fed && !revived ? feedLine(feeder, state) : pickLine(tier, renderState, now);
+  const line = pickLine(tier, renderState, now);
 
   const ctx = {
     days, line, revived, streak, profile: profileData, counter, views, fed, feeder,

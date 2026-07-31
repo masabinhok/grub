@@ -41,12 +41,9 @@
       "daysSinceCommit": "DAYS SINCE COMMIT",
       "mood": "MOOD",
       "resurrections": "RESURRECTIONS",
-      "timesFed": "TIMES FED",
       "feedMe": "FEED ME",
       "feedMeSub": "strangers only",
-      "fedBy": "FED BY",
-      "feedHint": null,
-      "reviveHint": "→ push a commit that says: i'm sorry"
+      "fedBy": "FED BY"
     },
     "streak": {
       "current": "CURRENT STREAK",

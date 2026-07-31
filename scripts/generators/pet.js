@@ -44,8 +44,7 @@ module.exports = function renderPet(state, ctx) {
     .val{font-size:11px;fill:${pal.ink};font-weight:700}
     .call{font-size:16px;font-weight:700;letter-spacing:2.5px;fill:${pal.accent}}
     .callsub{font-size:9px;letter-spacing:0.8px;fill:${pal.dim}}
-    .who{font-weight:700;fill:${pal.accent}}
-    .howto{font-size:9.5px;fill:${pal.dim}}`;
+    .who{font-weight:700;fill:${pal.accent}}`;
 
   const style = dead
     ? `${petBase}
@@ -196,7 +195,7 @@ module.exports = function renderPet(state, ctx) {
     bubbleLines.map((l, i) => `<text class="mono say" x="${BX + 16}" y="${BY + 27 + i * 19}">${esc(l)}</text>`).join('') +
     '</g>';
 
-  const MX = 222, MY = 186, MW = 200;
+  const MX = 222, MY = 192, MW = 200;
   const filled = Math.round((state.hunger / 100) * MW);
   const meter =
     `<text class="mono stat" x="${MX}" y="${MY - 6}">${esc(lbl.hunger)}</text>` +
@@ -204,30 +203,23 @@ module.exports = function renderPet(state, ctx) {
     (filled > 2 ? `<rect${animated && state.hunger >= 60 ? ' class="meter"' : ''} x="${MX + 1}" y="${MY + 1}" width="${filled - 2}" height="8" rx="2" fill="${dead ? pal.dim : pal.accent}"/>` : '') +
     `<text class="mono val" x="${MX + MW + 10}" y="${MY + 9}">${state.hunger}%</text>`;
 
+  // Set clear of the hunger bar rather than tucked under it: the meter is a
+  // gauge and these are a list, and touching they read as one confused block.
+  const STAT_Y = 236;
   const statBlock = [
     [lbl.daysSinceCommit, String(ctx.days)],
     [lbl.mood, mood.toUpperCase()],
     [lbl.resurrections, String(state.resurrections)],
-    [lbl.timesFed, String(state.pets || 0)],
   ].map(([k, v], i) =>
-    `<text class="mono stat" x="${MX}" y="${208 + i * 19}">${esc(k)}</text>` +
-    `<text class="mono val" x="${MX + 180}" y="${208 + i * 19}">${esc(v)}</text>`).join('');
-
-  // The one line on the card that tells a visitor what to actually do. It is the
-  // whole reason the placard is worth having, so it never gets crowded out.
-  // Both hints fall back rather than printing an empty line: a card that asks to
-  // be fed and then does not say how is the one failure mode worth avoiding.
-  const howTo = dead
-    ? (lbl.reviveHint || '→ push a commit that says: i\'m sorry')
-    : (lbl.feedHint || `→ open an issue titled "feed ${petName}"`);
-  const footer = `<text class="mono howto" x="${MX}" y="288">${esc(howTo)}</text>`;
+    `<text class="mono stat" x="${MX}" y="${STAT_Y + i * 19}">${esc(k)}</text>` +
+    `<text class="mono val" x="${MX + 180}" y="${STAT_Y + i * 19}">${esc(v)}</text>`).join('');
 
   const body =
     `<text class="mono brand" x="26" y="32">${esc(petName)}</text>` +
     `<text class="mono sub" x="${26 + petName.length * 13}" y="32">${esc(ctx.cfg.tagline)}</text>` +
     `<line x1="26" y1="44" x2="${W - 26}" y2="44" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
     `<rect x="30" y="262" width="176" height="4" rx="2" fill="${pal.ground}"/>` +
-    placard + spriteGroup + food + burst + hearts + bubble + meter + statBlock + footer;
+    placard + spriteGroup + food + burst + hearts + bubble + meter + statBlock;
 
   return svgDoc({
     w: W, h: H, pal, id: 'pet', style,

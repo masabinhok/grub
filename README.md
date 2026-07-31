@@ -21,7 +21,7 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <!-- pet:caption -->
-**thriving** · 0 days since the last commit · _Never died. Yet._
+**hungry** · 1 day since the last commit · _Never died. Yet._
 <!-- /pet:caption -->
 
 > The line above is rewritten by the Action on every run. Don't edit it by hand;
@@ -263,7 +263,7 @@ Abridged — see [`grub.config.json`](./grub.config.json) for every key:
 | `github.repo` | `owner/name` whose traffic feeds the eye and the counter. `null` auto-detects |
 | `components.*` | Set any to `false` and that SVG is never written |
 | `labels.pet.feedMe` | The plea on the placard above his head. Long strings shrink to fit |
-| `labels.pet.feedHint` | The instruction under the stats. `null` builds `→ open an issue titled "feed <petName>"` |
+| `labels.pet.fedBy` | What the placard says instead once somebody has fed him |
 | `marquee.text` | A string, or an array joined with `separator`. `null` falls back to the mood tagline |
 | `marquee.mode` | `"scroll"` or `"type"` |
 | `inventory.slots` | Any number of `{ slot, item }` rows. The one matching `petName` becomes the live companion |
@@ -278,9 +278,9 @@ not you. The insult pool itself lives in `scripts/lib/copy.js`.
 
 ## Feeding him
 
-The pet card asks. It says **FEED ME** on a placard over his head and it prints
-the instructions under his stats, because the whole thing is pointless if a
-visitor has to guess.
+The pet card asks: a placard over his head that bobs and blinks **FEED ME**. The
+instructions live here and in the link above the card rather than on it — the
+card stays a picture.
 
 **Anyone can feed GRUB.** [Open an issue](../../issues/new?title=feed%20GRUB)
 whose title starts with `feed` or `pet` — any capitalisation — and
@@ -293,10 +293,11 @@ What you get for it, for the next 24 hours:
   @you` — on the profile README, where everyone can see it.
 - **He reacts.** Food rains down, he squashes and stretches chewing it, hearts go
   up, sparkles go off, and there are crumbs on the ground when he is done.
-- **He says something to you specifically.** The speech bubble picks a line keyed
-  off your username, so two people feeding him the same day get different
-  answers. He is not grateful. He is never grateful.
-- **A tally.** `TIMES FED` on the pet card, and the `FED` column on the counter.
+- **A tally.** The `FED` column on the counter card goes up, permanently.
+
+He does not thank you in the speech bubble. That belongs to his mood, and his
+mood is about whether *I* have committed. After 24 hours the placard goes back to
+asking, needily, as if none of it ever happened.
 
 Maintainers can also label an existing issue `feed-grub`, or send a
 `repository_dispatch` of type `feed-grub`.

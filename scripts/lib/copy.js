@@ -39,17 +39,6 @@ const LINES = {
     'No animation. No pulse. No excuses left.',
     'The tombstone is committed to your repo. Enjoy the permanence.',
   ],
-  // Said for 24 hours after a stranger feeds him. `{who}` is the feeder's login,
-  // already validated against GitHub's rules before it gets here.
-  fed: [
-    '{who} fed me. A stranger. Not the person who owes me commits.',
-    'Snack from {who}. Tastes like pity. I am fine with that.',
-    '{who} brought food. New favourite. Low bar.',
-    'Fed by {who}. My own developer is right there, doing nothing.',
-    '{who} gave me a snack. It changes nothing. It was delicious.',
-    'I ate whatever {who} gave me. I did not ask what it was.',
-    'Thank you {who}. You are the only one who visits.',
-  ],
   revived: [
     'You said it out loud. In the log. Forever.',
     'I forgive you. `git log` does not.',
@@ -74,23 +63,7 @@ function pickLine(tier, state, now) {
   return pool[(now.getUTCDay() + (state.resurrections || 0)) % pool.length];
 }
 
-/**
- * What he says about a snack. Keyed off the feeder's name rather than the date,
- * so two people feeding him on the same day get different reactions — the point
- * of the whole thing is that it feels like a reply to *you*.
- */
-function feedLine(who, state) {
-  const name = String(who);
-  const seed = name.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-  const pool = LINES.fed;
-  // Every line has room for a 39-character login inside three wrapped lines of
-  // speech bubble, but only just — so an extreme one is shortened for the bubble.
-  // The placard above his head still shows more of it.
-  const shown = name.length > 22 ? `${name.slice(0, 21)}…` : name;
-  return pool[(seed + (state.pets || 0)) % pool.length].replace(/\{who\}/g, `@${shown}`);
-}
-
 /** Built-in taglines with any grub.config.json overrides folded in. */
 const taglinesFor = (cfg) => Object.assign({}, TAGLINES, (cfg && cfg.taglines) || {});
 
-module.exports = { LINES, TAGLINES, pickLine, feedLine, taglinesFor };
+module.exports = { LINES, TAGLINES, pickLine, taglinesFor };

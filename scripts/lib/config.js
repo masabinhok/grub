@@ -71,16 +71,11 @@ const DEFAULTS = {
       daysSinceCommit: 'DAYS SINCE COMMIT',
       mood: 'MOOD',
       resurrections: 'RESURRECTIONS',
-      timesFed: 'TIMES FED',
-      // The placard above his head, and the line under the stats that tells a
-      // visitor how to make it say their name instead.
+      // The placard above his head: the plea, and what it says instead once
+      // somebody has fed him.
       feedMe: 'FEED ME',
       feedMeSub: 'strangers only',
       fedBy: 'FED BY',
-      // null builds `→ open an issue titled "feed <petName>"`, so renaming the
-      // pet keeps the instructions correct without touching this.
-      feedHint: null,
-      reviveHint: '→ push a commit that says: i\'m sorry',
     },
     streak: {
       current: 'CURRENT STREAK',
