@@ -36,10 +36,10 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/masabinhok/grub/generate">⚡ Use this template</a></b> ·
-  <a href="../../fork">🍴 Fork it</a> ·
-  <a href="./docs/setup.md">📖 Five-minute setup</a> ·
-  <a href="./WALL-OF-SHAME.md">🪦 Wall of Shame</a>
+  <b><a href="https://github.com/masabinhok/grub/generate"> Use this template</a></b> ·
+  <a href="../../fork"> Fork it</a> ·
+  <a href="./docs/setup.md">Five-minute setup</a> ·
+  <a href="./WALL-OF-SHAME.md">Wall of Shame</a>
 </p>
 
 **Use this template** gives you a clean repo with no commit history attached.
