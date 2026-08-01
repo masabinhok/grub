@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 300" width="540" height="300" role="img" aria-labelledby="pett petd">
+<title id="pett">GRUB is dead — 6 day(s) since the last commit, 2 resurrection(s)</title>
+<desc id="petd">The tombstone is committed to your repo. Enjoy the permanence.</desc>
+<defs><linearGradient id="petbg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#141417"/><stop offset="1" stop-color="#0a0a0b"/>
+</linearGradient></defs>
+<style>
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
+    .brand{font-size:17px;font-weight:700;letter-spacing:2px;fill:#9aa0a6}
+    .sub{font-size:10px;letter-spacing:1px;fill:#6b7076}
+    .say{font-size:12.5px;fill:#9aa0a6}
+    .stat{font-size:11px;fill:#6b7076}
+    .val{font-size:11px;fill:#9aa0a6;font-weight:700}
+    .call{font-size:16px;font-weight:700;letter-spacing:2.5px;fill:#6b7076}
+    .callsub{font-size:9px;letter-spacing:0.8px;fill:#6b7076}
+    .who{font-weight:700;fill:#6b7076}
+    .rip{font-size:21px;font-weight:700;letter-spacing:3px;fill:#2e2f33}
+    .ripsub{font-size:9.5px;letter-spacing:1px;fill:#2e2f33}
+</style>
+<rect width="540" height="300" rx="14" fill="url(#petbg)"/>
+<rect x="0.75" y="0.75" width="538.5" height="298.5" rx="13.5" fill="none" stroke="#6b7076" stroke-opacity="0.35"/>
+<text class="mono brand" x="26" y="32">GRUB</text><text class="mono sub" x="78" y="32">// THE TAMAGOTCHI OF SHAME</text><line x1="26" y1="44" x2="514" y2="44" stroke="#6b7076" stroke-opacity="0.28"/><rect x="30" y="262" width="176" height="4" rx="2" fill="#2e2f33"/><g transform="translate(46 116)"><g><g><g><rect x="36" y="9" width="72" height="9" fill="#8d939b"/><rect x="18" y="18" width="108" height="9" fill="#8d939b"/><rect x="9" y="27" width="126" height="9" fill="#8d939b"/><rect x="9" y="36" width="126" height="9" fill="#8d939b"/><rect x="9" y="45" width="126" height="9" fill="#8d939b"/><rect x="9" y="54" width="126" height="9" fill="#8d939b"/><rect x="9" y="63" width="126" height="9" fill="#8d939b"/><rect x="9" y="72" width="126" height="9" fill="#8d939b"/><rect x="9" y="81" width="126" height="9" fill="#8d939b"/><rect x="9" y="90" width="126" height="9" fill="#8d939b"/><rect x="9" y="99" width="126" height="9" fill="#8d939b"/><rect x="9" y="108" width="126" height="9" fill="#8d939b"/><rect x="0" y="117" width="144" height="9" fill="#2e2f33"/><rect x="0" y="126" width="144" height="9" fill="#2e2f33"/><text class="mono rip" x="72" y="52" text-anchor="middle">R.I.P.</text><line x1="30" y1="62" x2="114" y2="62" stroke="#2e2f33" stroke-opacity="0.6"/><text class="mono ripsub" x="72" y="80" text-anchor="middle">GRUB</text><text class="mono ripsub" x="72" y="97" text-anchor="middle">2026-01-09</text><text class="mono ripsub" x="72" y="112" text-anchor="middle">STARVED</text></g></g></g></g><g><rect x="222" y="54" width="292" height="64" rx="10" fill="#0a0a0b" stroke="#6b7076" stroke-opacity="0.55" stroke-width="1.5"/><path d="M244 118 L224 139 L276 118 Z" fill="#0a0a0b" stroke="#6b7076" stroke-opacity="0.55" stroke-width="1.5"/><rect x="246" y="116" width="28" height="4" fill="#0a0a0b"/><text class="mono say" x="238" y="81">The tombstone is committed to your</text><text class="mono say" x="238" y="100">repo. Enjoy the permanence.</text></g><text class="mono stat" x="222" y="186">HUNGER</text><rect x="222" y="192" width="200" height="10" rx="3" fill="#0a0a0b" stroke="#6b7076" stroke-opacity="0.4"/><rect x="223" y="193" width="198" height="8" rx="2" fill="#6b7076"/><text class="mono val" x="432" y="201">100%</text><text class="mono stat" x="222" y="236">DAYS SINCE COMMIT</text><text class="mono val" x="402" y="236">6</text><text class="mono stat" x="222" y="255">MOOD</text><text class="mono val" x="402" y="255">DECEASED</text><text class="mono stat" x="222" y="274">RESURRECTIONS</text><text class="mono val" x="402" y="274">2</text>
+</svg>

@@ -125,18 +125,57 @@ const QUOTES = [
   'The only way to go fast, is to go well. — Robert C. Martin'
 ];
 
-function pickLine(tier, state, now) {
-  const pool = LINES[tier];
+/**
+ * Everything below is extensible from grub.config.json without editing this file.
+ *
+ * `copy.lines` and `copy.quotes` are **added** to the pools above by default —
+ * these are things GRUB can say, and one more of them is almost always what
+ * somebody means. Set `copy.replace: true` to start from an empty mouth and use
+ * only your own. A mood you never mention keeps its built-ins either way, because
+ * an empty pool would leave him with nothing to say at exactly the moment the
+ * card needs a line.
+ */
+
+const strings = (v) => (Array.isArray(v) ? v : v === undefined || v === null ? [] : [v])
+  .filter((s) => typeof s === 'string' && s.trim());
+
+/** The insult pools with any config additions folded in, one pool per mood. */
+function linesFor(cfg) {
+  const copy = (cfg && cfg.copy) || {};
+  const extra = (copy.lines && typeof copy.lines === 'object') ? copy.lines : {};
+  const out = {};
+  for (const tier of Object.keys(LINES)) {
+    const own = strings(extra[tier]);
+    const merged = copy.replace ? own : LINES[tier].concat(own);
+    out[tier] = merged.length ? merged : LINES[tier];
+  }
+  return out;
+}
+
+/** The marquee rotation with any config additions folded in. */
+function quotesFor(cfg) {
+  const copy = (cfg && cfg.copy) || {};
+  const own = strings(copy.quotes);
+  const merged = copy.replace ? own : QUOTES.concat(own);
+  return merged.length ? merged : QUOTES;
+}
+
+function pickLine(tier, state, now, lines = LINES) {
+  const pool = (lines && lines[tier] && lines[tier].length) ? lines[tier] : LINES[tier];
   return pool[(now.getUTCDay() + (state.resurrections || 0)) % pool.length];
 }
 
 /** Today's quote. Indexed by whole UTC days, so it turns over at midnight. */
 function quoteOfTheDay(now = new Date(), pool = QUOTES) {
+  const lines = (pool && pool.length) ? pool : QUOTES;
   const day = Math.floor(now.getTime() / 86400000);
-  return pool[((day % pool.length) + pool.length) % pool.length];
+  return lines[((day % lines.length) + lines.length) % lines.length];
 }
 
 /** Built-in taglines with any grub.config.json overrides folded in. */
 const taglinesFor = (cfg) => Object.assign({}, TAGLINES, (cfg && cfg.taglines) || {});
 
-module.exports = { LINES, TAGLINES, QUOTES, pickLine, quoteOfTheDay, taglinesFor };
+module.exports = {
+  LINES, TAGLINES, QUOTES,
+  pickLine, quoteOfTheDay, taglinesFor, linesFor, quotesFor,
+};

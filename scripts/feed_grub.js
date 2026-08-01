@@ -43,6 +43,7 @@ const fs = require('fs');
 const { loadState, saveState } = require('./lib/state');
 const { localDate } = require('./lib/dates');
 const { loadConfig } = require('./lib/config');
+const { resolveSnacks, pickSnack } = require('./lib/snacks');
 const { MAX_PETS_PER_DAY, LOGIN_RE } = require('./lib/constants');
 
 /**
@@ -151,6 +152,12 @@ function main() {
     return;
   }
 
+  // Which snack this is. Derived from the feeder and the day rather than picked
+  // at random, so the reply below and the card the renderer draws agree without
+  // either of them having to ask the other — the id in the state file is the
+  // whole handshake.
+  const snack = pickSnack(resolveSnacks(cfg), `${actor}:${today}`);
+
   const firstTime = !state.feeders.includes(actor);
   state.pets = (state.pets || 0) + 1;
   state.feedLog[actor] = today;
@@ -159,6 +166,7 @@ function main() {
   // Credited on the pet card until the reaction expires. Validated above, and
   // re-validated by the renderer before it is drawn.
   state.lastFedBy = actor;
+  state.lastSnack = snack.id;
   if (firstTime) state.feeders.push(actor);
 
   // The whole point of this script is what it does *not* change.
@@ -175,12 +183,13 @@ function main() {
 
   const dead = state.alive === false;
   const message = dead
-    ? `@${actor} offers ${petName} a snack. ${petName} is dead, so nothing happens.\n\n` +
+    ? `@${actor} offers ${petName} ${snack.name}. ${petName} is dead, so nothing happens.\n\n` +
       'Snacks are cosmetic — they have never fed him properly and they cannot ' +
       'raise him. That takes a commit whose message is exactly `i\'m sorry`, ' +
       'pushed by the person who let him starve.\n\n' +
       `Feed count: **${state.pets}** · people who have tried: **${state.feeders.length}**`
-    : `@${actor} fed ${petName}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
+    : `@${actor} fed ${petName} ${snack.name}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
+      `${snack.response}\n\n` +
       'He is chewing about it on the card right now, and your name is on it for ' +
       `the next 24 hours.${cardLink}\n\n` +
       `He is still **${state.mood}**, because a snack is not a meal — only commits ` +
@@ -188,7 +197,7 @@ function main() {
       `Feed count: **${state.pets}** · people who have fed him: **${state.feeders.length}**`;
 
   console.log(
-    `${petName}: fed by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
+    `${petName}: fed ${snack.name} by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
     `pets=${state.pets} feeders=${state.feeders.length} today=${state.feedDay.count}/${MAX_PETS_PER_DAY} ` +
     `mood=${state.mood} (unchanged)`);
 
@@ -204,7 +213,7 @@ function main() {
     console.log('\n-- dry run, nothing written --');
     console.log(JSON.stringify({
       pets: state.pets, feeders: state.feeders, lastFedBy: state.lastFedBy,
-      lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
+      lastSnack: state.lastSnack, lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
     }, null, 2));
     emit(outputs);
     return;

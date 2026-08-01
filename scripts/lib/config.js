@@ -39,6 +39,7 @@ const DEFAULTS = {
   // Which cards get written. Order is irrelevant; each SVG stands alone.
   components: {
     banner: true,
+    cta: true,
     pet: true,
     streak: true,
     eye: true,
@@ -58,6 +59,32 @@ const DEFAULTS = {
     separator: '   ·   ',
   },
 
+  // The "adopt one of these" card. `upstream` is the repo it sends people to —
+  // leave it pointing at the original and a fork becomes an advert for the
+  // template it came from, which is the entire idea.
+  cta: {
+    upstream: 'masabinhok/grub',
+  },
+
+  // Everything the creature can say or be handed, extensible without touching
+  // scripts/lib/. `lines` and `quotes` are added to the built-in pools; `snacks`
+  // adds to the pantry, and an entry reusing a built-in id replaces it. Set
+  // `replace: true` to drop the built-ins entirely and use only your own.
+  //
+  //   "copy": {
+  //     "lines": { "feral": ["I have eaten the LICENSE."] },
+  //     "quotes": ["Weeks of coding can save you hours of planning."],
+  //     "snacks": [{ "id": "mango", "name": "a mango", "tint": "t",
+  //                  "response": "Seasonal. Sticky. Gone.",
+  //                  "art": [".##.", "####", "####", ".##."] }]
+  //   }
+  copy: {
+    replace: false,
+    lines: {},
+    quotes: [],
+    snacks: [],
+  },
+
   // The RPG equipment screen. Any number of slots; the one whose item matches
   // petName is drawn as the live companion.
   inventory: {
@@ -72,6 +99,11 @@ const DEFAULTS = {
   // Every fixed string on a card, in one place.
   labels: {
     banner: { status: 'PET STATUS' },
+    cta: {
+      title: 'ADOPT ONE OF THESE',
+      sub: 'it starves when you stop committing',
+      button: 'USE THIS TEMPLATE',
+    },
     pet: {
       hunger: 'HUNGER',
       daysSinceCommit: 'DAYS SINCE COMMIT',

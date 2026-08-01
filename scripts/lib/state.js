@@ -21,6 +21,9 @@ function defaultState(now) {
     lastPettedAt: null,
     // Whoever fed him last, credited by name on the pet card for a day.
     lastFedBy: null,
+    // What they handed him — an id from lib/snacks.js. The only thing linking
+    // the reply the feeder got to the food the card actually draws.
+    lastSnack: null,
     // login -> UTC date of that login's last pet, for the one-a-day limit.
     feedLog: {},
     // Repo-wide pets today, for the global cap.

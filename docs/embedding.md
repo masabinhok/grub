@@ -28,6 +28,7 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
 | `assets/inventory.svg` | 420×196 | Tech stack as an RPG equipment screen |
+| `assets/cta.svg` | 840×64 | An adoption button — "use this template", mood-themed |
 
 `inventory.svg` grows with your slot list — 196px at four slots, +30px each after.
 
@@ -120,6 +121,20 @@ plea the card is making:
 ```html
 <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/inventory.svg" width="420" alt="Equipped skills">
 ```
+
+**Adoption button** — 840×64. Wrap it in a link to the template's `/generate`
+page, the same way the pet card wraps a link to the feed issue — the SVG cannot
+carry the link itself:
+
+```html
+<a href="https://github.com/masabinhok/grub/generate">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/cta.svg" width="840" alt="Use this template — adopt your own GRUB">
+</a>
+```
+
+Point `cta.upstream` in `grub.config.json` at whichever repo the button should
+advertise, and change the `href` to match. Left alone it sends people to the
+original, which is how a fork pays rent.
 
 ---
 

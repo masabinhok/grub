@@ -55,6 +55,17 @@
   <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/divider.svg" width="840" alt="">
 </p>
 
+<!--
+  The adoption button. It is why anyone else ends up with one of these: a visitor
+  who likes the page gets a one-click way to run it themselves. Delete it if you
+  would rather not advertise, or point cta.upstream at your own repo instead.
+-->
+<p align="center">
+  <a href="https://github.com/masabinhok/grub/generate">
+    <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/cta.svg" width="840" alt="Use this template — adopt your own GRUB">
+  </a>
+</p>
+
 <p align="center">
   <a href="https://sabinshrestha69.com.np">Website</a>
   ·

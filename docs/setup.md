@@ -6,13 +6,22 @@ dependencies.
 - [Fork it](#fork-it)
 - [Tokens](#tokens)
 - [Feeding it on private repos](#feeding-it-on-private-repos)
+- [Turning yours into a template](#turning-yours-into-a-template)
 
 ---
 
 ## Fork it
 
-1. **Fork or copy this repo.** It can be any public repo you own; it does not
-   have to be your profile repo.
+1. **Get a copy.** Two ways, and they differ in exactly one thing:
+
+   | | |
+   | --- | --- |
+   | **[Use this template](https://github.com/masabinhok/grub/generate)** | A clean repo, no commit history attached, not listed as a fork |
+   | **[Fork](https://github.com/masabinhok/grub/fork)** | Keeps the link back to the original and shows in its fork count |
+
+   Either is fine. Template is the tidier start if this is going to be *your*
+   repo; fork is friendlier if you plan to send changes back. It can be any
+   public repo you own — it does not have to be your profile repo.
 
 2. **Reset the state.** Overwrite `pet-state.json` with a fresh start:
 
@@ -49,6 +58,31 @@ dependencies.
 
 7. **Embed the cards** in your profile README — the blocks are in
    [Embedding the cards](./embedding.md).
+
+8. **Put yourself on the wall.** Optional, and one PR:
+   [WALL-OF-SHAME.md](../WALL-OF-SHAME.md#get-on-the-wall). It ranks every public
+   GRUB by deaths survived, read live from each repo's `pet-state.json`.
+
+---
+
+## Turning yours into a template
+
+The **Use this template** button only exists on repos that have been marked as
+one, and the setting is off by default — a `/generate` link to a repo without it
+just 404s.
+
+Settings → General → **Template repository** → tick it. That's the whole change:
+no workflow edits, nothing rebuilt, and forking still works exactly as before for
+anyone who prefers it.
+
+Worth doing if you want other people running your version. The `cta.svg` card
+points at `cta.upstream` in `grub.config.json`, which ships pointing at
+`masabinhok/grub` — so out of the box your copy sends people to the original.
+Point it at yourself and it sends them to you instead:
+
+```json
+{ "cta": { "upstream": "your-login/your-repo" } }
+```
 
 ---
 

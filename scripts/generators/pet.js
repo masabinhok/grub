@@ -1,7 +1,8 @@
 'use strict';
 
 const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
-const { SPRITES, HEART, BERRY, SPARKLE } = require('../lib/sprites');
+const { SPRITES, HEART, SPARKLE } = require('../lib/sprites');
+const { SNACKS } = require('../lib/snacks');
 const { localDate } = require('../lib/dates');
 
 const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
@@ -136,14 +137,19 @@ module.exports = function renderPet(state, ctx) {
   const at = (x, y, cls, delay, inner) =>
     `<g transform="translate(${x} ${y})"><g class="${cls}"${delay ? ` style="animation-delay:${delay}s"` : ''}>${inner}</g></g>`;
 
-  // Each berry is placed where it lands, and the animation lifts it back up to
+  // Whatever the feeder was given by feed_grub.js, so the issue reply and the
+  // card agree on what he is eating. Nothing but the state file passes between
+  // them, so an unknown id falls back rather than drawing an empty snack.
+  const snack = ctx.snack || SNACKS[0];
+  const scrap = pixelRects(snack.art, { '#': pal[snack.tint] || pal.accent, o: pal.w }, snack.cell);
+
+  // Each scrap is placed where it lands, and the animation lifts it back up to
   // fall again — so the frame a non-animating renderer draws is three crumbs on
-  // the ground rather than three berries stuck in mid-air over his face.
-  const berry = (tint) => pixelRects(BERRY, { '#': tint, o: pal.w }, 3);
+  // the ground rather than three snacks stuck in mid-air over his face.
   const food = fed
-    ? at(64, 248, 'crumb', 0, berry(pal.m)) +
-      at(112, 250, 'crumb', 0.55, berry(pal.t)) +
-      at(164, 246, 'crumb', 1.15, berry(pal.m))
+    ? at(64, 248, 'crumb', 0, scrap) +
+      at(112, 250, 'crumb', 0.55, scrap) +
+      at(164, 246, 'crumb', 1.15, scrap)
     : '';
 
   const hearts = fed
@@ -224,7 +230,7 @@ module.exports = function renderPet(state, ctx) {
   return svgDoc({
     w: W, h: H, pal, id: 'pet', style,
     title: `${petName} is ${dead ? 'dead' : mood} — ${ctx.days} day(s) since the last commit, ${state.resurrections} resurrection(s)` +
-      (feeder ? `, last fed by @${feeder}` : ''),
+      (feeder ? `, last fed ${snack.name} by @${feeder}` : ''),
     desc: ctx.line,
     body,
   });

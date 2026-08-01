@@ -1,7 +1,7 @@
 'use strict';
 
 const { esc, baseStyle, svgDoc } = require('../lib/svg');
-const { quoteOfTheDay } = require('../lib/copy');
+const { quoteOfTheDay, quotesFor } = require('../lib/copy');
 
 const W = 840, H = 88;
 const PAD = 14;                       // inset of the CRT panel inside the card
@@ -33,11 +33,12 @@ module.exports = function renderMarquee(state, ctx) {
   const lbl = ctx.cfg.labels.marquee;
 
   // Your own text always wins. Left at null, the ticker runs a joke, a quote or
-  // a fact from the pool in copy.js — a new one every UTC day, so the profile
-  // has something different on it tomorrow whether or not anything else changed.
+  // a fact from the pool in copy.js plus anything `copy.quotes` adds to it — a
+  // new one every UTC day, so the profile has something different on it tomorrow
+  // whether or not anything else changed.
   const raw = cfg.text;
   const text = (Array.isArray(raw) ? raw.filter(Boolean).join(cfg.separator) : raw) ||
-    quoteOfTheDay(ctx.now);
+    quoteOfTheDay(ctx.now, quotesFor(ctx.cfg));
   const shown = String(text);
   const textW = Math.ceil(shown.length * CHAR_W);
 

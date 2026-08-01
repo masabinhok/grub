@@ -59,7 +59,8 @@ const { loadConfig, enabledComponents } = require('./lib/config');
 const { resolvePalettes } = require('./lib/palette');
 const { loadState, saveState } = require('./lib/state');
 const { moodForDays, hungerForDays } = require('./lib/mood');
-const { pickLine } = require('./lib/copy');
+const { pickLine, linesFor } = require('./lib/copy');
+const { resolveSnacks, snackById, pickSnack } = require('./lib/snacks');
 const { captionFor, updateReadmeCaption } = require('./lib/readme');
 const {
   resolveUsername, resolveRepo, fetchActivity, fetchProfileData, fetchTraffic,
@@ -225,10 +226,16 @@ async function main() {
   // The bubble is the mood's, always. A snack shows up as the placard and the
   // reaction on the card; it does not get to interrupt what he was saying.
   const tier = revived ? 'revived' : renderState.mood;
-  const line = pickLine(tier, renderState, now);
+  const line = pickLine(tier, renderState, now, linesFor(cfg));
+
+  // What he is chewing. feed_grub.js wrote the id when it replied to the issue,
+  // so the card draws exactly what the reply promised. An id from a config that
+  // has since changed simply falls back to a fresh pick.
+  const snacks = resolveSnacks(cfg);
+  const snack = snackById(snacks, state.lastSnack) || pickSnack(snacks, feeder || petName);
 
   const ctx = {
-    days, line, revived, streak, profile: profileData, watchers, fed, feeder, now,
+    days, line, revived, streak, profile: profileData, watchers, fed, feeder, snack, now,
     cfg, palettes: resolvePalettes(cfg),
   };
 
@@ -246,7 +253,7 @@ async function main() {
   console.log(
     `  lurkers=${watchers.lurkers} fed=${watchers.fed} views=${watchers.views}` +
     `${watchers.since ? ` since=${watchers.since}` : ' (no traffic sampled yet)'}` +
-    `${feeder ? ` · last fed by @${feeder}` : ''}`);
+    `${feeder ? ` · last fed ${snack.name} by @${feeder}` : ''}`);
 
   if (OPTS.dryRun) {
     console.log('\n-- dry run, nothing written --');

@@ -30,11 +30,13 @@ const SPRITES = {
 };
 
 /**
- * The feeding theatre. None of these are 16x16 or mood-keyed, so they sit outside
- * SPRITES and skip the validation below. Every one of them is drawn at a small
- * cell size — they are props, not characters.
+ * The feeding theatre. Neither of these is 16x16 or mood-keyed, so they sit
+ * outside SPRITES and skip the validation below. Both are drawn at a small cell
+ * size — they are props, not characters.
  *
- * '#' takes the tint the caller passes; 'o' is the highlight.
+ * '#' takes the tint the caller passes; 'o' is the highlight. The food itself
+ * lives in lib/snacks.js, which uses the same format and is extensible from
+ * grub.config.json.
  */
 const HEART = [
   '.##.##.',
@@ -43,14 +45,6 @@ const HEART = [
   '.#####.',
   '..###..',
   '...#...',
-];
-
-/** What visitors throw at him. He does not ask what is in it. */
-const BERRY = [
-  '.##.',
-  '#o##',
-  '####',
-  '.##.',
 ];
 
 /** The little burst of delight, four-pointed and unsubtle. */
@@ -68,4 +62,4 @@ for (const [name, grid] of Object.entries(SPRITES)) {
   }
 }
 
-module.exports = { SPRITES, HEART, BERRY, SPARKLE };
+module.exports = { SPRITES, HEART, SPARKLE };

@@ -1,0 +1,11 @@
+{
+  "$comment": "Every GRUB running in public. Add yourself with a PR — see WALL-OF-SHAME.md. Required: user, repo. Optional: petName, branch (default main), note (60 chars, kept dry).",
+  "entries": [
+    {
+      "user": "masabinhok",
+      "repo": "grub",
+      "petName": "GRUB",
+      "note": "patient zero"
+    }
+  ]
+}

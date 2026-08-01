@@ -29,16 +29,41 @@ It can only be brought back by pushing a commit whose message is exactly
 
 ---
 
+## Adopt one
+
+<p align="center">
+  <a href="https://github.com/masabinhok/grub/generate"><img src="./assets/cta.svg" width="840" alt="Use this template — adopt your own GRUB"></a>
+</p>
+
+<p align="center">
+  <b><a href="https://github.com/masabinhok/grub/generate">⚡ Use this template</a></b> ·
+  <a href="../../fork">🍴 Fork it</a> ·
+  <a href="./docs/setup.md">📖 Five-minute setup</a> ·
+  <a href="./WALL-OF-SHAME.md">🪦 Wall of Shame</a>
+</p>
+
+**Use this template** gives you a clean repo with no commit history attached.
+**Fork** keeps the link back here and shows up in the fork count. Either works —
+the [setup](./docs/setup.md) is the same five minutes from both, and there is
+nothing to install at either end.
+
+The button above is one of the cards this thing generates, so it wears the
+creature's current mood like everything else on the page. If GRUB is dead right
+now, that button is grey. That is the honest advert.
+
+---
+
 ## Documentation
 
 | | |
 | --- | --- |
 | **[Setup](./docs/setup.md)** | Fork it for your own profile, Actions permissions, `PET_TOKEN`, private repos |
 | **[Embedding the cards](./docs/embedding.md)** | Every card, copy-paste blocks, a full profile layout |
-| **[Configuration](./docs/configuration.md)** | Every key in `grub.config.json`, writing your own insults |
+| **[Configuration](./docs/configuration.md)** | Every key in `grub.config.json`, your own snacks and insults |
 | **[Feeding him](./docs/feeding.md)** | How anyone can feed GRUB, the safety rules, what `LURKERS` counts |
 | **[Development](./docs/development.md)** | Repo layout, the local CLI, adding a card |
-| **[Contributing](./CONTRIBUTING.md)** | How to send a change |
+| **[Contributing](./CONTRIBUTING.md)** | Send a snack, a quote or an insult — good first PRs |
+| **[Wall of Shame](./WALL-OF-SHAME.md)** | Every GRUB running in public, ranked by deaths survived |
 
 Want it on your own profile? **[Start here](./docs/setup.md)** — about five
 minutes, no build step, zero dependencies.
@@ -57,6 +82,46 @@ minutes, no build step, zero dependencies.
 The stats — days since last commit, current mood, resurrection count — are
 rendered *inside* the SVG, not in the caption. You can't fake them without
 regenerating the image, and regenerating the image requires the real state file.
+
+### All four states
+
+The card at the top of this page only ever shows the state GRUB is actually in,
+which on a good day is the least interesting one. Here is the rest of it — real
+renders, animating, no cloning required. Watch the colour drain out.
+
+<table>
+  <tr>
+    <td align="center"><b>thriving</b> — day 0<br><sub>bouncing, bright, unbearable</sub></td>
+    <td align="center"><b>hungry</b> — day 2<br><sub>dimmer, slower, keeping notes</sub></td>
+  </tr>
+  <tr>
+    <td><img src="./docs/previews/pet-thriving.svg" width="420" alt="GRUB thriving"></td>
+    <td><img src="./docs/previews/pet-hungry.svg" width="420" alt="GRUB hungry"></td>
+  </tr>
+  <tr>
+    <td align="center"><b>feral</b> — day 4<br><sub>tearing, twitching, ribs out</sub></td>
+    <td align="center"><b>deceased</b> — day 5+<br><sub>a tombstone with a date on it</sub></td>
+  </tr>
+  <tr>
+    <td><img src="./docs/previews/pet-feral.svg" width="420" alt="GRUB feral"></td>
+    <td><img src="./docs/previews/pet-deceased.svg" width="420" alt="GRUB deceased — the tombstone"></td>
+  </tr>
+</table>
+
+The tombstone is the whole point of the exercise: it carries the death date, it
+does not move, and it gets committed to your repo and rendered on your profile
+until you [apologise in public](#resurrection).
+
+And this is what a stranger gets for [feeding him](./docs/feeding.md) — food
+rains down, he chews, and **their** username is on the card for 24 hours:
+
+<p align="center">
+  <img src="./docs/previews/pet-fed.svg" width="540" alt="GRUB being fed a donut by a visitor">
+</p>
+
+> These five are rendered off a pinned clock by `scripts/render_previews.js`, so
+> they are stable, byte-identical between runs, and never quietly drift out of
+> date with the real cards.
 
 ### Whose day is it
 
@@ -111,8 +176,9 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
 | `assets/inventory.svg` | 420×196 | Tech stack as an RPG equipment screen |
+| `assets/cta.svg` | 840×64 | The adoption button at the top of this page |
 
-Copy-paste blocks for all ten, plus a finished profile layout, are in
+Copy-paste blocks for all eleven, plus a finished profile layout, are in
 **[Embedding the cards](./docs/embedding.md)**. Turn any of them off with
 `components` in [`grub.config.json`](./grub.config.json).
 
@@ -124,6 +190,11 @@ Copy-paste blocks for all ten, plus a finished profile layout, are in
 whose title starts with `feed` or `pet` and he chews, sparkles, and wears **your
 username on the card** for 24 hours. Nothing to install.
 
+What he gets is picked from a pantry — a berry, a donut, a coffee, a cold slice,
+a cookie, or a bug — and the reply tells you which, because the card is genuinely
+raining that one. [Adding another](./CONTRIBUTING.md#add-a-snack) is a small
+self-contained PR: some pixel art and one rude line.
+
 It is also, deliberately, cosmetic. A snack never touches `hunger`, `mood` or
 `alive` — only commits keep GRUB alive, and only `i'm sorry` revives him. That
 gap between people who looked and people who acted is the whole `LURKERS` vs
@@ -134,16 +205,50 @@ what `LURKERS` actually measures: **[Feeding him](./docs/feeding.md)**.
 
 ---
 
+## GRUBs in the Wild
+
+Every GRUB running in public, ranked by **deaths survived** — the counter that
+never resets. A high rank is not an achievement. It means that many commits in
+your history read `i'm sorry`.
+
+<p align="center">
+  <b><a href="./WALL-OF-SHAME.md">🪦 See the Wall of Shame →</a></b>
+</p>
+
+**Getting on it takes one PR.** Adopt a GRUB, then add yourself to
+[`wall-of-shame.json`](./wall-of-shame.json):
+
+```json
+{
+  "user": "your-github-login",
+  "repo": "the-repo-your-grub-lives-in",
+  "petName": "WHATEVER YOU RENAMED IT TO",
+  "note": "one dry line, 60 characters"
+}
+```
+
+That is the whole submission. The table rebuilds itself on the next daily run:
+`scripts/render_wall.js` reads each fork's `pet-state.json` — a public file in
+every one of these repos — and re-ranks the wall. No form, no service, no
+account beyond the GitHub one you have. Full field reference and the house rules
+are on [the wall itself](./WALL-OF-SHAME.md#get-on-the-wall).
+
+---
+
 ## Under the hood
 
 ```
 scripts/update_pet.js          # entrypoint: CLI, state machine, writing files
 scripts/feed_grub.js           # the feed counter, and nothing else
-scripts/lib/                   # state, github, palette, svg, glyphs, traffic, copy...
+scripts/render_previews.js     # the four-state showcase, off a pinned clock
+scripts/render_wall.js         # the Wall of Shame, off every fork's public state
+scripts/lib/                   # state, github, palette, svg, glyphs, snacks, copy...
 scripts/generators/            # one module per card + index.js registry
 grub.config.json               # your settings. never written by the bot
 pet-state.json                 # the only persistence layer. no database
+wall-of-shame.json             # the fork list. one PR per entry
 assets/*.svg                   # generated output, committed by CI
+docs/previews/*.svg            # the showcase renders, regenerated on demand
 .github/workflows/             # the daily cron, and feeding by anyone who asks
 ```
 

@@ -29,6 +29,18 @@ What you get for it, for the next 24 hours:
   up, sparkles go off, and there are crumbs on the ground when he is done.
 - **A tally.** The `FED` number on the eye card goes up, permanently.
 
+### What he gets
+
+A berry, a donut, a coffee, a cold slice of pizza, a cookie, or a bug. Which one
+is derived from your login and the date, so the reply naming it and the card
+raining it agree without either asking the other — the only thing passing between
+them is a snack id in `pet-state.json`.
+
+Adding another is deliberately the smallest useful contribution in this repo:
+some pixel art and one line of GRUB being ungrateful. The schema is in
+[Add a snack](../CONTRIBUTING.md#add-a-snack), and the same shape works from
+`grub.config.json` under `copy.snacks` if you only want it in your own fork.
+
 He does not thank you in the speech bubble. That belongs to his mood, and his
 mood is about whether *I* have committed. After 24 hours the placard goes back to
 asking, needily, as if none of it ever happened.

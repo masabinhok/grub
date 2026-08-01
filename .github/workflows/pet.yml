@@ -76,6 +76,13 @@ jobs:
             ${{ github.event.inputs.force_apology == 'true' && '--apology' || '' }} \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
 
+      # Reads each fork's public pet-state.json off raw.githubusercontent.com.
+      # No token, one request per entry, and it swallows its own failures — the
+      # wall is decoration and does not get to fail the creature's job.
+      - name: Refresh the Wall of Shame
+        if: github.event.inputs.dry_run != 'true'
+        run: node scripts/render_wall.js
+
       - name: Commit if anything changed
         if: github.event.inputs.dry_run != 'true'
         run: |
@@ -85,6 +92,6 @@ jobs:
           fi
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add pet-state.json assets README.md
+          git add pet-state.json assets README.md WALL-OF-SHAME.md
           git commit -m 'chore: update pet state [skip ci]'
           git push

@@ -9,6 +9,7 @@
   },
   "components": {
     "banner": true,
+    "cta": true,
     "pet": true,
     "streak": true,
     "eye": true,
@@ -24,6 +25,15 @@
     "mode": "scroll",
     "separator": "   ·   "
   },
+  "cta": {
+    "upstream": "masabinhok/grub"
+  },
+  "copy": {
+    "replace": false,
+    "lines": {},
+    "quotes": [],
+    "snacks": []
+  },
   "inventory": {
     "slots": [
       { "slot": "Primary", "item": "NestJS" },
@@ -35,6 +45,11 @@
   "labels": {
     "banner": {
       "status": "PET STATUS"
+    },
+    "cta": {
+      "title": "ADOPT ONE OF THESE",
+      "sub": "it starves when you stop committing",
+      "button": "USE THIS TEMPLATE"
     },
     "pet": {
       "hunger": "HUNGER",

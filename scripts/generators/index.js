@@ -11,6 +11,7 @@
 
 module.exports = {
   banner: require('./banner'),
+  cta: require('./cta'),
   pet: require('./pet'),
   streak: require('./streak'),
   eye: require('./eye'),
