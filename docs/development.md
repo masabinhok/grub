@@ -90,7 +90,10 @@ in the quote-of-the-day and commit a fresh showcase forever. Nothing in it may
 read the real clock, the real state file or the API.
 
 `render_wall.js` fetches each listed fork's public `pet-state.json` from
-`raw.githubusercontent.com` — no token, one request per entry, six at a time. It
+`raw.githubusercontent.com` — no token, one request per entry, six at a time. Its
+own row is the exception and is read off disk: the table is built before the
+daily job commits the new state, and the raw file stays cached for minutes after
+that, so fetching our own row would always report a run behind. It
 swallows every failure it can: an unreachable fork renders as `⬛ unreachable`,
 and a crash in the script leaves `WALL-OF-SHAME.md` untouched rather than failing
 the run. Entries arrive by PR from strangers, so `user`, `repo` and `branch` are

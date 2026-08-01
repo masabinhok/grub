@@ -10,6 +10,8 @@
  * service: the state file is already public in every fork, which is the entire
  * reason this can exist without a backend.
  *
+ * The one exception is our own row, which is read off disk — see fetchStatus.
+ *
  * Every entry arrives by pull request from a stranger, so nothing here trusts the
  * file:
  *   - `user`, `repo` and `branch` are validated against character sets before
@@ -30,7 +32,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const { ROOT, LOGIN_RE } = require('./lib/constants');
+const { ROOT, STATE_PATH, LOGIN_RE } = require('./lib/constants');
+const { loadConfig } = require('./lib/config');
+const { resolveRepo } = require('./lib/github');
 
 const DATA_PATH = path.join(ROOT, 'wall-of-shame.json');
 const PAGE_PATH = path.join(ROOT, 'WALL-OF-SHAME.md');
@@ -119,21 +123,56 @@ async function getJson(url) {
   }
 }
 
-/** One fork's public state, or an empty status if it cannot be read. */
-async function fetchStatus(entry) {
+const EMPTY = { reachable: false, mood: null, resurrections: null, pets: null };
+
+/** Whatever of a state file we are willing to put in the table. */
+const statusFrom = (state) => (state ? {
+  reachable: true,
+  mood: MOODS[state.mood] ? state.mood : null,
+  resurrections: Number.isFinite(state.resurrections) ? state.resurrections : null,
+  pets: Number.isFinite(state.pets) ? state.pets : null,
+} : EMPTY);
+
+/** This repo's own `owner/name`, so it can recognise itself in the list. */
+function localRepo() {
+  try {
+    return resolveRepo({ repo: loadConfig().github.repo });
+  } catch (_) {
+    return null;
+  }
+}
+
+/** The state file sitting next to this script, for our own row. */
+function readLocalState() {
+  try {
+    return JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
+  } catch (_) {
+    return null;
+  }
+}
+
+/**
+ * One fork's public state, or an empty status if it cannot be read.
+ *
+ * Our own row is read off disk rather than over the network. Fetching it would
+ * always be a run behind: this runs before the daily job commits the new state,
+ * and raw.githubusercontent.com serves a cached copy for minutes afterwards
+ * anyway. Everyone else's row is a day old whatever we do — but there is no
+ * excuse for the wall misreporting the pet whose repo it lives in.
+ */
+async function fetchStatus(entry, self) {
+  if (self && `${entry.user}/${entry.repo}`.toLowerCase() === self.toLowerCase()) {
+    const state = readLocalState();
+    if (state) return statusFrom(state);
+    console.warn(`! ${entry.user}/${entry.repo} is this repo but pet-state.json is unreadable — fetching instead`);
+  }
   const raw = (branch) =>
     `https://raw.githubusercontent.com/${entry.user}/${entry.repo}/${branch}/pet-state.json`;
   // `main` first, then `master` — a fork of a template can be on either, and
   // guessing wrong is the most likely reason a real entry looks dead.
   const state = await getJson(raw(entry.branch)) ||
     (entry.branch === 'main' ? await getJson(raw('master')) : null);
-  if (!state) return { reachable: false, mood: null, resurrections: null, pets: null };
-  return {
-    reachable: true,
-    mood: MOODS[state.mood] ? state.mood : null,
-    resurrections: Number.isFinite(state.resurrections) ? state.resurrections : null,
-    pets: Number.isFinite(state.pets) ? state.pets : null,
-  };
+  return statusFrom(state);
 }
 
 /** Resolve `fn` over `items` a few at a time, in order. */
@@ -210,10 +249,18 @@ async function main() {
   const offline = process.argv.includes('--offline');
   const dryRun = process.argv.includes('--dry-run');
   const entries = loadEntries();
+  const self = localRepo();
 
+  // --offline still reads our own state file: it means "no network", not
+  // "know nothing", and the one row that needs no network is ours.
   const rows = offline
-    ? entries.map((entry) => ({ entry, status: { reachable: false, mood: null, resurrections: null, pets: null } }))
-    : await pool(entries, CONCURRENCY, async (entry) => ({ entry, status: await fetchStatus(entry) }));
+    ? entries.map((entry) => ({
+      entry,
+      status: (self && `${entry.user}/${entry.repo}`.toLowerCase() === self.toLowerCase())
+        ? statusFrom(readLocalState())
+        : EMPTY,
+    }))
+    : await pool(entries, CONCURRENCY, async (entry) => ({ entry, status: await fetchStatus(entry, self) }));
 
   const unreachable = rows.filter((r) => !r.status.reachable).length;
   if (!offline && unreachable) {
