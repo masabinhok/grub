@@ -1,0 +1,221 @@
+/* GRUB — adoption page.
+ *
+ * Every colour on this page is a CSS custom property written by app.js from
+ * scripts/lib/palette.js, the same table the cards render from. Drag the day
+ * scrubber and the page desaturates with the creature, because that is exactly
+ * what happens to a profile. The demo is the product.
+ *
+ * No webfonts: the project claims no third-party services and that has to stay
+ * literally true, so the display voice is the same monospace stack the SVGs use.
+ */
+
+:root {
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* Overwritten per mood at runtime. These are the thriving values. */
+  --accent: #5fd99a;
+  --ink: #e6fff2;
+  --dim: #79c9a4;
+  --panel: #0d2018;
+  --panel2: #173d2b;
+  --warn: #ff6f8f;
+  --gold: #ffd24c;
+  --page: #070d0a;
+
+  --edge: color-mix(in srgb, var(--dim) 22%, transparent);
+  --shift: 420ms cubic-bezier(.4, 0, .2, 1);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 15px;
+  line-height: 1.5;
+  transition: background-color var(--shift), color var(--shift);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { width: min(1000px, 100% - 3rem); margin-inline: auto; }
+
+/* ---------------------------------------------------------------- masthead */
+
+.top {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; padding: 1.4rem 0; border-bottom: 1px solid var(--edge);
+  transition: border-color var(--shift);
+}
+.mark { font-weight: 800; letter-spacing: .14em; font-size: .95rem; color: var(--accent); transition: color var(--shift); }
+.mark span { color: var(--dim); font-weight: 400; }
+.top nav { display: flex; gap: 1.4rem; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+/* The tagline is the first thing to go — three wrapped lines of masthead pushes
+ * the actual headline off a phone screen. */
+@media (max-width: 560px) {
+  .mark span { display: none; }
+  .top nav { gap: 1rem; font-size: .72rem; }
+}
+
+a { color: var(--accent); text-decoration-color: var(--edge); text-underline-offset: 3px; transition: color var(--shift); }
+a:hover { text-decoration-color: currentColor; }
+
+/* -------------------------------------------------------------------- type */
+
+.eyebrow {
+  font-size: .7rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--dim); margin: 0 0 1.1rem; transition: color var(--shift);
+}
+/* Monospace is far wider per character than a grotesk, so the usual display
+ * clamp overshoots badly here — this is tuned to break in three lines, not five. */
+h1 {
+  font-size: clamp(1.75rem, 3.9vw, 2.85rem); font-weight: 800; letter-spacing: -.035em;
+  line-height: 1.06; margin: 0 0 1.4rem; text-wrap: balance;
+}
+h1 em { font-style: normal; color: var(--accent); transition: color var(--shift); }
+h2 {
+  font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; letter-spacing: -.02em;
+  margin: 0 0 .6rem;
+}
+/* Prose is the one place the page stops being a terminal. */
+.prose { font-family: var(--sans); font-size: 1.02rem; line-height: 1.62; color: var(--dim); max-width: 62ch; transition: color var(--shift); }
+.prose strong { color: var(--ink); font-weight: 600; }
+
+section { padding: 4rem 0; border-top: 1px solid var(--edge); transition: border-color var(--shift); }
+section:first-of-type { border-top: 0; }
+
+/* ------------------------------------------------------------------- hero */
+
+.hero { padding: 3.4rem 0 3.6rem; }
+/* Top-aligned: the right column is short, and centring it opened a dead band
+ * under the prose that read as a missing section. */
+.hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3rem; align-items: start; }
+@media (max-width: 860px) { .hero-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+.stage { display: flex; flex-direction: column; align-items: center; gap: 1.1rem; }
+.stage svg { display: block; max-width: 100%; height: auto; }
+
+/* ---------------------------------------------------------------- scrubber */
+
+.scrub { width: min(540px, 100%); }
+.scrub-head {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-size: .76rem; letter-spacing: .16em; text-transform: uppercase; color: var(--dim);
+  margin-bottom: .55rem; transition: color var(--shift);
+}
+.scrub-head b { color: var(--accent); font-size: .82rem; transition: color var(--shift); }
+
+input[type=range] { width: 100%; appearance: none; background: transparent; cursor: grab; }
+input[type=range]:active { cursor: grabbing; }
+input[type=range]::-webkit-slider-runnable-track {
+  height: 6px; background: var(--panel2); border: 1px solid var(--edge); transition: background-color var(--shift);
+}
+input[type=range]::-moz-range-track { height: 6px; background: var(--panel2); border: 1px solid var(--edge); }
+input[type=range]::-webkit-slider-thumb {
+  appearance: none; width: 14px; height: 20px; margin-top: -8px;
+  background: var(--accent); border: 0; transition: background-color var(--shift);
+}
+input[type=range]::-moz-range-thumb { width: 14px; height: 20px; border: 0; border-radius: 0; background: var(--accent); }
+input[type=range]:focus-visible { outline: 2px solid var(--accent); outline-offset: 6px; }
+
+.ticks { display: flex; justify-content: space-between; margin-top: .45rem; font-size: .68rem; color: var(--dim); letter-spacing: .1em; }
+.ticks span[data-on] { color: var(--accent); }
+
+.hint { font-size: .78rem; color: var(--dim); letter-spacing: .04em; }
+
+/* ------------------------------------------------------------------ forms */
+
+label.field { display: block; font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin-bottom: .4rem; }
+
+input[type=text] {
+  font-family: var(--mono); font-size: .95rem; color: var(--ink);
+  background: var(--panel); border: 1px solid var(--edge); padding: .65rem .8rem; width: 100%;
+  transition: border-color var(--shift), background-color var(--shift);
+}
+input[type=text]:focus { outline: 0; border-color: var(--accent); }
+input[type=text]::placeholder { color: var(--dim); opacity: .55; }
+
+button {
+  font-family: var(--mono); font-size: .8rem; font-weight: 700; letter-spacing: .12em;
+  text-transform: uppercase; color: var(--page); background: var(--accent);
+  border: 1px solid var(--accent); padding: .7rem 1.2rem; cursor: pointer; white-space: nowrap;
+  transition: background-color var(--shift), color var(--shift), border-color var(--shift);
+}
+button:hover { background: var(--ink); border-color: var(--ink); }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+button.ghost { background: transparent; color: var(--accent); }
+button.ghost:hover { background: var(--accent); color: var(--page); }
+
+.row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: flex-end; }
+.row > .grow { flex: 1 1 14rem; }
+
+.note { font-size: .78rem; color: var(--dim); margin-top: .8rem; }
+.note.bad { color: var(--warn); }
+
+/* ------------------------------------------------------------- layout tabs */
+
+.tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.6rem; }
+.tabs button {
+  background: transparent; color: var(--dim); border-color: var(--edge);
+  font-weight: 400; letter-spacing: .1em;
+}
+.tabs button[aria-pressed=true] { color: var(--page); background: var(--accent); border-color: var(--accent); font-weight: 700; }
+.tabs button:hover { color: var(--page); background: var(--accent); border-color: var(--accent); }
+
+.canvas {
+  background: var(--page); border: 1px solid var(--edge); padding: 1.4rem;
+  display: flex; flex-direction: column; align-items: center; gap: .5rem;
+  overflow-x: auto; transition: border-color var(--shift), background-color var(--shift);
+}
+.canvas .pair { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
+.canvas svg { display: block; max-width: 100%; height: auto; }
+
+/* ------------------------------------------------------------------- steps */
+
+ol.steps { list-style: none; counter-reset: step; margin: 0; padding: 0; }
+ol.steps > li {
+  counter-increment: step; position: relative;
+  padding: 1.6rem 0 1.6rem 3.4rem; border-top: 1px solid var(--edge);
+  transition: border-color var(--shift);
+}
+ol.steps > li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute; left: 0; top: 1.6rem;
+  font-size: .82rem; font-weight: 800; letter-spacing: .06em; color: var(--accent);
+  transition: color var(--shift);
+}
+ol.steps h3 { margin: 0 0 .45rem; font-size: 1.02rem; font-weight: 700; letter-spacing: -.01em; }
+ol.steps p { margin: 0 0 .9rem; font-family: var(--sans); color: var(--dim); font-size: .95rem; line-height: 1.6; max-width: 60ch; transition: color var(--shift); }
+ol.steps .row { margin-bottom: .5rem; }
+
+kbd {
+  font-family: var(--mono); font-size: .82em; background: var(--panel);
+  border: 1px solid var(--edge); padding: .1em .4em; color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ output */
+
+.out { position: relative; }
+.out pre {
+  margin: 0; background: var(--panel); border: 1px solid var(--edge);
+  padding: 1rem 1.1rem; overflow-x: auto; font-size: .78rem; line-height: 1.55;
+  color: var(--dim); max-height: 22rem; transition: border-color var(--shift), background-color var(--shift);
+}
+.out > button { position: absolute; top: .6rem; right: .6rem; }
+
+dl.kv { display: grid; grid-template-columns: auto 1fr; gap: .4rem 1rem; font-size: .82rem; margin: 0 0 1rem; }
+dl.kv dt { color: var(--dim); letter-spacing: .1em; text-transform: uppercase; font-size: .7rem; align-self: center; }
+dl.kv dd { margin: 0; color: var(--ink); }
+
+footer { padding: 3rem 0 4rem; border-top: 1px solid var(--edge); color: var(--dim); font-size: .8rem; }
+
+/* The creature stops moving when it dies. The page should not be livelier than
+ * the thing it is selling, and motion sensitivity is a real constraint. */
+@media (prefers-reduced-motion: reduce) {
+  * { transition-duration: 0ms !important; animation-duration: 0ms !important; animation-iteration-count: 1 !important; }
+  html { scroll-behavior: auto; }
+}

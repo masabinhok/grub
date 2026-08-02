@@ -1,0 +1,53 @@
+name: Publish the site
+
+# Builds site/ and publishes it to GitHub Pages.
+#
+# The only build step is scripts/build_site.js, which concatenates the card
+# generators into one browser file. No npm, no bundler, no package.json — the
+# site renders previews with the same modules the daily job renders with, so a
+# preview can never show something the Action wouldn't produce.
+#
+# Turn it on once: Settings -> Pages -> Source -> GitHub Actions.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish rather than cancelling it half-published.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bundle the generators
+        run: node scripts/build_site.js
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

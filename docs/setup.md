@@ -3,6 +3,12 @@
 Getting GRUB living on your own profile, start to finish. About ten minutes,
 no build step, nothing to install.
 
+> **The short way:** [the adoption page](https://masabinhok.github.io/grub/)
+> walks the same steps with the forms pre-filled, and previews the cards with
+> your own profile data first. It asks for no signup and no token — it just
+> builds the links and the markdown for you. This page is the long-form version,
+> and the reference when something goes wrong.
+
 - [What you are building](#what-you-are-building)
 - [1. Get a copy](#1-get-a-copy)
 - [2. Make it yours](#2-make-it-yours) ← **do not skip this one**

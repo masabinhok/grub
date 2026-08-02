@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRUB — a pet that dies if you stop committing</title>
+<meta name="description" content="A pixel creature that lives on your GitHub profile and starves, visibly and publicly, when you stop committing. Set it up in about three minutes. No signup, no token, no service.">
+<meta property="og:title" content="GRUB — a pet that dies if you stop committing">
+<meta property="og:description" content="It lives on your GitHub profile. It starves when you don't commit. It leaves a tombstone with the date on it.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%230d2018'/><rect x='3' y='5' width='10' height='7' fill='%235fd99a'/><rect x='5' y='7' width='2' height='2' fill='%23fff'/><rect x='9' y='7' width='2' height='2' fill='%23fff'/></svg>">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="mark">GRUB<span> // the tamagotchi of shame</span></div>
+    <nav>
+      <a href="#adopt">Adopt</a>
+      <a href="https://github.com/masabinhok/grub/blob/main/docs/setup.md">Docs</a>
+      <a href="https://github.com/masabinhok/grub">Source</a>
+    </nav>
+  </header>
+</div>
+
+<!-- Hero. The thesis is the scrubber: drag it and the whole page starves too. -->
+<div class="wrap">
+  <section class="hero">
+    <div class="hero-grid">
+      <div>
+        <p class="eyebrow">Lives in your repo · fed by GitHub Actions</p>
+        <h1>This creature dies if you <em>stop coding</em>.</h1>
+        <p class="prose">
+          It sits on your GitHub profile and watches your commit history. Commit today
+          and it eats. Skip a day and it starts to starve — <strong>visibly, publicly</strong> —
+          until it dies and leaves a tombstone with the date on it. The only way back is a
+          commit that says <kbd>i'm sorry</kbd>, and the counter never resets.
+        </p>
+        <p class="prose" style="margin-top:1rem">
+          Drag the day. Everything on this page starves with it, which is precisely what
+          it does to your profile.
+        </p>
+      </div>
+
+      <div class="stage">
+        <div id="hero-card" aria-live="polite"></div>
+        <div class="scrub">
+          <div class="scrub-head">
+            <span>Days since your last commit</span>
+            <b id="scrub-mood">thriving</b>
+          </div>
+          <input type="range" id="scrub" min="0" max="6" step="1" value="0"
+                 aria-label="Days since last commit">
+          <div class="ticks" id="ticks"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Their own data. Everything here is rendered client-side by the same modules
+     the Action uses, so nothing shown can drift from what they'd actually get. -->
+<div class="wrap">
+  <section id="preview">
+    <p class="eyebrow">Step zero</p>
+    <h2>See it with your own profile</h2>
+    <p class="prose">
+      Type your GitHub username. The cards below are rendered right here in your
+      browser by the same code the Action runs — this is not a mockup, it is the
+      real renderer reading your real public profile.
+    </p>
+
+    <div class="row" style="margin:1.6rem 0 .4rem">
+      <div class="grow">
+        <label class="field" for="user">Your GitHub username</label>
+        <input type="text" id="user" placeholder="octocat" autocomplete="off" spellcheck="false">
+      </div>
+      <button id="load">Show me mine</button>
+    </div>
+    <p class="note" id="load-note">Showing sample data until you enter a username.</p>
+
+    <div class="tabs" id="tabs" role="group" aria-label="Layout"></div>
+    <div class="canvas" id="canvas"></div>
+    <p class="note" id="streak-note"></p>
+  </section>
+</div>
+
+<!-- Setup. Numbered because it genuinely is a sequence: each step depends on
+     the one above it, and doing 4 before 2 is the most common way to fail. -->
+<div class="wrap">
+  <section id="adopt">
+    <p class="eyebrow">About three minutes · no signup, no token, nothing installed</p>
+    <h2>Put it on your profile</h2>
+    <p class="prose">
+      GRUB needs to live in a repo of your own — that is what makes the numbers real
+      rather than something a website could fake. These five steps do it. Each button
+      opens GitHub with the form already filled in.
+    </p>
+
+    <div class="row" style="margin:1.8rem 0 .6rem">
+      <div class="grow">
+        <label class="field" for="repo">Name the repo it will live in</label>
+        <input type="text" id="repo" value="grub" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="grow">
+        <label class="field" for="pet">Name your creature</label>
+        <input type="text" id="pet" value="GRUB" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <div class="row" style="margin-bottom:.6rem">
+      <div class="grow">
+        <label class="field" for="tz">Timezone it starves by</label>
+        <input type="text" id="tz" value="Asia/Kathmandu" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="grow">
+        <label class="field" for="stack">Your stack, comma separated</label>
+        <input type="text" id="stack" placeholder="Next.js, Postgres, TypeScript" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+
+    <ol class="steps">
+      <li>
+        <h3>Create your copy of the repo</h3>
+        <p>
+          Opens GitHub's "new repository from template" form with the owner and name
+          filled in. Leave it <strong>public</strong> — GitHub will not serve images out
+          of a private repo, so your profile would show broken icons instead of a creature.
+        </p>
+        <div class="row"><a id="s1" href="#" target="_blank" rel="noopener"><button>Create the repo</button></a></div>
+      </li>
+
+      <li>
+        <h3>Let the Action write to it</h3>
+        <p>
+          Under <em>Workflow permissions</em>, choose <strong>Read and write permissions</strong>
+          and save. The job regenerates the cards and commits them back; without this it
+          runs perfectly and then fails on the last line with a 403.
+        </p>
+        <div class="row"><a id="s2" href="#" target="_blank" rel="noopener"><button>Open Actions settings</button></a></div>
+      </li>
+
+      <li>
+        <h3>Make it yours</h3>
+        <p>
+          Run the <em>Adopt this GRUB</em> workflow and paste these three values into its
+          boxes. A fresh copy still carries the previous owner's cached profile, streak and
+          stack; this clears them. Skip it and your cards will show somebody else's name.
+        </p>
+        <dl class="kv">
+          <dt>Pet name</dt><dd><code id="v-pet">GRUB</code></dd>
+          <dt>Timezone</dt><dd><code id="v-tz">Asia/Kathmandu</code></dd>
+          <dt>Stack</dt><dd><code id="v-stack">—</code></dd>
+        </dl>
+        <div class="row"><a id="s3" href="#" target="_blank" rel="noopener"><button>Run "Adopt this GRUB"</button></a></div>
+      </li>
+
+      <li>
+        <h3>Feed it once</h3>
+        <p>
+          Run <em>Tamagotchi of Shame</em> with every input left blank — blank means a real
+          run. Fifteen seconds later your repo holds eleven freshly rendered cards with your
+          own numbers on them. Wait for this to go green before the last step.
+        </p>
+        <div class="row"><a id="s4" href="#" target="_blank" rel="noopener"><button>Run the daily job</button></a></div>
+      </li>
+
+      <li>
+        <h3>Paste it onto your profile</h3>
+        <p>
+          A public repo named exactly the same as your username shows its README at the top
+          of your profile. Create it, then paste the markdown below. If you already have one,
+          just paste.
+        </p>
+        <div class="row" style="margin-bottom:1rem">
+          <a id="s5" href="#" target="_blank" rel="noopener"><button>Create the profile repo</button></a>
+        </div>
+        <div class="out">
+          <button class="ghost" data-copy="markdown">Copy</button>
+          <pre id="markdown">Enter your username above.</pre>
+        </div>
+      </li>
+    </ol>
+
+    <p class="note" id="cfg-note" style="margin-top:2rem">
+      Want to change the cards, the insults or the snacks later? Everything lives in
+      <code>grub.config.json</code> —
+      <a href="https://github.com/masabinhok/grub/blob/main/docs/configuration.md">the key reference is here</a>.
+    </p>
+  </section>
+</div>
+
+<div class="wrap">
+  <footer>
+    Built with no dependencies, no build step and no third-party services — including
+    this page, which renders the cards above using the same modules the Action does.
+    <a href="https://github.com/masabinhok/grub">Source</a> ·
+    <a href="https://github.com/masabinhok/grub/blob/main/WALL-OF-SHAME.md">Wall of Shame</a>
+  </footer>
+</div>
+
+<script src="grub.browser.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

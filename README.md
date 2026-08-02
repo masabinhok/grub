@@ -36,11 +36,20 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/masabinhok/grub/generate"> Use this template</a></b> ·
-  <a href="../../fork"> Fork it</a> ·
-  <a href="./docs/setup.md">Five-minute setup</a> ·
+  <b><a href="https://masabinhok.github.io/grub/">Adopt one in three minutes →</a></b>
+</p>
+
+<p align="center">
+  <a href="https://github.com/masabinhok/grub/generate">Use this template</a> ·
+  <a href="../../fork">Fork it</a> ·
+  <a href="./docs/setup.md">Full setup guide</a> ·
   <a href="./WALL-OF-SHAME.md">Wall of Shame</a>
 </p>
+
+The [adoption page](https://masabinhok.github.io/grub/) previews the cards with
+**your** GitHub profile before you commit to anything, then hands you the exact
+markdown and pre-filled links for every step. No signup, no token, no service —
+it renders those previews in your browser using the same modules the Action runs.
 
 **Use this template** gives you a clean repo with no commit history attached.
 **Fork** keeps the link back here and shows up in the fork count. Either works —

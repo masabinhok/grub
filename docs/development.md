@@ -17,6 +17,7 @@ scripts/adopt.js               # one-shot: strip the previous owner out of a cop
 scripts/feed_grub.js           # the feed counter, and nothing else
 scripts/render_previews.js     # docs/previews/ — the four-state showcase
 scripts/render_wall.js         # WALL-OF-SHAME.md — the fork leaderboard
+scripts/build_site.js          # bundles the generators for site/
 scripts/lib/                   # state, github, palette, svg, glyphs, snacks, copy...
 scripts/generators/            # one module per card + index.js registry
 grub.config.json               # your settings. never written by the bot
@@ -103,7 +104,25 @@ node scripts/render_previews.js            # rewrite docs/previews/
 node scripts/render_previews.js --check    # fail if what's committed is stale
 node scripts/render_wall.js --dry-run      # print the wall table, write nothing
 node scripts/render_wall.js --offline      # rebuild it without touching the network
+node scripts/build_site.js                 # bundle the generators into site/
+node scripts/build_site.js --check         # fail if that bundle is stale
 ```
+
+The adoption page in `site/` renders its live previews by loading the generators
+directly — `build_site.js` walks the require graph from `generators/index.js` and
+wraps each module in a CommonJS shim, so the page cannot show a card the Action
+would not produce. Three Node builtins get reached transitively (`path` and
+`__dirname` in `constants.js`, `fs` in `config.js`) and are stubbed; every one of
+those code paths already falls back to defaults when it fails, which in a browser
+is the correct answer. To work on it:
+
+```bash
+node scripts/build_site.js && python3 -m http.server -d site 8000
+```
+
+`file://` works too — the GitHub API sends `Access-Control-Allow-Origin: *`, so
+the username lookup succeeds from a local file. The bundle is generated, gitignored
+and rebuilt by `.github/workflows/pages.yml` on every deploy.
 
 `render_previews.js` is pinned to a fixed clock and fixed numbers on purpose — it
 must produce byte-identical output every run, or the daily job would find a diff
