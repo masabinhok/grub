@@ -123,6 +123,9 @@ node scripts/build_site.js && python3 -m http.server -d site 8000
 `file://` works too — the GitHub API sends `Access-Control-Allow-Origin: *`, so
 the username lookup succeeds from a local file. The bundle is generated, gitignored
 and rebuilt by `.github/workflows/pages.yml` on every deploy.
+If the repo has never had GitHub Pages enabled before, the workflow can enable it
+with a `PAGES_TOKEN` secret that has Pages/admin write access; otherwise enable
+Pages once in repository settings and the normal `GITHUB_TOKEN` path is enough.
 
 `render_previews.js` is pinned to a fixed clock and fixed numbers on purpose — it
 must produce byte-identical output every run, or the daily job would find a diff
