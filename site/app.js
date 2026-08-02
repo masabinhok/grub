@@ -308,6 +308,41 @@
     throw e;
   }
 
+  // ------------------------------------------------------------ star count
+
+  // Every visitor spending a request on the same public number is how a page
+  // burns the 60-per-hour unauthenticated budget that the preview above actually
+  // needs. Cache it for an hour and paint the cached figure immediately, so a
+  // rate-limited visitor still sees a count rather than a bare button.
+  var STAR_KEY = 'grub:stars';
+  var STAR_TTL = 3600000;
+
+  function showStars(n) {
+    $('star-count').textContent = n >= 10000 ? Math.round(n / 1000) + 'k'
+      : n >= 1000 ? (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k'
+        : String(n);
+    $('star-count').parentNode.setAttribute(
+      'aria-label', 'Star masabinhok/grub on GitHub — ' + n + (n === 1 ? ' star' : ' stars'));
+  }
+
+  function loadStars() {
+    var cached = null;
+    try { cached = JSON.parse(localStorage.getItem(STAR_KEY)); } catch (e) { /* private mode */ }
+    if (cached && typeof cached.n === 'number') {
+      showStars(cached.n);
+      if (Date.now() - cached.at < STAR_TTL) return;
+    }
+    fetch('https://api.github.com/repos/masabinhok/grub').then(check).then(function (r) {
+      showStars(r.stargazers_count);
+      try {
+        localStorage.setItem(STAR_KEY, JSON.stringify({ n: r.stargazers_count, at: Date.now() }));
+      } catch (e) { /* quota or private mode — the count still shows this visit */ }
+    }).catch(function () {
+      // Offline, rate-limited or blocked. The button is still a link to the repo,
+      // which is the part that matters; a broken number would be worse than none.
+    });
+  }
+
   // ---------------------------------------------------------------- wiring
 
   LAYOUTS_INIT: {
@@ -371,4 +406,5 @@
   });
 
   renderAll();
+  loadStars();
 }());

@@ -53,12 +53,35 @@ body {
 }
 .mark { font-weight: 800; letter-spacing: .14em; font-size: .95rem; color: var(--accent); transition: color var(--shift); }
 .mark span { color: var(--dim); font-weight: 400; }
-.top nav { display: flex; gap: 1.4rem; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+.top nav { display: flex; align-items: center; gap: 1.4rem; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; }
+
+/* The star button. Boxed rather than another bare link, because it is the only
+ * thing in the masthead asking for something instead of offering it. */
+.top nav a.star {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .34rem .62rem; margin: -.34rem 0;
+  border: 1px solid var(--edge); background: var(--panel);
+  color: var(--ink); text-decoration: none; font-weight: 700;
+  transition: border-color var(--shift), background-color var(--shift), color var(--shift);
+}
+.top nav a.star:hover { border-color: var(--accent); color: var(--accent); }
+.top nav a.star svg { color: var(--gold); flex: none; transition: color var(--shift); }
+/* Divided like GitHub's own, so the number reads as a count and not as part of
+ * the label. Empty until the API answers — no dash, no zero, no flicker. */
+.top nav a.star b { font-weight: 700; color: var(--accent); transition: color var(--shift); }
+.top nav a.star b:empty { display: none; }
+.top nav a.star b:not(:empty) {
+  border-left: 1px solid var(--edge); padding-left: .55rem; margin-left: .1rem;
+  transition: border-color var(--shift), color var(--shift);
+}
+
 /* The tagline is the first thing to go — three wrapped lines of masthead pushes
- * the actual headline off a phone screen. */
+ * the actual headline off a phone screen. Source goes next: the star button is
+ * already a link to the same repo. */
 @media (max-width: 560px) {
   .mark span { display: none; }
   .top nav { gap: 1rem; font-size: .72rem; }
+  .top nav a.src { display: none; }
 }
 
 a { color: var(--accent); text-decoration-color: var(--edge); text-underline-offset: 3px; transition: color var(--shift); }
