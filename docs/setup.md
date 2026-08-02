@@ -33,7 +33,7 @@ between them, so it is worth being clear up front:
 | | |
 | --- | --- |
 | **The GRUB repo** — your copy of this one | Runs the Action, holds `pet-state.json`, writes the SVGs into `assets/`. Can be named anything. Must be **public**. |
-| **Your profile repo** — `your-login/your-login` | Holds a `README.md` that GitHub shows at the top of your profile. Contains no code — just `<img>` tags pointing at the SVGs in the first repo. |
+| **Your profile repo** — `your-username/your-username` | Holds a `README.md` that GitHub shows at the top of your profile. Contains no code — just `<img>` tags pointing at the SVGs in the first repo. |
 
 Nothing is copied between them. The profile README links to raw URLs, GitHub
 fetches those through its image cache, and the cards update on your profile
@@ -58,7 +58,7 @@ Template is the tidier start if this is going to be *your* repo; fork is
 friendlier if you plan to send changes back. Name it whatever you like — `grub`,
 `tamagotchi`, `shame-machine`. Just make sure it is public.
 
-> **Don't name it `your-login/your-login`.** That repo is your profile README and
+> **Don't name it `your-username/your-username`.** That repo is your profile README and
 > it is the *second* repo, in [step 6](#6-your-profile-repo). Putting the workflow
 > there works, but every state commit the bot makes then lands on your profile
 > repo's history, and you lose the clean separation.
@@ -90,12 +90,12 @@ that looks like an error.
 One command clears all of it:
 
 ```bash
-git clone https://github.com/your-login/your-repo.git
+git clone https://github.com/your-username/your-repo.git
 cd your-repo
 node scripts/adopt.js
 ```
 
-It resolves your login and repo name from the `origin` remote, resets
+It resolves your username and repo name from the `origin` remote, resets
 `pet-state.json` to a blank slate, puts you on your own wall, and rewrites every
 URL in `PROFILE-README.md` to point at your repo. Then commit:
 
@@ -135,7 +135,7 @@ If you would rather do it by hand, the equivalent is:
 2. In `grub.config.json`, rewrite `inventory.slots` and `petName`.
 3. In `wall-of-shame.json`, replace the entry with your own.
 4. In `PROFILE-README.md`, find-and-replace `masabinhok/grub` with
-   `your-login/your-repo`.
+   `your-username/your-repo`.
 
 ---
 
@@ -220,7 +220,7 @@ same as your username** renders its `README.md` at the top of your profile page.
 If you already have one, skip ahead. Otherwise:
 
 1. [Create a new repository](https://github.com/new).
-2. Name it your login, character for character —
+2. Name it your username, character for character —
    `octocat` → repo named `octocat`. GitHub will show a small note reading
    *"You found a secret! …is a special repository"*. If you don't see that note,
    the name is wrong.
@@ -239,10 +239,10 @@ your profile repo and commit.
 Sanity check before you do — one of the image URLs should read:
 
 ```
-https://raw.githubusercontent.com/YOUR-LOGIN/YOUR-REPO/main/assets/pet.svg
+https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/assets/pet.svg
 ```
 
-If it still says somebody else's login, go back to [step 2](#2-make-it-yours).
+If it still says somebody else's username, go back to [step 2](#2-make-it-yours).
 
 Keep what you like and delete the rest; the cards are independent and any of them
 can be dropped, reordered or resized. Individual copy-paste blocks, sizes and a
@@ -255,7 +255,7 @@ URLs to match — that path segment is a branch name, not a keyword.
 
 ## 8. Check it worked
 
-Load `github.com/your-login`. You should see your cards, animating.
+Load `github.com/your-username`. You should see your cards, animating.
 
 **Give it a few minutes.** GitHub serves README images through its `camo` proxy,
 which caches aggressively — a card you regenerated thirty seconds ago can keep
@@ -351,7 +351,7 @@ points at `cta.upstream` in `grub.config.json`, which ships pointing at
 to you instead:
 
 ```json
-{ "cta": { "upstream": "your-login/your-repo" } }
+{ "cta": { "upstream": "your-username/your-repo" } }
 ```
 
 ---
@@ -365,7 +365,7 @@ to you instead:
 | Job succeeds, profile never updates | `camo` cache. Open the raw URL directly to confirm, then wait. |
 | Job fails on the last step with `403` | Workflow permissions are read-only — [step 3](#3-let-the-action-write). |
 | Broken image icons on your profile | The GRUB repo is private, or the branch in the URL is wrong (`main` vs `master`). |
-| Nothing at all on your profile page | The profile repo name doesn't exactly match your login, or it is private. |
+| Nothing at all on your profile page | The profile repo name doesn't exactly match your username, or it is private. |
 | The cron never fires | Scheduled workflows are disabled on new forks until you enable them on the Actions tab. GitHub also disables them on repos with no activity for 60 days. |
 | `LURKERS` stuck at 0 | No `PET_TOKEN`, or it isn't a classic PAT with `repo` scope — [Tokens](#tokens). |
 | Pet starves on days you worked | Your work is private, or the cron and `timezone` disagree — steps [4](#4-set-your-timezone) and [private repos](#feeding-it-on-private-repos). |

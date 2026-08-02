@@ -241,7 +241,7 @@ your history read `i'm sorry`.
 
 ```json
 {
-  "user": "your-github-login",
+  "user": "your-github-username",
   "repo": "the-repo-your-grub-lives-in",
   "petName": "WHATEVER YOU RENAMED IT TO",
   "note": "one dry line, 60 characters"
