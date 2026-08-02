@@ -1,0 +1,73 @@
+name: Adopt this GRUB
+
+# One-time setup, for people who never clone the repo.
+#
+# A copy of this repo arrives carrying the previous owner: their cached profile,
+# their streak, their stack, their wall entry, and a PROFILE-README.md whose
+# image URLs still point at their repo. This runs scripts/adopt.js to clear all
+# of it and commits the result.
+#
+# Running it a second time is safe but pointless — it resets the creature's
+# state, which after a few days of running is state you would rather keep.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pet_name:
+        description: 'Name your creature (blank keeps GRUB)'
+        required: false
+        default: ''
+      timezone:
+        description: 'IANA timezone it starves by, e.g. Europe/Lisbon'
+        required: false
+        default: ''
+      stack:
+        description: 'Inventory items, comma separated, e.g. Next.js,Postgres,Go'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+jobs:
+  adopt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # Inputs go through the environment rather than being interpolated into
+      # the script. `${{ }}` substitution happens before bash sees the line, so
+      # a pet name containing a quote would otherwise rewrite the command.
+      - name: Make it yours
+        env:
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          BRANCH: ${{ github.event.repository.default_branch }}
+          PET_NAME: ${{ github.event.inputs.pet_name }}
+          PET_TZ: ${{ github.event.inputs.timezone }}
+          PET_STACK: ${{ github.event.inputs.stack }}
+        run: |
+          args=(--user "$OWNER" --repo "$REPO" --branch "$BRANCH")
+          if [ -n "$PET_NAME" ];  then args+=(--name "$PET_NAME");      fi
+          if [ -n "$PET_TZ" ];    then args+=(--timezone "$PET_TZ");    fi
+          if [ -n "$PET_STACK" ]; then args+=(--stack "$PET_STACK");    fi
+          node scripts/adopt.js "${args[@]}"
+
+      - name: Commit
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "Nothing changed — already adopted?"
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'chore: adopt GRUB [skip ci]'
+          git push
+
+      - name: What now
+        run: |
+          echo "::notice::Adopted. Next: run the 'Tamagotchi of Shame' workflow to"
+          echo "::notice::replace the inherited cards in assets/, then copy"
+          echo "::notice::PROFILE-README.md into ${{ github.repository_owner }}/${{ github.repository_owner }}"

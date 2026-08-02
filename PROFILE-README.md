@@ -5,10 +5,14 @@
   whole page desaturates and stops animating if the streak breaks.
 
   Keep what you like, delete the rest — the components are independent.
+
+  Adopted this? Every URL below is absolute and points at the repo the cards are
+  built in — leave them and you are embedding somebody else's profile under your
+  own name. `node scripts/adopt.js` rewrites the lot. See docs/setup.md.
 -->
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/banner.svg" alt="Sabin Shrestha" width="840">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/banner.svg" alt="Profile banner" width="840">
 </p>
 
 

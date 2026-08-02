@@ -13,6 +13,7 @@ job runs in about fifteen seconds. If you have Node, you can run everything here
 
 ```
 scripts/update_pet.js          # entrypoint: CLI, state machine, writing files
+scripts/adopt.js               # one-shot: strip the previous owner out of a copy
 scripts/feed_grub.js           # the feed counter, and nothing else
 scripts/render_previews.js     # docs/previews/ — the four-state showcase
 scripts/render_wall.js         # WALL-OF-SHAME.md — the fork leaderboard
@@ -60,6 +61,26 @@ Previewing a mood needs somewhere to put the output:
 node scripts/update_pet.js --mood feral --outdir /tmp/preview --offline
 node scripts/update_pet.js --days 4 --outdir /tmp/preview
 ```
+
+Prefer `--days` over `--mood`: `--mood` overrides the palette only and leaves the
+real day count, so a feral card comes out reading `0 DAYS SINCE COMMIT`. Both are
+simulations and neither can write to `assets/` or the state file — pointing
+either at the real assets directory prints a warning and exits without writing,
+so a test run can never backdate `lastCommitDate` and starve the pet on fiction.
+
+Rendering all four side by side is a directory each. Written out rather than
+looped on purpose — `set -- $pair` inside a `for` doesn't word-split under zsh,
+which silently drops `--days` and turns each preview into a real API run:
+
+```bash
+node scripts/update_pet.js --days 0 --outdir preview/thriving
+node scripts/update_pet.js --days 2 --outdir preview/hungry
+node scripts/update_pet.js --days 4 --outdir preview/feral
+node scripts/update_pet.js --days 6 --outdir preview/deceased
+```
+
+`--days` never touches the network, so it needs no token — it themes the cards
+off whatever the state file last cached.
 
 `--mood` and `--days` are **simulations**. Aimed at the real `assets/` directory
 they refuse to write anything at all, because a `--days 4` render would otherwise

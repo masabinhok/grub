@@ -44,8 +44,20 @@ It can only be brought back by pushing a commit whose message is exactly
 
 **Use this template** gives you a clean repo with no commit history attached.
 **Fork** keeps the link back here and shows up in the fork count. Either works —
-the [setup](./docs/setup.md) is the same five minutes from both, and there is
-nothing to install at either end.
+the [setup](./docs/setup.md) is the same from both, and there is nothing to
+install at either end.
+
+Whichever you pick, **run this first**:
+
+```bash
+node scripts/adopt.js
+```
+
+A copy of this repo arrives carrying me — my cached profile, my streak, my stack,
+and a `PROFILE-README.md` whose image URLs still point back here. That one
+command clears the lot and rewrites the URLs to your repo. Browser only? Actions
+tab → **Adopt this GRUB** → Run workflow. Then follow
+[the setup guide](./docs/setup.md) the rest of the way.
 
 The button above is one of the cards this thing generates, so it wears the
 creature's current mood like everything else on the page. If GRUB is dead right
