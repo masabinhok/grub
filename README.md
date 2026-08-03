@@ -21,7 +21,7 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <!-- pet:caption -->
-**hungry** · 1 day since the last commit · _Never died. Yet._
+**hungry** · 2 days since the last commit · _Never died. Yet._
 <!-- /pet:caption -->
 
 > The line above is rewritten by the Action on every run. Don't edit it by hand;

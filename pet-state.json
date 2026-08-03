@@ -1,7 +1,7 @@
 {
   "lastCommitDate": "2026-08-02T07:00:00Z",
-  "lastCheckedDate": "2026-08-02T18:42:29.359Z",
-  "hunger": 20,
+  "lastCheckedDate": "2026-08-03T19:10:40.479Z",
+  "hunger": 40,
   "mood": "hungry",
   "alive": true,
   "diedOn": null,
@@ -28,7 +28,6 @@
       "longest": 27,
       "activeDays": 158,
       "spark": [
-        4,
         6,
         0,
         0,
@@ -57,9 +56,10 @@
         24,
         8,
         8,
-        16
+        16,
+        0
       ],
-      "totalContributions": 1157
+      "totalContributions": 1148
     },
     "profile": {
       "name": "Sabin Shrestha",
