@@ -11,13 +11,14 @@ It can only be brought back by pushing a commit whose message is exactly
 `i'm sorry`. The resurrection counter never resets.
 
 <p align="center">
-  <a href="../../issues/new?title=feed%20GRUB&body=here%20you%20go"><img src="./assets/pet.svg" alt="GRUB, the tamagotchi of shame" width="540"></a>
+  <a href="../../issues/new?title=feed%20GRUB%20%F0%9F%8D%93&body=%F0%9F%8D%93%20**A%20snack%20has%20been%20prepared%20for%20GRUB.**%0A%0A-%20**Ration%3A**%20one%20%281%29%20suspiciously%20ripe%20strawberry%0A-%20**Delivered%20by%3A**%20a%20passing%20stranger%20with%20good%20intentions%0A-%20**Nutritional%20value%3A**%20none%20%E2%80%94%20purely%20emotional%0A%0A%3C!--%20Submit%20this%20issue%20to%20feed%20the%20pet%20and%20your%20name%20will%20be%20displayed%20on%20his%20card.%20--%3E%0A%0A**Just%20press%20%60Submit%20new%20issue%60.**%20GRUB%20will%20chew%2C%20sparkle%20and%20wear%20*your%20username*%20on%20his%20card%20for%20the%20next%2024%20hours%2C%20then%20close%20this%20issue%20himself.%0A%0A_Snacks%20are%20cosmetic%20%E2%80%94%20they%20cannot%20keep%20him%20alive.%20Only%20commits%20do%20that%2C%20and%20that%20is%20my%20problem%2C%20not%20yours._"><img src="./assets/pet.svg" alt="GRUB, the tamagotchi of shame" width="540"></a>
 </p>
 
 <p align="center">
-  <b><a href="../../issues/new?title=feed%20GRUB&body=here%20you%20go">🍓 Feed GRUB</a></b> —
-  opens an issue titled <code>feed GRUB</code>. Submit it and he chews, sparkles,
-  and puts <b>your username on the card</b> for 24 hours.
+  <b><a href="../../issues/new?title=feed%20GRUB%20%F0%9F%8D%93&body=%F0%9F%8D%93%20**A%20snack%20has%20been%20prepared%20for%20GRUB.**%0A%0A-%20**Ration%3A**%20one%20%281%29%20suspiciously%20ripe%20strawberry%0A-%20**Delivered%20by%3A**%20a%20passing%20stranger%20with%20good%20intentions%0A-%20**Nutritional%20value%3A**%20none%20%E2%80%94%20purely%20emotional%0A%0A%3C!--%20Submit%20this%20issue%20to%20feed%20the%20pet%20and%20your%20name%20will%20be%20displayed%20on%20his%20card.%20--%3E%0A%0A**Just%20press%20%60Submit%20new%20issue%60.**%20GRUB%20will%20chew%2C%20sparkle%20and%20wear%20*your%20username*%20on%20his%20card%20for%20the%20next%2024%20hours%2C%20then%20close%20this%20issue%20himself.%0A%0A_Snacks%20are%20cosmetic%20%E2%80%94%20they%20cannot%20keep%20him%20alive.%20Only%20commits%20do%20that%2C%20and%20that%20is%20my%20problem%2C%20not%20yours._">🍓 Feed GRUB</a></b> —
+  opens a <b>pre-filled issue</b>, title and snack already written. Press
+  <i>Submit new issue</i> and he chews, sparkles, and puts <b>your username on the
+  card</b> for 24 hours. He closes the issue himself.
 </p>
 
 <!-- pet:caption -->
@@ -207,9 +208,10 @@ Copy-paste blocks for all eleven, plus a finished profile layout, are in
 
 ## Feeding him
 
-**Anyone can feed GRUB.** [Open an issue](../../issues/new?title=feed%20GRUB)
-whose title starts with `feed` or `pet` and he chews, sparkles, and wears **your
-username on the card** for 24 hours. Nothing to install.
+**Anyone can feed GRUB.** [Open an issue](../../issues/new?title=feed%20GRUB%20%F0%9F%8D%93&body=%F0%9F%8D%93%20**A%20snack%20has%20been%20prepared%20for%20GRUB.**%0A%0A-%20**Ration%3A**%20one%20%281%29%20suspiciously%20ripe%20strawberry%0A-%20**Delivered%20by%3A**%20a%20passing%20stranger%20with%20good%20intentions%0A-%20**Nutritional%20value%3A**%20none%20%E2%80%94%20purely%20emotional%0A%0A%3C!--%20Submit%20this%20issue%20to%20feed%20the%20pet%20and%20your%20name%20will%20be%20displayed%20on%20his%20card.%20--%3E%0A%0A**Just%20press%20%60Submit%20new%20issue%60.**%20GRUB%20will%20chew%2C%20sparkle%20and%20wear%20*your%20username*%20on%20his%20card%20for%20the%20next%2024%20hours%2C%20then%20close%20this%20issue%20himself.%0A%0A_Snacks%20are%20cosmetic%20%E2%80%94%20they%20cannot%20keep%20him%20alive.%20Only%20commits%20do%20that%2C%20and%20that%20is%20my%20problem%2C%20not%20yours._)
+— it comes pre-filled, so press *Submit new issue* and he chews, sparkles, and
+wears **your username on the card** for 24 hours. Any title starting with `feed`
+or `pet` does the same. Nothing to install.
 
 What he gets is picked from a pantry — a berry, a donut, a coffee, a cold slice,
 a cookie, or a bug — and the reply tells you which, because the card is genuinely
