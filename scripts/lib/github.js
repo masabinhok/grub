@@ -218,6 +218,31 @@ async function fetchProfileData(username) {
   };
 }
 
+/**
+ * One commit's message and author. Used only to read a push whose payload no
+ * longer carries its commits (see fetchActivity), so it swallows its own
+ * failures — a 404 on a repo that has since gone private must not take the run
+ * down, it just means that push cannot be an apology.
+ */
+async function fetchCommit(nameWithOwner, sha) {
+  if (!nameWithOwner || !sha) return null;
+  const [owner, repo] = String(nameWithOwner).split('/');
+  if (!owner || !repo) return null;
+  try {
+    const data = await gh(
+      `/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/commits/${encodeURIComponent(sha)}`,
+    );
+    const c = data && data.commit;
+    if (!c) return null;
+    return { message: c.message || '', authorName: (c.author && c.author.name) || '' };
+  } catch (_) { return null; }
+}
+
+// How many head commits fetchActivity will go and read per run. Only pushes
+// inside the apology window are ever looked up, and only until the pet has a
+// reason to come back, so this is a ceiling rather than a typical cost.
+const MAX_COMMIT_LOOKUPS = 5;
+
 async function fetchActivity(username, { includePrivate = false } = {}) {
   const result = { lastCommitAt: null, apology: false, source: null, contrib: null };
   const sources = [];
@@ -260,18 +285,41 @@ async function fetchActivity(username, { includePrivate = false } = {}) {
 
   try {
     const events = await gh(`/users/${encodeURIComponent(username)}/events/public?per_page=100`);
+    let lookups = 0;
     for (const ev of events) {
       const when = new Date(ev.created_at).getTime();
       const commits = (ev.payload && ev.payload.commits) || [];
       if (!isSaneDate(ev.created_at, nowMs)) continue;
+      // Only a recent push can be an apology, and reading one costs a request.
+      const recent = nowMs - when < 2 * DAY_MS;
 
       if (ev.type === 'PushEvent') {
-        const real = commits.filter((c) => !isBotCommit(c.message, c.author && c.author.name));
-        if (real.length) {
-          consider(ev.created_at, 'events');
-          if (nowMs - when < 2 * DAY_MS && real.some((c) => normalize(c.message) === APOLOGY_NORM)) {
-            result.apology = true;
+        if (commits.length) {
+          // The payload still had them. Cheapest path, and the only one that can
+          // see every commit in the push rather than just the head.
+          const real = commits.filter((c) => !isBotCommit(c.message, c.author && c.author.name));
+          if (real.length) {
+            consider(ev.created_at, 'events');
+            if (recent && real.some((c) => normalize(c.message) === APOLOGY_NORM)) result.apology = true;
           }
+          continue;
+        }
+
+        // GitHub now trims `commits` out of PushEvent payloads — what arrives is
+        // ref/head/before and nothing else. Read the push itself as the evidence:
+        // this is the actor feed of the user being tracked, so a push in it is
+        // their work by construction. The bot's own commits are pushed by
+        // github-actions[bot] and land in *its* feed, never here, which is the
+        // filtering isBotCommit used to do.
+        consider(ev.created_at, 'events');
+
+        // The head message is the one thing still worth a request: without it a
+        // dead pet could never be revived from an apology pushed anywhere but
+        // this repo (localHeadMessage only ever sees this one).
+        if (!result.apology && recent && lookups < MAX_COMMIT_LOOKUPS) {
+          lookups += 1;
+          const head = await fetchCommit(ev.repo && ev.repo.name, ev.payload && ev.payload.head);
+          if (head && normalize(head.message) === APOLOGY_NORM) result.apology = true;
         }
       } else if (ev.type === 'CreateEvent' && ev.payload && ev.payload.ref_type === 'repository') {
         consider(ev.created_at, 'events');
@@ -330,6 +378,7 @@ module.exports = {
   resolveUsername,
   resolveRepo,
   fetchTraffic,
+  fetchCommit,
   gh,
   ghGraphQL,
   isBotCommit,
