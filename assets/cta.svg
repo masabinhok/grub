@@ -2,27 +2,27 @@
 <title id="ctat">ADOPT ONE OF THESE — masabinhok/grub</title>
 <desc id="ctad">USE THIS TEMPLATE at github.com/masabinhok/grub. it starves when you stop committing.</desc>
 <defs><linearGradient id="ctabg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#252c1c"/><stop offset="1" stop-color="#171b12"/>
+<stop offset="0" stop-color="#173d2b"/><stop offset="1" stop-color="#0d2018"/>
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#94a37d}
-    .big{font-size:31px;font-weight:700;fill:#dfe6cf}
-    .med{font-size:15px;font-weight:700;fill:#dfe6cf}
-    .sm{font-size:11px;fill:#dfe6cf}
-    .dim{font-size:11px;fill:#94a37d}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#79c9a4}
+    .big{font-size:31px;font-weight:700;fill:#e6fff2}
+    .med{font-size:15px;font-weight:700;fill:#e6fff2}
+    .sm{font-size:11px;fill:#e6fff2}
+    .dim{font-size:11px;fill:#79c9a4}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
-    .cta{font-size:13px;font-weight:700;letter-spacing:2.2px;fill:#dfe6cf}
-    .ctasub{font-size:10px;letter-spacing:0.6px;fill:#94a37d}
-    .btn{font-size:12.5px;font-weight:700;letter-spacing:1.6px;fill:#93ad78}
-    .repo{fill:#93ad78;font-weight:700}
+    .cta{font-size:13px;font-weight:700;letter-spacing:2.2px;fill:#e6fff2}
+    .ctasub{font-size:10px;letter-spacing:0.6px;fill:#79c9a4}
+    .btn{font-size:12.5px;font-weight:700;letter-spacing:1.6px;fill:#5fd99a}
+    .repo{fill:#5fd99a;font-weight:700}
     
     .nudge{animation:nudge 3.6s ease-in-out infinite}
     @keyframes nudge{0%,88%,100%{transform:translateX(0)}94%{transform:translateX(4px)}}
 </style>
 <rect width="840" height="64" rx="14" fill="url(#ctabg)"/>
-<rect x="0.75" y="0.75" width="838.5" height="62.5" rx="13.5" fill="none" stroke="#93ad78" stroke-opacity="0.35"/>
-<g transform="translate(18 16)"><rect x="12" y="0" width="4" height="2" fill="#c2a244"/><rect x="14" y="2" width="2" height="2" fill="#c2a244"/><rect x="10" y="4" width="12" height="2" fill="#93ad78"/><rect x="4" y="6" width="24" height="2" fill="#93ad78"/><rect x="2" y="8" width="28" height="2" fill="#93ad78"/><rect x="2" y="10" width="4" height="2" fill="#93ad78"/><rect x="6" y="10" width="6" height="2" fill="#efefe6"/><rect x="12" y="10" width="8" height="2" fill="#93ad78"/><rect x="20" y="10" width="6" height="2" fill="#efefe6"/><rect x="26" y="10" width="4" height="2" fill="#93ad78"/><rect x="2" y="12" width="4" height="2" fill="#93ad78"/><rect x="6" y="12" width="2" height="2" fill="#20250f"/><rect x="8" y="12" width="4" height="2" fill="#efefe6"/><rect x="12" y="12" width="8" height="2" fill="#93ad78"/><rect x="20" y="12" width="2" height="2" fill="#20250f"/><rect x="22" y="12" width="4" height="2" fill="#efefe6"/><rect x="26" y="12" width="4" height="2" fill="#93ad78"/><rect x="2" y="14" width="4" height="2" fill="#93ad78"/><rect x="6" y="14" width="6" height="2" fill="#efefe6"/><rect x="12" y="14" width="8" height="2" fill="#93ad78"/><rect x="20" y="14" width="6" height="2" fill="#efefe6"/><rect x="26" y="14" width="4" height="2" fill="#93ad78"/><rect x="2" y="16" width="28" height="2" fill="#93ad78"/><rect x="2" y="18" width="28" height="2" fill="#93ad78"/><rect x="2" y="20" width="10" height="2" fill="#93ad78"/><rect x="12" y="20" width="8" height="2" fill="#b06274"/><rect x="20" y="20" width="10" height="2" fill="#93ad78"/><rect x="2" y="22" width="28" height="2" fill="#93ad78"/><rect x="4" y="24" width="24" height="2" fill="#93ad78"/><rect x="6" y="26" width="20" height="2" fill="#93ad78"/><rect x="6" y="28" width="4" height="2" fill="#93ad78"/><rect x="22" y="28" width="4" height="2" fill="#93ad78"/><rect x="4" y="30" width="6" height="2" fill="#93ad78"/><rect x="22" y="30" width="6" height="2" fill="#93ad78"/></g><text class="mono cta" x="66" y="29">ADOPT ONE OF THESE</text><text class="mono ctasub" x="66" y="47"><tspan class="repo">masabinhok/grub</tspan> · it starves when you stop committing</text><g class="pulse"><rect x="611" y="15" width="211" height="34" rx="9" fill="#171b12" stroke="#93ad78" stroke-opacity="0.75" stroke-width="1.5"/><text class="mono btn" x="707.5" y="37" text-anchor="middle">USE THIS TEMPLATE</text><g class="nudge"><text class="mono btn" x="804" y="37" text-anchor="middle">&#8594;</text></g></g>
+<rect x="0.75" y="0.75" width="838.5" height="62.5" rx="13.5" fill="none" stroke="#5fd99a" stroke-opacity="0.35"/>
+<g transform="translate(18 16)"><rect x="14" y="0" width="4" height="2" fill="#ffd24c"/><rect x="14" y="2" width="4" height="2" fill="#ffd24c"/><rect x="8" y="4" width="16" height="2" fill="#5fd99a"/><rect x="4" y="6" width="24" height="2" fill="#5fd99a"/><rect x="2" y="8" width="28" height="2" fill="#5fd99a"/><rect x="2" y="10" width="4" height="2" fill="#5fd99a"/><rect x="6" y="10" width="6" height="2" fill="#ffffff"/><rect x="12" y="10" width="8" height="2" fill="#5fd99a"/><rect x="20" y="10" width="6" height="2" fill="#ffffff"/><rect x="26" y="10" width="4" height="2" fill="#5fd99a"/><rect x="2" y="12" width="4" height="2" fill="#5fd99a"/><rect x="6" y="12" width="2" height="2" fill="#ffffff"/><rect x="8" y="12" width="2" height="2" fill="#0d2018"/><rect x="10" y="12" width="2" height="2" fill="#ffffff"/><rect x="12" y="12" width="8" height="2" fill="#5fd99a"/><rect x="20" y="12" width="2" height="2" fill="#ffffff"/><rect x="22" y="12" width="2" height="2" fill="#0d2018"/><rect x="24" y="12" width="2" height="2" fill="#ffffff"/><rect x="26" y="12" width="4" height="2" fill="#5fd99a"/><rect x="2" y="14" width="4" height="2" fill="#5fd99a"/><rect x="6" y="14" width="6" height="2" fill="#ffffff"/><rect x="12" y="14" width="8" height="2" fill="#5fd99a"/><rect x="20" y="14" width="6" height="2" fill="#ffffff"/><rect x="26" y="14" width="4" height="2" fill="#5fd99a"/><rect x="2" y="16" width="28" height="2" fill="#5fd99a"/><rect x="2" y="18" width="8" height="2" fill="#5fd99a"/><rect x="10" y="18" width="12" height="2" fill="#ff6f8f"/><rect x="22" y="18" width="8" height="2" fill="#5fd99a"/><rect x="2" y="20" width="10" height="2" fill="#5fd99a"/><rect x="12" y="20" width="8" height="2" fill="#ff6f8f"/><rect x="20" y="20" width="10" height="2" fill="#5fd99a"/><rect x="2" y="22" width="28" height="2" fill="#5fd99a"/><rect x="4" y="24" width="24" height="2" fill="#5fd99a"/><rect x="6" y="26" width="20" height="2" fill="#5fd99a"/><rect x="6" y="28" width="4" height="2" fill="#5fd99a"/><rect x="22" y="28" width="4" height="2" fill="#5fd99a"/><rect x="4" y="30" width="6" height="2" fill="#5fd99a"/><rect x="22" y="30" width="6" height="2" fill="#5fd99a"/></g><text class="mono cta" x="66" y="29">ADOPT ONE OF THESE</text><text class="mono ctasub" x="66" y="47"><tspan class="repo">masabinhok/grub</tspan> · it starves when you stop committing</text><g class="pulse"><rect x="611" y="15" width="211" height="34" rx="9" fill="#0d2018" stroke="#5fd99a" stroke-opacity="0.75" stroke-width="1.5"/><text class="mono btn" x="707.5" y="37" text-anchor="middle">USE THIS TEMPLATE</text><g class="nudge"><text class="mono btn" x="804" y="37" text-anchor="middle">&#8594;</text></g></g>
 </svg>
