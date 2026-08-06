@@ -167,7 +167,11 @@ async function main() {
     state.hunger = hungerForDays(days);
     if (state.mood === 'deceased') {
       state.alive = false;
-      state.diedOn = addDays(localDate(state.lastCommitDate, tz), DEATH_THRESHOLD_DAYS);
+      // Mood turns deceased once DEATH_THRESHOLD_DAYS full days have been missed,
+      // which happens the calendar day *after* that — see the grace day in
+      // lib/mood.js — so diedOn has to add the same extra day to land on the
+      // date that actually triggered it.
+      state.diedOn = addDays(localDate(state.lastCommitDate, tz), DEATH_THRESHOLD_DAYS + 1);
       state.hunger = 100;
     }
   }
