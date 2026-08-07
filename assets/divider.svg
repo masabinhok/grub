@@ -5,5 +5,5 @@
     @keyframes slide{to{transform:translateX(24px)}}
 </style>
 <rect width="840" height="12" fill="none"/>
-<g class="dash"><line x1="-24" y1="6" x2="864" y2="6" stroke="#93ad78" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="6 18" stroke-linecap="round"/></g>
+<g class="dash"><line x1="-24" y1="6" x2="864" y2="6" stroke="#5fd99a" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="6 18" stroke-linecap="round"/></g>
 </svg>
