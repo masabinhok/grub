@@ -2,20 +2,20 @@
 <title id="stst">30 public repos, 21 stars, 17 followers</title>
 <desc id="stsd">Profile statistics</desc>
 <defs><linearGradient id="stsbg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#173d2b"/><stop offset="1" stop-color="#0d2018"/>
+<stop offset="0" stop-color="#252c1c"/><stop offset="1" stop-color="#171b12"/>
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#79c9a4}
-    .big{font-size:31px;font-weight:700;fill:#e6fff2}
-    .med{font-size:15px;font-weight:700;fill:#e6fff2}
-    .sm{font-size:11px;fill:#e6fff2}
-    .dim{font-size:11px;fill:#79c9a4}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#94a37d}
+    .big{font-size:31px;font-weight:700;fill:#dfe6cf}
+    .med{font-size:15px;font-weight:700;fill:#dfe6cf}
+    .sm{font-size:11px;fill:#dfe6cf}
+    .dim{font-size:11px;fill:#94a37d}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
 </style>
 <rect width="420" height="180" rx="14" fill="url(#stsbg)"/>
-<rect x="0.75" y="0.75" width="418.5" height="178.5" rx="13.5" fill="none" stroke="#5fd99a" stroke-opacity="0.35"/>
-<text class="mono lbl" x="24" y="26">BY THE NUMBERS</text><line x1="24" y1="36" x2="396" y2="36" stroke="#5fd99a" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">PUBLIC REPOS</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#e6fff2">30</text><text class="mono lbl" x="224" y="52">STARS EARNED</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#e6fff2">21</text><text class="mono lbl" x="24" y="118">FOLLOWERS</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#e6fff2">17</text><text class="mono lbl" x="224" y="118">CONTRIBUTIONS</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#e6fff2">1340</text>
+<rect x="0.75" y="0.75" width="418.5" height="178.5" rx="13.5" fill="none" stroke="#93ad78" stroke-opacity="0.35"/>
+<text class="mono lbl" x="24" y="26">BY THE NUMBERS</text><line x1="24" y1="36" x2="396" y2="36" stroke="#93ad78" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">PUBLIC REPOS</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#dfe6cf">30</text><text class="mono lbl" x="224" y="52">STARS EARNED</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#dfe6cf">21</text><text class="mono lbl" x="24" y="118">FOLLOWERS</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#dfe6cf">17</text><text class="mono lbl" x="224" y="118">CONTRIBUTIONS</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#dfe6cf">1340</text>
 </svg>
