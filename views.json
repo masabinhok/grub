@@ -1,7 +1,13 @@
 {
-  "since": null,
-  "updatedAt": null,
-  "total": 0,
-  "days": {},
-  "worker": null
+  "since": "2026-08-31T05:59:58.331Z",
+  "updatedAt": "2026-08-31T06:19:12.928Z",
+  "total": 3,
+  "days": {
+    "2026-08-31": 3
+  },
+  "worker": {
+    "total": 3,
+    "rejected": 11,
+    "since": "2026-08-31T05:59:58.331Z"
+  }
 }
