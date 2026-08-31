@@ -222,11 +222,25 @@ longer your most interesting problem.
 
 ## Keeping the history
 
-The Durable Object is the live counter; it is not an archive. `.github/workflows/views.yml`
-runs daily, reads `/stats.json`, and folds it into `views.json` at the repo root
-via `scripts/merge_views.js` — append-only per day, past days never rewritten
-downward. If the DO is ever wiped, the history is still in git and the total
-plateaus instead of falling off a cliff.
+The Durable Object is the live counter; it is not an archive. `scripts/merge_views.js`
+reads `/stats.json` and folds it into `views.json` at the repo root — append-only
+per day, past days never rewritten downward. If the DO is ever wiped, the history
+is still in git and the total plateaus instead of falling off a cliff.
+
+It runs twice a day, on purpose:
+
+- **`pet.yml`, at 17:45 UTC**, immediately before the cards are drawn. This is
+  the one that matters for the number you see: the eye card is rendered from
+  `views.json`, so refreshing it in the same run is what makes the count on the
+  card current as of midnight rather than as of the previous morning. The step is
+  `continue-on-error` — Cloudflare having a bad day must not stop the creature
+  from updating.
+- **`views.yml`, at 04:25 UTC**, on its own. This one is the backstop. It keeps
+  the history accumulating even if the pet job is disabled, failing, or the repo
+  has gone quiet, which is the whole reason the history lives in git.
+
+Running it twice is free and idempotent: the merge only writes when a number
+actually moved, and only commits when the file changed.
 
 Set the Worker URL as a **repository variable** named `VIEWS_URL` (Settings →
 Secrets and variables → Actions → Variables). Not a secret — it is a public URL

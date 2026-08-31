@@ -2,6 +2,11 @@ name: Profile Views
 
 # Copies the Worker's counter into git once a day.
 #
+# This is the backstop, not the main path. pet.yml runs the same merge right
+# before it draws the cards, which is what keeps the number on the eye card
+# current. This job exists so the history keeps accumulating even if the pet job
+# is disabled or failing — losing the count is the one thing views.json is for.
+#
 # The Durable Object behind counter/ is the live counter, but it is not a
 # permanent record: delete the Worker, botch a migration, or move the Cloudflare
 # account and the number is gone. This job is the durable half — views.json is

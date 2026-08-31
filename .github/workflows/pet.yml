@@ -55,6 +55,21 @@ jobs:
       # zero dependencies, so there is nothing to install. Keeps the job ~15s.
       - uses: actions/checkout@v4
 
+      # Pull the Worker's live count into views.json *before* the cards are drawn,
+      # so the eye card shows this run's number rather than whatever the 04:25
+      # views.yml run happened to see. views.yml still runs on its own schedule —
+      # it is the backstop that keeps the history if this job ever stops.
+      #
+      # Never fatal, and deliberately so: Cloudflare having a bad morning must not
+      # stop the creature from being updated. A failure here just means the card
+      # is drawn with the last committed count.
+      - name: Refresh the view count
+        if: vars.VIEWS_URL != '' && github.event.inputs.dry_run != 'true'
+        continue-on-error: true
+        env:
+          VIEWS_URL: ${{ vars.VIEWS_URL }}
+        run: node scripts/merge_views.js
+
       - name: Update the creature
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -92,6 +107,6 @@ jobs:
           fi
           git config user.name  'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add pet-state.json assets README.md WALL-OF-SHAME.md
+          git add pet-state.json views.json assets README.md WALL-OF-SHAME.md
           git commit -m 'chore: update pet state [skip ci]'
           git push
