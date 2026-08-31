@@ -91,6 +91,16 @@ jobs:
             ${{ github.event.inputs.force_apology == 'true' && '--apology' || '' }} \
             ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
 
+      # The no-background set, used by the profile README. Same state, same
+      # numbers, same run — only the palette and the card chrome differ, so the
+      # two sets can never disagree about what day it is.
+      #
+      # --bare counts as a preview inside update_pet.js, which is why it needs
+      # its own --outdir and cannot touch assets/ or the state file.
+      - name: Render the no-background set
+        if: github.event.inputs.dry_run != 'true'
+        run: node scripts/update_pet.js --offline --bare --outdir assets/bare
+
       # Reads each fork's public pet-state.json off raw.githubusercontent.com.
       # No token, one request per entry, and it swallows its own failures — the
       # wall is decoration and does not get to fail the creature's job.

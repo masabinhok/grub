@@ -100,7 +100,7 @@ module.exports = function renderStar(state, ctx) {
     `<polygon points="${points}" fill="none" stroke="${gold}" stroke-opacity="${dead ? 0.35 : 0.85}" stroke-width="2" stroke-linejoin="round"/>` +
     sparkles +
     `<text class="mono lbl" x="${COL_X}" y="60">${esc(lbl.title)}</text>` +
-    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(stars, { x: COL_X, y: 108 - GLYPH_H * scale, scale, fill: gold })}</g>` +
+    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(stars, { x: COL_X, y: 108 - GLYPH_H * scale, scale, fill: pal.hot || gold })}</g>` +
     `<text class="mono lbl" x="${COL_X}" y="140">${esc(lbl.repos)}</text>` +
     `<text class="mono med" x="${COL_X + 104}" y="140">${p.publicRepos || 0}</text>`;
 

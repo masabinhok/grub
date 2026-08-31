@@ -112,7 +112,7 @@ module.exports = function renderStreak(state, ctx) {
   const body =
     glow + hearth + fire + embers + coalBed +
     `<text class="mono lbl" x="${COL_X}" y="42">${esc(lbl.current)}</text>` +
-    glyphRects(num, { x: COL_X, y: numY, scale, fill: lit ? gold : pal.dim }) +
+    glyphRects(num, { x: COL_X, y: numY, scale, fill: lit ? (pal.hot || gold) : pal.dim }) +
     `<text class="mono fnum" x="${COL_X + numW + 8}" y="94">${esc(lbl.days)}</text>` +
     `<text class="mono lbl" x="${COL_X}" y="130">${esc(lbl.longest)}</text>` +
     `<text class="mono med" x="${COL_X}" y="152">${s.longest || 0}</text>` +

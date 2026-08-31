@@ -57,7 +57,7 @@ const {
 const { DAY_MS, localDate, addDays, daysBetween, startOfLocalDay } = require('./lib/dates');
 const { parseArgs } = require('./lib/cli');
 const { loadConfig, enabledComponents } = require('./lib/config');
-const { resolvePalettes } = require('./lib/palette');
+const { resolvePalettes, barePalette } = require('./lib/palette');
 const { loadState, saveState } = require('./lib/state');
 const { moodForDays, hungerForDays } = require('./lib/mood');
 const { pickLine, linesFor } = require('./lib/copy');
@@ -265,10 +265,15 @@ async function main() {
   const snacks = resolveSnacks(cfg);
   const snack = snackById(snacks, state.lastSnack) || pickSnack(snacks, feeder || petName);
 
-  // Marking the palettes rather than passing a flag down: every generator already
-  // hands `pal` to svgDoc, so this reaches all ten cards without touching one.
-  const palettes = resolvePalettes(cfg);
-  if (OPTS.bare) for (const pal of Object.values(palettes)) pal.bare = true;
+  // Retinting the palettes rather than passing a flag down: every generator
+  // already hands `pal` to svgDoc, so this reaches all eleven cards without
+  // touching one. barePalette also sets the `bare` marker svgDoc looks for.
+  let palettes = resolvePalettes(cfg);
+  if (OPTS.bare) {
+    palettes = Object.fromEntries(
+      Object.entries(palettes).map(([mood, pal]) => [mood, barePalette(pal)]),
+    );
+  }
 
   const ctx = {
     days, line, revived, streak, profile: profileData, watchers, fed, feeder, snack, now,

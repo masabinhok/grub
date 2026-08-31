@@ -69,7 +69,7 @@ simulations and neither can write to `assets/` or the state file — pointing
 either at the real assets directory prints a warning and exits without writing,
 so a test run can never backdate `lastCommitDate` and starve the pet on fiction.
 
-### `--bare` (experimental)
+### `--bare`
 
 Renders every card without its background panel or border, so the artwork sits
 directly on the README page:
@@ -78,21 +78,37 @@ directly on the README page:
 node scripts/update_pet.js --bare --outdir /tmp/bare --offline
 ```
 
-`--bare` counts as a simulation for the rule above, so it can never overwrite
-`assets/`. It is a flag on the palette (`pal.bare`), read by `svgDoc` in
-`lib/svg.js` — that is why it reaches all eleven cards without a line of change
-in any generator.
+This is what `PROFILE-README.md` now embeds. `pet.yml` renders the set into
+`assets/bare/` on every daily run, from the same state as `assets/`, so the two
+can never disagree.
 
-**It only works on a dark page.** The palettes carry near-white type (`ink` is
-`#e6fff2`), and the card background is the only reason that is legible. Drop the
-background and the artwork — grub, star, fire, eye, the language bars — still
-reads fine on white, but every number and label goes invisible: the whole of
-`stats`, the values in `inventory`, the name in `banner`, `FED` on the eye.
+`--bare` counts as a simulation, so it can never overwrite `assets/` itself. It
+is a flag on the palette (`pal.bare`), read by `svgDoc` in `lib/svg.js` — that is
+why it reaches all eleven cards without a line of change in any generator.
 
-GitHub renders READMEs on white as readily as on black, and `prefers-color-scheme`
-is not reliably honoured inside a camo-proxied image, so a media query would be a
-coin flip rather than a fix. Making this shippable means a second palette whose
-type is a mid-tone that survives both grounds — not a change to `svgDoc`.
+**The palette is retinted, and that is the whole trick.** Without a card behind
+it the type has to survive whichever theme the reader has GitHub set to. The
+normal `ink` is `#e6fff2`: 1.05:1 on white, i.e. invisible. `barePalette()` in
+`lib/palette.js` pulls each meaningful role to a target relative luminance,
+preserving hue, so a green stays the same green.
+
+There is a hard ceiling worth knowing before retuning those targets. Contrast
+against white falls as a colour lightens and contrast against `#0d1117` rises;
+the best a single colour can do against both is where the curves cross, at
+luminance ~0.19, which is **4.34:1**. AA for large text (3:1) is reachable. AA
+for body text (4.5:1) is not reachable at all, by any colour. The cards buy it
+back by setting type large, bold or letter-spaced.
+
+Current worst case across all four moods and every role is 3.36:1. To check
+after a palette change:
+
+```js
+const { resolvePalettes, barePalette, contrast } = require('./scripts/lib/palette');
+// contrast(colour, '#ffffff') and contrast(colour, '#0d1117') — both must clear 3
+```
+
+`prefers-color-scheme` is not an alternative: camo does not honour it reliably
+inside a proxied image, so a media query would be a coin flip rather than a fix.
 
 Rendering all four side by side is a directory each. Written out rather than
 looped on purpose — `set -- $pair` inside a `for` doesn't word-split under zsh,

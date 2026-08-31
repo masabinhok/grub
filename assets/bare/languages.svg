@@ -6,15 +6,15 @@
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#79c9a4}
-    .big{font-size:31px;font-weight:700;fill:#e6fff2}
-    .med{font-size:15px;font-weight:700;fill:#e6fff2}
-    .sm{font-size:11px;fill:#e6fff2}
-    .dim{font-size:11px;fill:#79c9a4}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#3f9c71}
+    .big{font-size:31px;font-weight:700;fill:#008a42}
+    .med{font-size:15px;font-weight:700;fill:#008a42}
+    .sm{font-size:11px;fill:#008a42}
+    .dim{font-size:11px;fill:#3f9c71}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
 </style>
 
-<text class="mono lbl" x="24" y="26">MOST USED LANGUAGES</text><line x1="24" y1="36" x2="396" y2="36" stroke="#5fd99a" stroke-opacity="0.25"/><rect x="24" y="58" width="200" height="14" fill="#3178c6" rx="3"/><rect x="226" y="58" width="114" height="14" fill="#f1e05a" rx="0"/><rect x="342" y="58" width="29" height="14" fill="#3572a5" rx="0"/><rect x="373" y="58" width="14" height="14" fill="#a97bff" rx="0"/><rect x="389" y="58" width="14" height="14" fill="#00add8" rx="3"/><rect x="24" y="98" width="9" height="9" rx="2" fill="#3178c6"/><text class="mono sm" x="39" y="106">TypeScript</text><text class="mono dim" x="113" y="106">54%</text><rect x="224" y="98" width="9" height="9" rx="2" fill="#f1e05a"/><text class="mono sm" x="239" y="106">JavaScript</text><text class="mono dim" x="313" y="106">31%</text><rect x="24" y="124" width="9" height="9" rx="2" fill="#3572a5"/><text class="mono sm" x="39" y="132">Python</text><text class="mono dim" x="86.6" y="132">8%</text><rect x="224" y="124" width="9" height="9" rx="2" fill="#a97bff"/><text class="mono sm" x="239" y="132">Kotlin</text><text class="mono dim" x="286.6" y="132">4%</text><rect x="24" y="150" width="9" height="9" rx="2" fill="#00add8"/><text class="mono sm" x="39" y="158">Go</text><text class="mono dim" x="60.2" y="158">4%</text>
+<text class="mono lbl" x="24" y="26">MOST USED LANGUAGES</text><line x1="24" y1="36" x2="396" y2="36" stroke="#239359" stroke-opacity="0.25"/><rect x="24" y="58" width="200" height="14" fill="#3178c6" rx="3"/><rect x="226" y="58" width="114" height="14" fill="#f1e05a" rx="0"/><rect x="342" y="58" width="29" height="14" fill="#3572a5" rx="0"/><rect x="373" y="58" width="14" height="14" fill="#a97bff" rx="0"/><rect x="389" y="58" width="14" height="14" fill="#00add8" rx="3"/><rect x="24" y="98" width="9" height="9" rx="2" fill="#3178c6"/><text class="mono sm" x="39" y="106">TypeScript</text><text class="mono dim" x="113" y="106">54%</text><rect x="224" y="98" width="9" height="9" rx="2" fill="#f1e05a"/><text class="mono sm" x="239" y="106">JavaScript</text><text class="mono dim" x="313" y="106">31%</text><rect x="24" y="124" width="9" height="9" rx="2" fill="#3572a5"/><text class="mono sm" x="39" y="132">Python</text><text class="mono dim" x="86.6" y="132">8%</text><rect x="224" y="124" width="9" height="9" rx="2" fill="#a97bff"/><text class="mono sm" x="239" y="132">Kotlin</text><text class="mono dim" x="286.6" y="132">4%</text><rect x="24" y="150" width="9" height="9" rx="2" fill="#00add8"/><text class="mono sm" x="39" y="158">Go</text><text class="mono dim" x="60.2" y="158">4%</text>
 </svg>

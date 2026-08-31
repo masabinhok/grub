@@ -20,7 +20,7 @@ workers_dev = true
 # ADOPTING THIS REPO? Point this at your own fork, or you will be serving — and
 # counting views onto — somebody else's card.
 [vars]
-CARD_URL = "https://raw.githubusercontent.com/masabinhok/grub/main/assets/eye.svg"
+CARD_URL = "https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/eye.svg"
 
 [[durable_objects.bindings]]
 name = "VIEWS"
