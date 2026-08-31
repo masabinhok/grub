@@ -65,8 +65,30 @@ function baseStyle(pal, dead) {
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}`}`;
 }
 
-/** Wraps body content in a themed card with a gradient background and border. */
+/**
+ * Wraps body content in a themed card with a gradient background and border.
+ *
+ * EXPERIMENTAL: a palette carrying `bare: true` (set by --bare, see
+ * scripts/lib/cli.js) drops the background and the border, leaving the artwork
+ * to sit directly on the README page. Everything else renders identically, so
+ * the two modes cannot drift apart.
+ *
+ * The flag rides on the palette rather than the argument list because every
+ * generator already threads `pal` through to here — this way the mode reaches
+ * all ten cards without editing any of them.
+ *
+ * Read the caveat in docs/development.md before using it for real: the card
+ * background is the only reason the light-coloured type is legible, and GitHub
+ * renders READMEs on white as readily as on black.
+ */
 function svgDoc({ w, h, pal, id, title, desc, style, body }) {
+  // The newline between the two rects is load-bearing: without it every card in
+  // assets/ re-serialises differently and the next scheduled run commits eleven
+  // files of pure whitespace churn. Bare mode leaves a blank line here instead,
+  // which costs one byte and changes nothing.
+  const chrome = pal.bare ? '' :
+    `<rect width="${w}" height="${h}" rx="14" fill="url(#${id}bg)"/>\n` +
+    `<rect x="0.75" y="0.75" width="${w - 1.5}" height="${h - 1.5}" rx="13.5" fill="none" stroke="${pal.accent}" stroke-opacity="0.35"/>`;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-labelledby="${id}t ${id}d">
 <title id="${id}t">${esc(title)}</title>
 <desc id="${id}d">${esc(desc)}</desc>
@@ -75,8 +97,7 @@ function svgDoc({ w, h, pal, id, title, desc, style, body }) {
 </linearGradient></defs>
 <style>${style}
 </style>
-<rect width="${w}" height="${h}" rx="14" fill="url(#${id}bg)"/>
-<rect x="0.75" y="0.75" width="${w - 1.5}" height="${h - 1.5}" rx="13.5" fill="none" stroke="${pal.accent}" stroke-opacity="0.35"/>
+${chrome}
 ${body}
 </svg>
 `;

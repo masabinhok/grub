@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 120" width="840" height="120" role="img" aria-labelledby="bant band">
+<title id="bant">Sabin Shrestha — what i do is art</title>
+<desc id="band">Pet status: thriving</desc>
+<defs><linearGradient id="banbg" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#173d2b"/><stop offset="1" stop-color="#0d2018"/>
+</linearGradient></defs>
+<style>
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#79c9a4}
+    .big{font-size:31px;font-weight:700;fill:#e6fff2}
+    .med{font-size:15px;font-weight:700;fill:#e6fff2}
+    .sm{font-size:11px;fill:#e6fff2}
+    .dim{font-size:11px;fill:#79c9a4}
+    
+    .pulse{animation:pulse 3.4s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
+</style>
+
+<text class="mono big" x="34" y="56">SABIN SHRESTHA</text><text class="mono dim" x="34" y="78">IOE, Pulchowk Campus · Kathmandu, Nepal</text><text class="mono lbl" x="34" y="98">WHAT I DO IS ART</text><text class="mono lbl" x="806" y="42" text-anchor="end">PET STATUS</text><text class="mono med pulse" x="806" y="64" text-anchor="end" fill="#5fd99a">THRIVING</text><rect x="560" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="569" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="578" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="587" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="596" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="605" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="614" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="623" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="632" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="641" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="650" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="659" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="668" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="677" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="686" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="695" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="704" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="713" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="722" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="731" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="740" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="749" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="758" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="767" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="776" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="785" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="794" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/><rect x="803" y="78" width="6" height="6" fill="#5fd99a" opacity="1"/>
+</svg>

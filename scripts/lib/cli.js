@@ -24,6 +24,9 @@ function parseArgs(argv = process.argv.slice(2)) {
     only: getOpt('only', null),
     config: getOpt('config', process.env.GRUB_CONFIG || null),
     forceMood: getOpt('mood', null),
+    // Experimental. Renders every card without its background or border.
+    // Treated as a preview by update_pet.js, so it can never overwrite assets/.
+    bare: hasFlag('bare'),
     includePrivate: hasFlag('include-private') || process.env.PET_INCLUDE_PRIVATE === '1',
     help: hasFlag('help') || hasFlag('h'),
   };

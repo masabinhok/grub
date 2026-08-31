@@ -69,6 +69,31 @@ simulations and neither can write to `assets/` or the state file — pointing
 either at the real assets directory prints a warning and exits without writing,
 so a test run can never backdate `lastCommitDate` and starve the pet on fiction.
 
+### `--bare` (experimental)
+
+Renders every card without its background panel or border, so the artwork sits
+directly on the README page:
+
+```bash
+node scripts/update_pet.js --bare --outdir /tmp/bare --offline
+```
+
+`--bare` counts as a simulation for the rule above, so it can never overwrite
+`assets/`. It is a flag on the palette (`pal.bare`), read by `svgDoc` in
+`lib/svg.js` — that is why it reaches all eleven cards without a line of change
+in any generator.
+
+**It only works on a dark page.** The palettes carry near-white type (`ink` is
+`#e6fff2`), and the card background is the only reason that is legible. Drop the
+background and the artwork — grub, star, fire, eye, the language bars — still
+reads fine on white, but every number and label goes invisible: the whole of
+`stats`, the values in `inventory`, the name in `banner`, `FED` on the eye.
+
+GitHub renders READMEs on white as readily as on black, and `prefers-color-scheme`
+is not reliably honoured inside a camo-proxied image, so a media query would be a
+coin flip rather than a fix. Making this shippable means a second palette whose
+type is a mid-tone that survives both grounds — not a change to `svgDoc`.
+
 Rendering all four side by side is a directory each. Written out rather than
 looped on purpose — `set -- $pair` inside a `for` doesn't word-split under zsh,
 which silently drops `--days` and turns each preview into a real API run:

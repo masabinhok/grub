@@ -31,6 +31,7 @@
  *   node scripts/update_pet.js --include-private    # let private repos feed it
  *   node scripts/update_pet.js --mood feral --outdir /tmp/x --offline   # preview
  *   node scripts/update_pet.js --only streak        # render one component
+ *   node scripts/update_pet.js --bare --outdir /tmp/x --offline   # no card bg
  *   node scripts/update_pet.js --config alt.json    # use a different config
  *
  * Configuration:
@@ -233,7 +234,10 @@ async function main() {
 
   // --mood is a preview override: render as if the pet were in that state
   // without letting it touch the real saved state.
-  const isPreview = Boolean(OPTS.forceMood) || source === 'simulated';
+  // --bare joins --mood and --days as a preview. That is not cosmetic: it is what
+  // makes the existing assets/ guard below refuse to overwrite the real cards, so
+  // an experiment can never end up on the profile by accident.
+  const isPreview = Boolean(OPTS.forceMood) || source === 'simulated' || OPTS.bare;
   const renderState = OPTS.forceMood ? Object.assign({}, state, { mood: OPTS.forceMood, alive: OPTS.forceMood !== 'deceased' }) : state;
   // The reaction expires on its own, so a normal scheduled run is what clears it —
   // the feed workflow never has to schedule a follow-up to take it back down.
@@ -261,9 +265,14 @@ async function main() {
   const snacks = resolveSnacks(cfg);
   const snack = snackById(snacks, state.lastSnack) || pickSnack(snacks, feeder || petName);
 
+  // Marking the palettes rather than passing a flag down: every generator already
+  // hands `pal` to svgDoc, so this reaches all ten cards without touching one.
+  const palettes = resolvePalettes(cfg);
+  if (OPTS.bare) for (const pal of Object.values(palettes)) pal.bare = true;
+
   const ctx = {
     days, line, revived, streak, profile: profileData, watchers, fed, feeder, snack, now,
-    cfg, palettes: resolvePalettes(cfg),
+    cfg, palettes,
   };
 
   const names = OPTS.only ? [OPTS.only] : enabledComponents(cfg, COMPONENTS);
@@ -294,7 +303,7 @@ async function main() {
   // otherwise `--days 4` leaves feral cards next to a thriving state file, and
   // the mismatch gets committed. Point it somewhere else to actually see them.
   if (isPreview && path.resolve(OPTS.outDir) === ASSETS_DIR) {
-    console.log('\n-- simulation, nothing written --');
+    console.log(`\n-- ${OPTS.bare ? 'experiment' : 'simulation'}, nothing written --`);
     console.log('   re-run with --outdir <dir> to write these previews somewhere safe');
     return;
   }
