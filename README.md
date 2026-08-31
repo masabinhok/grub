@@ -82,7 +82,7 @@ now, that button is grey. That is the honest advert.
 | **[Setup](./docs/setup.md)** | Fork it for your own profile, Actions permissions, `PET_TOKEN`, private repos |
 | **[Embedding the cards](./docs/embedding.md)** | Every card, copy-paste blocks, a full profile layout |
 | **[Configuration](./docs/configuration.md)** | Every key in `grub.config.json`, your own snacks and insults |
-| **[Feeding him](./docs/feeding.md)** | How anyone can feed GRUB, the safety rules, what `LURKERS` counts |
+| **[Feeding him](./docs/feeding.md)** | How anyone can feed GRUB, and the safety rules on a public write path |
 | **[Development](./docs/development.md)** | Repo layout, the local CLI, adding a card |
 | **[Contributing](./CONTRIBUTING.md)** | Send a snack, a quote or an insult — good first PRs |
 | **[Wall of Shame](./WALL-OF-SHAME.md)** | Every GRUB running in public, ranked by deaths survived |
@@ -193,7 +193,7 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
 | `assets/pet.svg` | 540×300 | GRUB himself, asking to be fed |
 | `assets/streak.svg` | 420×180 | A fire the size of your streak, one coal per day |
-| `assets/eye.svg` | 420×180 | An eye that watches back. Lurkers vs. people who fed him |
+| `assets/eye.svg` | 420×180 | An eye that watches back, counting profile views |
 | `assets/star.svg` | 420×180 | One glazed star holding every star you've earned |
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
@@ -220,11 +220,11 @@ self-contained PR: some pixel art and one rude line.
 
 It is also, deliberately, cosmetic. A snack never touches `hunger`, `mood` or
 `alive` — only commits keep GRUB alive, and only `i'm sorry` revives him. That
-gap between people who looked and people who acted is the whole `LURKERS` vs
-`FED` split on the eye card.
+gap between people who looked and people who acted is the whole point of the eye
+card: a big view count, and a small `FED` beside it.
 
-The full rules, the abuse limits on a public write path, and an honest account of
-what `LURKERS` actually measures: **[Feeding him](./docs/feeding.md)**.
+The full rules and the abuse limits on a public write path:
+**[Feeding him](./docs/feeding.md)**.
 
 ---
 
@@ -292,9 +292,12 @@ Local commands and how to add a card: **[Development](./docs/development.md)**.
   pet can lag by a few minutes before it shows up on your profile.
 - The Action's own commits are filtered out by author and by `[skip ci]`, so the
   pet can never feed itself.
-- The eye's `LURKERS` figure starts at zero on the day you first run it and
-  counts repo traffic. It is not a profile README view counter, because no such
-  thing is possible for anyone.
+- The eye's view count starts at zero the day you deploy the Worker in
+  `counter/`, and counts fetches of the card by GitHub's image proxy — i.e.
+  renders of your profile README. It is not unique visitors: the proxy strips
+  the viewer's IP, so that number is not measurable by anyone. Without the
+  Worker the card renders a 0 and everything else still works.
+  See **[counter/README.md](./counter/README.md)**.
 - Feeding him is cosmetic on purpose. If you were hoping the button would keep
   him alive, that is the joke.
 

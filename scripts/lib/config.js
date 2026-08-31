@@ -122,7 +122,6 @@ const DEFAULTS = {
       activeDays: 'ACTIVE DAYS',
     },
     eye: {
-      lurkers: 'LURKERS',
       fed: 'FED',
     },
     star: {

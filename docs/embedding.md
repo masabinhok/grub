@@ -23,7 +23,7 @@ desaturates together — and when he dies, **nothing on the page animates at all
 | `assets/divider.svg` | 840×12 | Dashed rule that drifts while alive, freezes when dead |
 | `assets/pet.svg` | 540×300 | GRUB himself, asking to be fed |
 | `assets/streak.svg` | 420×180 | A fire the size of your streak, one coal per day |
-| `assets/eye.svg` | 420×180 | An eye that watches back. Lurkers vs. people who fed him |
+| `assets/eye.svg` | 420×180 | An eye that watches back, counting profile views |
 | `assets/star.svg` | 420×180 | One glazed star holding every star you've earned |
 | `assets/stats.svg` | 420×180 | Repos, stars, followers, contributions |
 | `assets/languages.svg` | 420×180 | Top languages as a segmented bar |
@@ -37,9 +37,11 @@ supporting paragraph:
 
 - **The eye** blinks on a loop, drifts its pupil around like it is reading over
   your shoulder, and takes the iris colour from GRUB's mood. When he dies it
-  closes and stays closed. Beside it: `LURKERS`, everyone who turned up, and
-  `FED`, the ones who did something about it. The gap is the point — see
-  [What `LURKERS` actually counts](./feeding.md#what-lurkers-actually-counts).
+  closes and stays closed. Beside it, unlabelled, is the profile view count — an
+  eye with a number next to it does not need telling what it counts — and `FED`
+  in the corner, the ones who did something about it. The gap is the point.
+  What the number honestly is, and what it cannot be:
+  [counter/README.md](../counter/README.md).
 - **The star** is a five-pointer under a highlight that sweeps across it on a
   loop, with rays turning slowly behind and sparkles firing off the points. Dead
   pet, dead star: grey metal, no sweep.
@@ -95,7 +97,7 @@ plea the card is making:
 **Eye** — 420×180
 
 ```html
-<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Lurkers versus people who fed him">
+<img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Profile views, and people who fed him">
 ```
 
 **Star** — 420×180
@@ -167,7 +169,7 @@ The bare layout, everything at once, with the rows lined up:
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Lurkers versus people who fed him">
+  <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/eye.svg" width="420" alt="Profile views, and people who fed him">
   <img src="https://raw.githubusercontent.com/USERNAME/REPO/main/assets/stats.svg" width="420" alt="Profile statistics">
 </p>
 

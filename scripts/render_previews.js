@@ -44,7 +44,10 @@ const DIED_ON = '2026-01-09';
 // invented, and they are the same every run — these cards are a showroom, not a
 // status readout.
 const STREAK = { current: 12, longest: 47, activeDays: 214, totalContributions: 1893 };
-const WATCHERS = { lurkers: 1204, fed: 37, views: 3160, since: '2025-11-02' };
+const WATCHERS = {
+  profileViews: 18402, profileViewsSince: '2025-11-02',
+  lurkers: 1204, fed: 37, views: 3160, since: '2025-11-02',
+};
 
 const SCENES = [
   { file: 'pet-thriving', mood: 'thriving', days: 0 },

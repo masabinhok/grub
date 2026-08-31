@@ -1,7 +1,12 @@
 # Profile view counter
 
-A Cloudflare Worker that serves `badge.svg` and counts how often GitHub's image
+A Cloudflare Worker that serves the eye card and counts how often GitHub's image
 proxy asks for it.
+
+The count is drawn on the eye card itself — the big number, no label. The Worker
+does not draw that card: `scripts/generators/eye.js` does, once a day, and the
+Worker is a turnstile in front of the committed result. One renderer, one copy
+of the art.
 
 It deploys on its own and is not part of the site build. `vercel.json` builds
 `site/` via `scripts/build_site.js` and never looks in this directory; nothing
@@ -20,7 +25,7 @@ could have called instead.
 
 So the counter measures exactly one event:
 
-> **how many times GitHub's camo image proxy fetched `/badge.svg`**
+> **how many times GitHub's camo image proxy fetched `/eye.svg`**
 
 which happens when somebody renders the profile README **in a browser**. That is
 a decent proxy for "someone looked at my profile", and it is not the same thing.
@@ -60,9 +65,35 @@ adopt this repo, please do not describe it as one.
 
 ## Endpoints
 
+### `GET /eye.svg` — the one that matters
+
+Serves the eye card from `assets/eye.svg` in the repo (set by `CARD_URL` in
+`wrangler.toml`), counting the fetch on the way through. This is what
+`PROFILE-README.md` points at, and pointing it back at `raw.githubusercontent`
+is exactly how you turn the counter off without losing the card.
+
+The upstream fetch is edge-cached for five minutes. That cannot cache away a
+count — the increment happens before the fetch, and the response you get is
+still `no-store`. If GitHub is unreachable the Worker falls back to the
+self-contained badge below: a different shape, stretched by the profile's
+`width="420"`, but a right number beats a broken image.
+
+**The number on the card lags by up to a day.** The counting is live and exact;
+the *drawing* happens in the daily workflow, which reads `views.json`. Every
+other number on the profile is daily too. If you want the figure to tick in real
+time, the Worker would have to render the card itself — which means a second
+copy of the eye art in `counter/`, and that is the trade this design refuses.
+
 ### `GET /badge.svg`
 
-Serves the badge — **always**, counted or not. An uncounted request still came
+A small self-contained badge, drawn by the Worker with no upstream fetch. Not
+used by `PROFILE-README.md`; it exists as the fallback above, and as the way to
+exercise the counter without touching your profile.
+
+Both image routes count into the same total — both mean "somebody rendered the
+profile README", and only one is ever embedded at a time.
+
+Both serve the image **always**, counted or not. An uncounted request still came
 from somebody looking at an image, and breaking it to make a point about
 accuracy would just leave a broken image on the profile.
 
@@ -153,8 +184,10 @@ That prints the URL, `https://grub-views.<your-subdomain>.workers.dev`. Check it
 curl -s https://grub-views.<your-subdomain>.workers.dev/stats.json
 ```
 
-Then put the badge in the profile README — there is a line ready to edit at the
-top of `PROFILE-README.md`.
+Then point `PROFILE-README.md`'s eye card at your Worker (the line is already
+there, with a comment explaining why it is the one image not served from
+`raw.githubusercontent`), and set `CARD_URL` in `wrangler.toml` to your own
+fork's `assets/eye.svg` before deploying.
 
 ### Custom domain (optional)
 
@@ -220,11 +253,18 @@ Runs the real Durable Object against local SQLite. The verification suite:
 ```sh
 B=http://127.0.0.1:8787
 
-curl -s -A 'github-camo (abc123)' -D - -o /dev/null $B/badge.svg   # counts
-curl -s -D - -o /dev/null $B/badge.svg                             # served, not counted
-curl -s -I -A 'github-camo (abc123)' $B/badge.svg                  # HEAD, not counted
-seq 1 50 | xargs -P 50 -I{} curl -s -o /dev/null -A 'github-camo (x)' $B/badge.svg
+curl -s -A 'github-camo (abc123)' -D - -o /dev/null $B/eye.svg     # counts
+curl -s -D - -o /dev/null $B/eye.svg                               # served, not counted
+curl -s -I -A 'github-camo (abc123)' $B/eye.svg                    # HEAD, not counted
+seq 1 50 | xargs -P 50 -I{} curl -s -o /dev/null -A 'github-camo (x)' $B/eye.svg
 curl -s $B/stats.json
+```
+
+To exercise the upstream-failure fallback:
+
+```sh
+npx wrangler dev --var CARD_URL:https://example.invalid/nope.svg
+curl -s -A 'github-camo (x)' $B/eye.svg | head -c 60   # the badge, still counted
 ```
 
 `total` should be up by exactly 51, `rejected` by 2, and `total` should equal the

@@ -51,7 +51,7 @@ const fs = require('fs');
 const path = require('path');
 
 const {
-  ASSETS_DIR, STATE_PATH, DEATH_THRESHOLD_DAYS, FEED_REACTION_MS, MOODS, LOGIN_RE,
+  ASSETS_DIR, STATE_PATH, VIEWS_PATH, DEATH_THRESHOLD_DAYS, FEED_REACTION_MS, MOODS, LOGIN_RE,
 } = require('./lib/constants');
 const { DAY_MS, localDate, addDays, daysBetween, startOfLocalDay } = require('./lib/dates');
 const { parseArgs } = require('./lib/cli');
@@ -68,6 +68,20 @@ const {
 } = require('./lib/github');
 const { mergeTraffic, trafficTotal, firstSampleDate } = require('./lib/traffic');
 const COMPONENTS = require('./generators');
+
+/**
+ * views.json, or zeroes. Deliberately forgiving: a fork that never deployed the
+ * Worker has no such file, and that must render a 0 rather than fail the run.
+ */
+function loadViews(viewsPath = VIEWS_PATH) {
+  try {
+    const raw = JSON.parse(fs.readFileSync(viewsPath, 'utf8'));
+    return { total: Math.max(0, Number(raw.total) || 0), since: raw.since || null };
+  } catch (err) {
+    if (err.code !== 'ENOENT') console.warn(`! views.json unreadable (${err.message}) — drawing 0 profile views`);
+    return { total: 0, since: null };
+  }
+}
 
 const OPTS = parseArgs();
 
@@ -197,11 +211,20 @@ async function main() {
   if (trafficViews) {
     state.cache = Object.assign({}, state.cache, { traffic: { daily, views: dailyViews } });
   }
-  // What the eye is looking at. `lurkers` is unique visitors per day, summed:
-  // people who arrived at the repo, which from a profile README means they
-  // clicked the creature. `views` is every hit — kept because it costs nothing
-  // (same API response) and it is the honest number for the card's description.
+  // Profile views, read off the committed history rather than fetched. The
+  // Worker in counter/ does the counting; scripts/merge_views.js folds its
+  // /stats.json into views.json once a day. Reading the file keeps this render
+  // offline and deterministic — a card must never fail to draw because a Worker
+  // was down, and --offline runs (the feed path) get the same number as cron.
+  const views = loadViews();
+
+  // What the eye is looking at. `profileViews` is the headline: camo fetches of
+  // the eye card, i.e. renders of the profile README. `lurkers` and `views` are
+  // repo traffic, no longer drawn on the card but still accumulated — they cost
+  // nothing (same API response) and the wall and docs still reference them.
   const watchers = {
+    profileViews: views.total,
+    profileViewsSince: views.since ? String(views.since).slice(0, 10) : null,
     lurkers: trafficTotal(daily),
     fed: (state.feeders || []).length,
     views: trafficTotal(dailyViews),
@@ -255,7 +278,7 @@ async function main() {
     console.log(`  streak=${streak.current} longest=${streak.longest} contributions=${streak.totalContributions || 0}`);
   }
   console.log(
-    `  lurkers=${watchers.lurkers} fed=${watchers.fed} views=${watchers.views}` +
+    `  profileViews=${watchers.profileViews} lurkers=${watchers.lurkers} fed=${watchers.fed} views=${watchers.views}` +
     `${watchers.since ? ` since=${watchers.since}` : ' (no traffic sampled yet)'}` +
     `${feeder ? ` · last fed ${snack.name} by @${feeder}` : ''}`);
 

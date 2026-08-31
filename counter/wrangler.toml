@@ -13,6 +13,15 @@ compatibility_date = "2025-01-01"
 # be served from a cache — see badgeHeaders() in src/index.js.
 workers_dev = true
 
+# The card the Worker serves at /eye.svg, counting each camo fetch on the way.
+# It is rendered by the daily workflow (scripts/generators/eye.js) and committed,
+# so there is exactly one copy of the art and the Worker never draws it itself.
+#
+# ADOPTING THIS REPO? Point this at your own fork, or you will be serving — and
+# counting views onto — somebody else's card.
+[vars]
+CARD_URL = "https://raw.githubusercontent.com/masabinhok/grub/main/assets/eye.svg"
+
 [[durable_objects.bindings]]
 name = "VIEWS"
 class_name = "ViewCounter"

@@ -31,7 +31,7 @@ Abridged — see [`grub.config.json`](../grub.config.json) for every key:
       { "slot": "Companion", "item": "GRUB" }
     ]
   },
-  "labels": { "eye": { "lurkers": "LURKERS", "fed": "FED" } },
+  "labels": { "eye": { "fed": "FED" } },
   "taglines": {},
   "palette": {}
 }

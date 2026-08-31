@@ -11,18 +11,25 @@ const COL_W = 188;
 const LID = 104;             // how far the lids travel to get out of the way
 
 /**
- * The eye — the watching card. Lurkers on one side of it, feeders on the other.
+ * The eye — the watching card, and the profile view counter.
  *
  * It blinks, the pupil drifts, and the iris takes the mood accent, so it belongs
  * to the same creature as everything else on the page. When GRUB dies the eye
  * closes and stays closed.
  *
- * LURKERS is repo traffic: people who arrived at this repository, which from a
- * profile README means they clicked the creature. It is not a profile-README
- * view count — nobody can measure those, because GitHub serves README images
- * through a caching proxy that reports nothing back. FED is the number of
- * distinct people who went the extra step and actually fed him. The gap between
- * the two is the entire point of the card.
+ * The big number is profile views, and it carries no label on purpose: an eye
+ * with a number beside it does not need to be told what it is counting.
+ *
+ * What that number honestly is: how many times GitHub's camo image proxy fetched
+ * this card, which happens when somebody renders the profile README in a browser.
+ * It is NOT unique visitors — camo strips the viewer's IP, so uniqueness is not
+ * measurable and no number here pretends otherwise. The counting is done by the
+ * Cloudflare Worker in counter/, which serves this same card; the figure drawn
+ * here is the committed total from views.json, so it refreshes once a day like
+ * every other number on the page. counter/README.md has the full accounting.
+ *
+ * FED, small in the corner, is how many distinct people went the extra step and
+ * actually fed him. The gap between the two is the point of the card.
  */
 module.exports = function renderEye(state, ctx) {
   const pal = ctx.palettes[state.mood];
@@ -34,14 +41,12 @@ module.exports = function renderEye(state, ctx) {
   // exactly RY away, so the opening is the size it says it is.
   const eye = `M${CX - RX} ${CY}Q${CX} ${CY - RY * 2} ${CX + RX} ${CY}Q${CX} ${CY + RY * 2} ${CX - RX} ${CY}Z`;
 
-  const lurkers = groupDigits(v.lurkers);
+  const views = groupDigits(v.profileViews);
   const fed = groupDigits(v.fed);
-  // One scale for both, driven by the longer, so they read as a matched pair
-  // however many digits either one gains.
-  const scale = Math.min(
-    fitScale(lurkers, COL_W, { min: 2, max: 5 }),
-    fitScale(fed, COL_W, { min: 2, max: 5 }),
-  );
+  // The one number on the card, so it gets the whole column and a bigger ceiling
+  // than the old paired layout could afford. It steps down a size rather than
+  // overflowing once the count gains a digit.
+  const scale = fitScale(views, COL_W, { min: 2, max: 6 });
 
   const style = `${baseStyle(pal, dead)}
     ${dead ? '' : `
@@ -100,18 +105,24 @@ module.exports = function renderEye(state, ctx) {
     '</g>' +
     `<path d="${eye}" fill="none" stroke="${pal.accent}" stroke-opacity="0.75" stroke-width="2"/>` +
     lashes +
-    // Two rows, sharing the column beside the eye: who looked, who helped.
-    `<text class="mono lbl" x="${COL_X}" y="48">${esc(lbl.lurkers)}</text>` +
-    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(lurkers, { x: COL_X, y: 88 - GLYPH_H * scale, scale, fill: pal.accent })}</g>` +
-    `<line x1="${COL_X}" y1="102" x2="${W - 24}" y2="102" stroke="${pal.accent}" stroke-opacity="0.22"/>` +
-    `<text class="mono lbl" x="${COL_X}" y="122">${esc(lbl.fed)}</text>` +
-    glyphRects(fed, { x: COL_X, y: 162 - GLYPH_H * scale, scale, fill: pal.ink });
+    // The count, unlabelled, centred on the eye's own axis so the two read as one
+    // object rather than a picture with a caption bolted beside it.
+    `<g${dead ? '' : ' class="pulse"'}>${glyphRects(views, {
+      x: COL_X, y: CY - Math.round((GLYPH_H * scale) / 2), scale, fill: pal.accent,
+    })}</g>` +
+    // FED sits in the bottom corner as a footnote, right-aligned so it stays put
+    // whatever the digits do. Monospace rather than pixel glyphs: it is an aside,
+    // and the pixel font is reserved for numbers meant to be read across a room.
+    `<text class="mono" text-anchor="end" x="${W - 24}" y="${H - 20}">` +
+    `<tspan class="lbl">${esc(lbl.fed)}</tspan>` +
+    `<tspan class="sm" dx="7">${fed}</tspan>` +
+    '</text>';
 
   return svgDoc({
     w: W, h: H, pal, id: 'eye', style,
-    title: `${lurkers} ${String(lbl.lurkers).toLowerCase()}, ${fed} fed him`,
-    desc: (v.since ? `Counted since ${v.since}. ` : 'Awaiting the first traffic sample. ') +
-      `${groupDigits(v.views)} total repository views.`,
+    title: `${views} profile views, ${fed} fed him`,
+    desc: (v.profileViewsSince ? `Counted since ${v.profileViewsSince}. ` : 'Awaiting the first counted view. ') +
+      'Renders of the profile README, measured at GitHub\'s image proxy. Not unique visitors.',
     body,
   });
 };

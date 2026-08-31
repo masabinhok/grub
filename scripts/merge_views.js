@@ -28,10 +28,7 @@
  */
 
 const fs = require('fs');
-const path = require('path');
-const { ROOT } = require('./lib/constants');
-
-const VIEWS_PATH = path.join(ROOT, 'views.json');
+const { VIEWS_PATH } = require('./lib/constants');
 
 const isoDay = (d = new Date()) => d.toISOString().slice(0, 10);
 

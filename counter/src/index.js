@@ -47,12 +47,52 @@ function badgeHeaders() {
   };
 }
 
+/**
+ * The eye card, as rendered by the daily workflow and committed to assets/.
+ *
+ * The Worker proxies it rather than drawing it: the art, the palette and the
+ * mood machinery all live in scripts/generators/eye.js, and a second copy in
+ * here would drift the first time somebody edited one of them. So there is one
+ * renderer, and this is a turnstile in front of it.
+ *
+ * What that costs: the number drawn on the card is the committed total from
+ * views.json, refreshed by the daily workflow, so the *display* lags by up to a
+ * day. The *counting* does not — every camo fetch is recorded live and exactly.
+ * Every other number on the profile is daily too, so the card is not the odd one
+ * out.
+ *
+ * The upstream fetch is cached at the edge for five minutes. That saves a GitHub
+ * round trip on a hot path; it cannot cache away a count, because the increment
+ * happens before this is ever called and the outer response is still no-store.
+ */
+async function fetchCard(env) {
+  if (!env.CARD_URL) return null;
+  try {
+    const res = await fetch(env.CARD_URL, {
+      cf: { cacheTtl: 300, cacheEverything: true },
+      headers: { 'User-Agent': 'grub-views' },
+    });
+    if (!res.ok) return null;
+    return await res.text();
+  } catch (_) {
+    // GitHub being down must not take the badge down with it — the caller falls
+    // back to the self-contained badge, which needs nothing but the count.
+    return null;
+  }
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const stub = env.VIEWS.get(env.VIEWS.idFromName(COUNTER_NAME));
 
-    if (url.pathname === '/badge.svg') {
+    // Both image routes count into the same total, because both mean the same
+    // thing: somebody's browser rendered the profile README. Only one of them is
+    // ever embedded at a time, so there is nothing to double-count.
+    //
+    //   /eye.svg    the real card, and what PROFILE-README.md points at
+    //   /badge.svg  a small self-contained alternative, and the fallback below
+    if (url.pathname === '/eye.svg' || url.pathname === '/badge.svg') {
       const ua = request.headers.get('user-agent') || '';
       // HEAD is excluded deliberately. Camo issues one on its own account when
       // it is sizing or revalidating an image, and no human is looking at
@@ -65,7 +105,15 @@ export default {
       // about accuracy would just show a broken image on the profile.
       const stats = counted ? await stub.record() : await stub.reject();
 
-      return new Response(renderBadge(stats.total, counted), {
+      // Counting first, art second: whether the card renders has no bearing on
+      // whether the view happened.
+      const card = url.pathname === '/eye.svg' ? await fetchCard(env) : null;
+
+      // The fallback is the standalone badge. It is a different shape, so a
+      // profile using width="420" will stretch it — deliberately: a slightly
+      // wrong-looking card that still shows the right number beats a broken
+      // image icon on somebody's profile.
+      return new Response(card || renderBadge(stats.total, counted), {
         status: 200,
         headers: badgeHeaders(),
       });

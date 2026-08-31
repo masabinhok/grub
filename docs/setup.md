@@ -279,7 +279,7 @@ Two features want more than the Action's built-in `GITHUB_TOKEN`:
 
 | Feature | Needs |
 | --- | --- |
-| `eye.svg` (the `LURKERS` half) | Push access to read the traffic API |
+| `eye.svg` (the view count) | The Worker in `counter/` deployed — see [counter/README.md](../counter/README.md) |
 | Private contributions | A token that can see `contributionsCollection` |
 
 Both are served by a single **classic PAT with `repo` scope**
@@ -367,7 +367,7 @@ to you instead:
 | Broken image icons on your profile | The GRUB repo is private, or the branch in the URL is wrong (`main` vs `master`). |
 | Nothing at all on your profile page | The profile repo name doesn't exactly match your username, or it is private. |
 | The cron never fires | Scheduled workflows are disabled on new forks until you enable them on the Actions tab. GitHub also disables them on repos with no activity for 60 days. |
-| `LURKERS` stuck at 0 | No `PET_TOKEN`, or it isn't a classic PAT with `repo` scope — [Tokens](#tokens). |
+| Eye's view count stuck at 0 | The Worker in `counter/` is not deployed, `VIEWS_URL` is not set as a repo variable, or `PROFILE-README.md` still points the card at `raw.githubusercontent` — [counter/README.md](../counter/README.md). |
 | Pet starves on days you worked | Your work is private, or the cron and `timezone` disagree — steps [4](#4-set-your-timezone) and [private repos](#feeding-it-on-private-repos). |
 | Pet is dead and won't come back | The apology has to be the **first line** of a commit on your default branch, and pushed. Case and punctuation don't matter — `I'm sorry`, `Im sorry` and `i’m sorry` all count — but it is read from the public event feed, so a private or unpushed commit won't do it. |
 

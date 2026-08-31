@@ -6,7 +6,7 @@ difference is the joke.
 - [How to feed him](#how-to-feed-him)
 - [What a snack explicitly cannot do](#what-a-snack-explicitly-cannot-do)
 - [Because it's a public write path](#because-its-a-public-write-path)
-- [What `LURKERS` actually counts](#what-lurkers-actually-counts)
+- [What the eye's numbers actually count](#what-the-eyes-numbers-actually-count)
 
 ---
 
@@ -60,8 +60,9 @@ asserts all six are unchanged and refuses to save if they aren't. Only commits
 keep GRUB alive; only `i'm sorry` revives him. A stranger's sympathy is not an
 apology.
 
-That is the point of the `LURKERS` vs `FED` split on the eye card: the gap is how
-many people looked at a starving worm and did nothing.
+That is the point of the eye card: a big count of everyone who looked, and a
+small `FED` in the corner for the ones who did something about it. The gap is how
+many people looked at a starving worm and walked on.
 
 ---
 
@@ -86,17 +87,27 @@ An issue from a stranger can cause a commit to this repo, so:
 
 ---
 
-## What `LURKERS` actually counts
+## What the eye's numbers actually count
 
 The honest answer, because it is easy to assume otherwise.
 
 **`FED` is exact.** It is the number of distinct logins in `feeders`. Those people
 each opened an issue; there is nothing to estimate.
 
-**`LURKERS` is unique visitors to this repository**, from GitHub's traffic API,
-summed per day. On a profile README that is *almost exactly* "people who clicked
-GRUB", because the card is the only thing on the page linking here — but it also
-catches anyone who arrived from search, a link, or their own bookmarks.
+**The big number is profile views** — specifically, how many times GitHub's camo
+image proxy fetched the eye card, which happens when somebody renders your
+profile README in a browser. It is counted by the Cloudflare Worker in
+`counter/`, which serves the card.
+
+It is **not unique visitors**, and nothing here pretends it is: camo fetches the
+image on the reader's behalf and strips their IP, so there is no signal left to
+deduplicate on. Anyone showing you a unique-visitor count on a README badge is
+inventing it. The full accounting — including why the count is bot-light, and
+why most such badges undercount — is in
+[counter/README.md](../counter/README.md).
+
+Without the Worker deployed, the card renders a `0` and everything else on the
+page works normally.
 
 A literal click counter is not possible without a server. The image cannot run
 JavaScript, and the click itself is a plain navigation to GitHub that nobody gets

@@ -9,6 +9,10 @@ const ROOT = path.resolve(__dirname, '..', '..');
 module.exports = {
   ROOT,
   STATE_PATH: path.join(ROOT, 'pet-state.json'),
+  // Committed profile-view history, written by scripts/merge_views.js from the
+  // Worker in counter/. The eye card reads its total from here rather than
+  // calling the Worker, so a render never depends on the Worker being up.
+  VIEWS_PATH: path.join(ROOT, 'views.json'),
   ASSETS_DIR: path.join(ROOT, 'assets'),
   README_PATH: path.join(ROOT, 'README.md'),
   CONFIG_PATH: path.join(ROOT, 'grub.config.json'),

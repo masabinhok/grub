@@ -99,7 +99,7 @@
       revived: false,
       streak: SAMPLE_STREAK,
       profile: state.profile,
-      watchers: { lurkers: 0, fed: 0, views: 0, since: null },
+      watchers: { profileViews: 0, profileViewsSince: null, lurkers: 0, fed: 0, views: 0, since: null },
       fed: false,
       feeder: null,
       snack: snacks[0],
@@ -197,7 +197,7 @@
     var base = 'https://raw.githubusercontent.com/' + user + '/' + repo + '/main/assets/';
     var alt = {
       banner: 'Profile banner', pet: 'GRUB, the tamagotchi of shame', streak: 'Commit streak',
-      star: 'Stars earned', eye: 'Lurkers versus people who fed him', stats: 'Profile statistics',
+      star: 'Stars earned', eye: 'Profile views, and people who fed him', stats: 'Profile statistics',
       languages: 'Most used languages', inventory: 'Equipped skills', marquee: 'Status ticker',
       divider: '', cta: 'Adopt your own GRUB',
     };
