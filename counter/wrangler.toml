@@ -1,0 +1,38 @@
+# The view counter deploys on its own, with `npx wrangler deploy` from this
+# directory. It is not part of the Vercel build: vercel.json builds site/ via
+# scripts/build_site.js and never looks in here.
+
+name = "grub-views"
+main = "src/index.js"
+
+# Durable Object RPC (calling stub.record() instead of stub.fetch()) needs a
+# compatibility date on or after 2024-04-03.
+compatibility_date = "2025-01-01"
+
+# Off by default. The badge is the whole point of the Worker and it must never
+# be served from a cache — see badgeHeaders() in src/index.js.
+workers_dev = true
+
+[[durable_objects.bindings]]
+name = "VIEWS"
+class_name = "ViewCounter"
+
+# new_sqlite_classes, not new_classes: the SQLite backend is what gives us a real
+# table to increment and query. A key-value DO would work but would mean
+# rewriting the whole days map on every single view — and it is also the backend
+# that needs a paid plan. SQLite-backed Durable Objects are included on the
+# Workers Free plan, so this whole counter costs nothing.
+#
+# This migration is append-only history. Never edit v1 after a deploy — add a v2.
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ViewCounter"]
+
+# Serving the badge from a subdomain you control means the URL in the profile
+# README survives a rename of the Worker, and keeps *.workers.dev out of a page
+# some corporate proxies are unenthusiastic about. Uncomment, set your zone, and
+# add the record in the Cloudflare dashboard.
+#
+# [[routes]]
+# pattern = "views.example.com"
+# custom_domain = true

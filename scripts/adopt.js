@@ -203,6 +203,23 @@ if (fs.existsSync(PROFILE_README)) {
   const prev = src && src[1] !== user ? src[1] : null;
   const stragglers = prev && after.includes(`${prev}/`) ? ` — "${prev}" still appears, check it by hand` : '';
   console.log(`  PROFILE-README.md now points at ${user}/${repo}@${branch} (${urls} images)${stragglers}`);
+
+  // The view-counter badge is the one image that is NOT on raw.githubusercontent
+  // and so is not covered by the swap above. It points at somebody's deployed
+  // Cloudflare Worker, and this script has no way to guess yours — you may not
+  // have deployed one at all. Left in place it is worse than a stale image: it
+  // silently feeds the previous owner's counter and shows you their number.
+  //
+  // So: warn, loudly, and do not touch it. See counter/README.md.
+  const worker = after.match(/https:\/\/[^/\s"']+\.workers\.dev\/badge\.svg/);
+  if (worker) {
+    console.log('');
+    console.log(`  ! PROFILE-README.md still has a view-counter badge pointing at`);
+    console.log(`      ${worker[0]}`);
+    console.log('    That is somebody else\'s Worker. Deploy your own (see counter/README.md)');
+    console.log('    and swap the host, or delete the badge block. Leaving it counts your');
+    console.log('    profile views onto their total.');
+  }
 }
 
 // ------------------------------------------------------------------- report

@@ -1,0 +1,64 @@
+name: Profile Views
+
+# Copies the Worker's counter into git once a day.
+#
+# The Durable Object behind counter/ is the live counter, but it is not a
+# permanent record: delete the Worker, botch a migration, or move the Cloudflare
+# account and the number is gone. This job is the durable half — views.json is
+# committed, append-only per day, and never goes down. See scripts/merge_views.js
+# for the merge rules.
+#
+# It reads /stats.json, which is a public read-only endpoint. Nothing here can
+# move the counter.
+
+on:
+  # 04:25 UTC — a quiet hour, well clear of the creature's 17:45 run, and off the
+  # hour because GitHub's scheduler is best-effort and :00 is where every other
+  # repo in the world queues up. The exact minute does not matter: days are UTC
+  # buckets and the Worker keeps a full per-day map, so a late or skipped run
+  # loses nothing. The next one picks up every day it missed.
+  schedule:
+    - cron: '25 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Shared with pet.yml and feed.yml: all three push to main, and two pushes
+# racing is how a run ends up rejected or, worse, clobbering the other's commit.
+# Queued rather than cancelled — a dropped run would just skip a day of history.
+concurrency:
+  group: tamagotchi
+  cancel-in-progress: false
+
+jobs:
+  views:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Set this as a repository *variable* (Settings -> Secrets and variables ->
+    # Actions -> Variables), not a secret: it is a public URL that is already
+    # printed in the profile README. Without it the job is skipped rather than
+    # failed, so a fork that never deployed the Worker does not get a red X on
+    # its Actions tab every morning.
+    if: vars.VIEWS_URL != ''
+    steps:
+      # No actions/setup-node, matching pet.yml: ubuntu-latest ships Node 20+ and
+      # the script has zero dependencies.
+      - uses: actions/checkout@v4
+
+      - name: Fold today's count into views.json
+        env:
+          VIEWS_URL: ${{ vars.VIEWS_URL }}
+        run: node scripts/merge_views.js
+
+      - name: Commit if anything changed
+        run: |
+          if [ -z "$(git status --porcelain views.json)" ]; then
+            echo "Nothing changed — no commit."
+            exit 0
+          fi
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add views.json
+          git commit -m 'chore: update view history [skip ci]'
+          git push

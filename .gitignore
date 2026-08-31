@@ -9,3 +9,8 @@ site/grub.browser.js
 # vercel.json, which is committed.
 .vercel
 .env*
+
+# Local Durable Object state and build cache from `wrangler dev`. The deployed
+# counter's data lives in Cloudflare; this is a throwaway SQLite file.
+counter/.wrangler
+counter/node_modules
