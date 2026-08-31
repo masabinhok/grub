@@ -7,15 +7,22 @@ const { SPRITES } = require('../lib/sprites');
 const W = 420, H = 180;
 const CX = 106, CY = 92;     // centre of the eye
 const RX = 76, RY = 42;      // half-width, half-height of the opening
-const COL_X = 196;           // the numbers column
-const COL_W = 208;           // COL_X -> 16px from the right edge
+// The numbers column. The eye's outer stroke ends at x=182, so this leaves a
+// 26px gutter — enough that the two read as separate elements, close enough that
+// they still read as one card. Left-aligned: centring pushed short counts into
+// the middle of the card, which looked adrift rather than deliberate.
+const COL_X = 208;
+const COL_W = 196;           // COL_X -> 16px from the right edge
 const LID = 104;             // how far the lids travel to get out of the way
-const NUM_CY = 84;           // centre of the count, lifted off the eye's axis to
-                             // leave the grub and FED room underneath
 const GRUB_CELL = 2;         // 16x16 sprite -> 32x32
 const GRUB = 16 * GRUB_CELL;
 const GRUB_X = 396 - GRUB;   // right-aligned with FED, directly above it
-const GRUB_Y = 116;
+const GRUB_Y = 120;
+const FED_Y = 168;           // baseline; FED is a footnote and stays in the corner
+const NUM_CY = 88;           // centre of the count. Level with the eye (92) to
+                             // within a few px, so the two read as a pair and the
+                             // count's own margins top and bottom come out even —
+                             // the 4px of lift is clearance for the grub below.
 
 /**
  * The eye — the watching card, and the profile view counter.
@@ -56,8 +63,9 @@ module.exports = function renderEye(state, ctx) {
   const fed = groupDigits(v.fed);
   // The one number on the card, so it gets the whole column and a bigger ceiling
   // than the old paired layout could afford. It steps down a size rather than
-  // overflowing once the count gains a digit.
-  const scale = fitScale(views, COL_W, { min: 2, max: 7 });
+  // overflowing once the count gains a digit, and is centred in the column
+  // rather than anchored left — left-aligned it sat right up against the eye.
+  const scale = fitScale(views, COL_W, { min: 2, max: 6 });
 
   const style = `${baseStyle(pal, dead)}
     ${dead ? '' : `
@@ -139,7 +147,7 @@ module.exports = function renderEye(state, ctx) {
     // FED sits in the bottom corner as a footnote, right-aligned so it stays put
     // whatever the digits do. Monospace rather than pixel glyphs: it is an aside,
     // and the pixel font is reserved for numbers meant to be read across a room.
-    `<text class="mono" text-anchor="end" x="${W - 24}" y="${H - 14}">` +
+    `<text class="mono" text-anchor="end" x="${W - 24}" y="${FED_Y}">` +
     `<tspan class="lbl">${esc(lbl.fed)}</tspan>` +
     `<tspan class="sm" dx="7">${fed}</tspan>` +
     '</text>';
