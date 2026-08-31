@@ -1,14 +1,21 @@
 'use strict';
 
-const { esc, baseStyle, svgDoc } = require('../lib/svg');
+const { esc, baseStyle, svgDoc, pixelRects } = require('../lib/svg');
 const { glyphRects, groupDigits, fitScale, GLYPH_H } = require('../lib/glyphs');
+const { SPRITES } = require('../lib/sprites');
 
 const W = 420, H = 180;
 const CX = 106, CY = 92;     // centre of the eye
 const RX = 76, RY = 42;      // half-width, half-height of the opening
-const COL_X = 208;           // the numbers column
-const COL_W = 188;
+const COL_X = 196;           // the numbers column
+const COL_W = 208;           // COL_X -> 16px from the right edge
 const LID = 104;             // how far the lids travel to get out of the way
+const NUM_CY = 84;           // centre of the count, lifted off the eye's axis to
+                             // leave the grub and FED room underneath
+const GRUB_CELL = 2;         // 16x16 sprite -> 32x32
+const GRUB = 16 * GRUB_CELL;
+const GRUB_X = 396 - GRUB;   // right-aligned with FED, directly above it
+const GRUB_Y = 116;
 
 /**
  * The eye — the watching card, and the profile view counter.
@@ -30,6 +37,10 @@ const LID = 104;             // how far the lids travel to get out of the way
  *
  * FED, small in the corner, is how many distinct people went the extra step and
  * actually fed him. The gap between the two is the point of the card.
+ *
+ * Dancing above FED is GRUB himself at 2px per pixel, drawn from the same mood
+ * sprite as the big pet card. He greys out, stops jigging, and turns into a
+ * headstone along with everything else when the streak breaks.
  */
 module.exports = function renderEye(state, ctx) {
   const pal = ctx.palettes[state.mood];
@@ -46,14 +57,16 @@ module.exports = function renderEye(state, ctx) {
   // The one number on the card, so it gets the whole column and a bigger ceiling
   // than the old paired layout could afford. It steps down a size rather than
   // overflowing once the count gains a digit.
-  const scale = fitScale(views, COL_W, { min: 2, max: 6 });
+  const scale = fitScale(views, COL_W, { min: 2, max: 7 });
 
   const style = `${baseStyle(pal, dead)}
     ${dead ? '' : `
     .lidT{animation:lidT 6.4s ease-in-out infinite}
     .lidB{animation:lidB 6.4s ease-in-out infinite}
     @keyframes lidT{0%,88%{transform:translateY(0)}92%,94%{transform:translateY(${LID}px)}97%,100%{transform:translateY(0)}}
-    @keyframes lidB{0%,88%{transform:translateY(0)}92%,94%{transform:translateY(-${LID}px)}97%,100%{transform:translateY(0)}}`}`;
+    @keyframes lidB{0%,88%{transform:translateY(0)}92%,94%{transform:translateY(-${LID}px)}97%,100%{transform:translateY(0)}}
+    .jig{animation:jig 1.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+    @keyframes jig{0%,100%{transform:translateY(0) rotate(-7deg)}25%{transform:translateY(-3px) rotate(0deg)}50%{transform:translateY(0) rotate(7deg)}75%{transform:translateY(-3px) rotate(0deg)}}`}`;
 
   // The lids park *outside* the eye and move in to blink, rather than the other
   // way round. A renderer that ignores the animation then draws an open eye
@@ -94,6 +107,18 @@ module.exports = function renderEye(state, ctx) {
     return `<rect x="${x - 1.5}" y="${y - len}" width="3" height="${len}" rx="1.5" fill="${pal.accent}" opacity="0.45"/>`;
   }).join('');
 
+  // A tiny GRUB jigging above the FED line — the mood's own sprite, so he greys
+  // out and stops dancing with the rest of the card. The pivot is his feet
+  // (transform-origin 50% 100%), which is what makes it read as a jig rather
+  // than a spin.
+  //
+  // Wrapper <g> places him, inner <g> does the moving: a CSS transform on the
+  // same element would throw away the translate that puts him there.
+  const dancer =
+    `<g transform="translate(${GRUB_X} ${GRUB_Y})">` +
+    `<g${dead ? '' : ' class="jig"'}>${pixelRects(SPRITES[state.mood], pal, GRUB_CELL)}</g>` +
+    '</g>';
+
   const body =
     `<defs><radialGradient id="eyeIris" cx="0.4" cy="0.35" r="0.75">` +
     `<stop offset="0" stop-color="${pal.accent}"/><stop offset="1" stop-color="${pal.bg1}"/>` +
@@ -108,12 +133,13 @@ module.exports = function renderEye(state, ctx) {
     // The count, unlabelled, centred on the eye's own axis so the two read as one
     // object rather than a picture with a caption bolted beside it.
     `<g${dead ? '' : ' class="pulse"'}>${glyphRects(views, {
-      x: COL_X, y: CY - Math.round((GLYPH_H * scale) / 2), scale, fill: pal.accent,
+      x: COL_X, y: NUM_CY - Math.round((GLYPH_H * scale) / 2), scale, fill: pal.accent,
     })}</g>` +
+    dancer +
     // FED sits in the bottom corner as a footnote, right-aligned so it stays put
     // whatever the digits do. Monospace rather than pixel glyphs: it is an aside,
     // and the pixel font is reserved for numbers meant to be read across a room.
-    `<text class="mono" text-anchor="end" x="${W - 24}" y="${H - 20}">` +
+    `<text class="mono" text-anchor="end" x="${W - 24}" y="${H - 14}">` +
     `<tspan class="lbl">${esc(lbl.fed)}</tspan>` +
     `<tspan class="sm" dx="7">${fed}</tspan>` +
     '</text>';

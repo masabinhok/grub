@@ -38,8 +38,9 @@ supporting paragraph:
 - **The eye** blinks on a loop, drifts its pupil around like it is reading over
   your shoulder, and takes the iris colour from GRUB's mood. When he dies it
   closes and stays closed. Beside it, unlabelled, is the profile view count — an
-  eye with a number next to it does not need telling what it counts — and `FED`
-  in the corner, the ones who did something about it. The gap is the point.
+  eye with a number next to it does not need telling what it counts — with a
+  miniature GRUB jigging above `FED` in the corner, the ones who did something
+  about it. The gap is the point.
   What the number honestly is, and what it cannot be:
   [counter/README.md](../counter/README.md).
 - **The star** is a five-pointer under a highlight that sweeps across it on a
