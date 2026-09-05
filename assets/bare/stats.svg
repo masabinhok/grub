@@ -2,19 +2,19 @@
 <title id="stst">30 public repos, 21 stars, 17 followers</title>
 <desc id="stsd">Profile statistics</desc>
 <defs><linearGradient id="stsbg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#173d2b"/><stop offset="1" stop-color="#0d2018"/>
+<stop offset="0" stop-color="#252c1c"/><stop offset="1" stop-color="#171b12"/>
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#3f9c71}
-    .big{font-size:31px;font-weight:700;fill:#008a42}
-    .med{font-size:15px;font-weight:700;fill:#008a42}
-    .sm{font-size:11px;fill:#008a42}
-    .dim{font-size:11px;fill:#3f9c71}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#819267}
+    .big{font-size:31px;font-weight:700;fill:#6c7e42}
+    .med{font-size:15px;font-weight:700;fill:#6c7e42}
+    .sm{font-size:11px;fill:#6c7e42}
+    .dim{font-size:11px;fill:#819267}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
 </style>
 
-<text class="mono lbl" x="24" y="26">BY THE NUMBERS</text><line x1="24" y1="36" x2="396" y2="36" stroke="#239359" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">PUBLIC REPOS</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#008a42">30</text><text class="mono lbl" x="224" y="52">STARS EARNED</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#008a42">21</text><text class="mono lbl" x="24" y="118">FOLLOWERS</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#008a42">17</text><text class="mono lbl" x="224" y="118">CONTRIBUTIONS</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#008a42">1399</text>
+<text class="mono lbl" x="24" y="26">BY THE NUMBERS</text><line x1="24" y1="36" x2="396" y2="36" stroke="#6f8a54" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">PUBLIC REPOS</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#6c7e42">30</text><text class="mono lbl" x="224" y="52">STARS EARNED</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#6c7e42">21</text><text class="mono lbl" x="24" y="118">FOLLOWERS</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#6c7e42">17</text><text class="mono lbl" x="224" y="118">CONTRIBUTIONS</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#6c7e42">1399</text>
 </svg>
