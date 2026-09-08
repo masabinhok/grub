@@ -49,11 +49,13 @@ const WATCHERS = {
   lurkers: 1204, fed: 37, views: 3160, since: '2025-11-02',
 };
 
+// `days` is missed days, the unit lib/mood.js and the card both speak: whole
+// calendar days that went by with nothing committed in them.
 const SCENES = [
   { file: 'pet-thriving', mood: 'thriving', days: 0 },
-  { file: 'pet-hungry', mood: 'hungry', days: 2 },
-  { file: 'pet-feral', mood: 'feral', days: 4 },
-  { file: 'pet-deceased', mood: 'deceased', days: 6 },
+  { file: 'pet-hungry', mood: 'hungry', days: 1 },
+  { file: 'pet-feral', mood: 'feral', days: 3 },
+  { file: 'pet-deceased', mood: 'deceased', days: 5 },
   // The reward for feeding him, which is the one state a visitor can cause.
   { file: 'pet-fed', mood: 'thriving', days: 0, feeder: 'octocat', snack: 'donut' },
 ];
@@ -61,7 +63,9 @@ const SCENES = [
 function renderScene(scene, cfg) {
   const dead = scene.mood === 'deceased';
   const state = {
-    lastCommitDate: new Date(NOW.getTime() - scene.days * DAY_MS).toISOString(),
+    // + 1: the day the commit landed in is not a missed one, so a scene with n
+    // missed days last committed n + 1 days ago.
+    lastCommitDate: new Date(NOW.getTime() - (scene.days + 1) * DAY_MS).toISOString(),
     lastCheckedDate: NOW.toISOString(),
     hunger: dead ? 100 : hungerForDays(scene.days),
     mood: scene.mood,

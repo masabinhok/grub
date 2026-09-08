@@ -79,6 +79,25 @@ function daysBetween(a, b, tz = 'UTC') {
   return Math.max(0, dayIndex(localDate(b, tz)) - dayIndex(localDate(a, tz)));
 }
 
+/**
+ * Whole days that went by with nothing committed in them, counted in `tz`.
+ *
+ * This is the number the creature is judged on and the number the card prints,
+ * and it is not the same as `daysBetween`. That one counts day boundaries
+ * crossed, so it ticks to 1 the instant a new local day begins — before that day
+ * has had any chance to see a commit. The day you are standing in cannot be a
+ * missed one; only the days that have already closed behind you can. Hence the
+ * -1.
+ *
+ * Worked through, at the midnight the daily job runs at: commit yesterday and
+ * nothing has been missed, so 0. Commit the day before yesterday and exactly one
+ * whole day went by untouched, so 1 — not 2, which is what counting boundaries
+ * would say.
+ */
+function daysMissed(lastCommit, now, tz = 'UTC') {
+  return Math.max(0, daysBetween(lastCommit, now, tz) - 1);
+}
+
 /** "YYYY-MM-DD" plus n days. Calendar arithmetic, so no DST can skew it. */
 const addDays = (isoDay, n) => isoDate((dayIndex(isoDay) + n) * DAY_MS);
 
@@ -93,5 +112,5 @@ function startOfLocalDay(d, tz = 'UTC') {
 
 module.exports = {
   DAY_MS, startOfDayUTC, isoDate,
-  localDate, dayIndex, daysBetween, addDays, startOfLocalDay,
+  localDate, dayIndex, daysBetween, daysMissed, addDays, startOfLocalDay,
 };

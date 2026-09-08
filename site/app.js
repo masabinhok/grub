@@ -33,6 +33,11 @@
     spark: [1, 3, 0, 2, 5, 1, 0, 4, 2, 6, 1, 0, 3, 2],
   };
 
+  // Missed days at which the creature is dead, and therefore the top of the
+  // scrubber — past it every card looks the same. Mirrors DEATH_THRESHOLD_DAYS
+  // in scripts/lib/constants.js, which the bundle does not expose.
+  var DEATH_DAYS = 5;
+
   var state = {
     day: 0,
     profile: SAMPLE,
@@ -79,7 +84,13 @@
 
   function moodFor(days) { return GRUB.mood.moodForDays(days); }
 
-  /** The same shape update_pet.js hands the generators. */
+  /**
+   * The same shape update_pet.js hands the generators.
+   *
+   * `days` is missed days throughout, matching lib/mood.js and the number the
+   * card prints — the scrubber is a dial on that one value, so what the preview
+   * shows at 1 is what a real card shows after one whole day went untouched.
+   */
   function build(days) {
     var mood = moodFor(days);
     var dead = mood === 'deceased';
@@ -87,7 +98,7 @@
       mood: mood,
       hunger: GRUB.mood.hungerForDays(days),
       alive: !dead,
-      diedOn: dead ? iso(NOW, -(days - 5)) : null,
+      diedOn: dead ? iso(NOW, -(days - DEATH_DAYS)) : null,
       resurrections: 0,
       pets: 0,
       feeders: [],
@@ -160,9 +171,9 @@
 
     var ticks = $('ticks');
     ticks.innerHTML = '';
-    for (var d = 0; d <= 6; d++) {
+    for (var d = 0; d <= DEATH_DAYS; d++) {
       var s = document.createElement('span');
-      s.textContent = d === 6 ? '6+' : d;
+      s.textContent = d === DEATH_DAYS ? DEATH_DAYS + '+' : d;
       if (d === state.day) s.setAttribute('data-on', '');
       ticks.appendChild(s);
     }
@@ -369,11 +380,11 @@
     renderCanvas();
   });
 
-  // #day=6 opens straight into the tombstone. Read on load only — writing it
-  // back on every drag would bury the user's history under seven entries.
+  // #day=5 opens straight into the tombstone. Read on load only — writing it
+  // back on every drag would bury the user's history under six entries.
   var deep = /(?:^|[#&])day=(\d)/.exec(location.hash);
   if (deep) {
-    state.day = Math.max(0, Math.min(6, parseInt(deep[1], 10)));
+    state.day = Math.max(0, Math.min(DEATH_DAYS, parseInt(deep[1], 10)));
     $('scrub').value = String(state.day);
   }
 

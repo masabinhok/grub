@@ -205,7 +205,7 @@ hour of the previous one. If your zone does shift, adjust the cron when it does.
 blank → green button.
 
 Blank inputs mean a real run: it hits the API, writes `pet-state.json`, renders
-`assets/`, and commits. Filling in *Pretend this many days have passed* renders a
+`assets/`, and commits. Filling in *Pretend this many whole days were missed* renders a
 simulation that is deliberately never saved.
 
 Watch it finish. It takes about fifteen seconds, and it should end with a commit

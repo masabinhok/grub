@@ -22,7 +22,7 @@
  * Usage:
  *   node scripts/update_pet.js                      # normal run (hits the API)
  *   node scripts/update_pet.js --dry-run            # print the summary, write nothing
- *   node scripts/update_pet.js --days 4             # pretend it has been 4 days
+ *   node scripts/update_pet.js --days 4             # pretend 4 whole days were missed
  *
  * --days and --mood are simulations: they render but never persist, so a test
  * run cannot backdate lastCommitDate and starve the pet off fictional data.
@@ -54,7 +54,7 @@ const path = require('path');
 const {
   ASSETS_DIR, STATE_PATH, VIEWS_PATH, DEATH_THRESHOLD_DAYS, FEED_REACTION_MS, MOODS, LOGIN_RE,
 } = require('./lib/constants');
-const { DAY_MS, localDate, addDays, daysBetween, startOfLocalDay } = require('./lib/dates');
+const { DAY_MS, localDate, addDays, daysMissed, startOfLocalDay } = require('./lib/dates');
 const { parseArgs } = require('./lib/cli');
 const { loadConfig, enabledComponents } = require('./lib/config');
 const { resolvePalettes, barePalette } = require('./lib/palette');
@@ -108,6 +108,9 @@ async function main() {
     state.lastCommitDate = now.toISOString();
   }
 
+  // Whole days gone by with nothing committed in them. Not the number of day
+  // boundaries crossed since the commit — see daysMissed in lib/dates.js. Mood,
+  // hunger and the number printed on the card are all this one value.
   let days;
   let apology = OPTS.apology;
   let source = 'state';
@@ -118,10 +121,13 @@ async function main() {
   if (OPTS.simulateDays !== null && OPTS.simulateDays !== undefined) {
     days = parseInt(OPTS.simulateDays, 10);
     if (Number.isNaN(days)) throw new Error(`--days expects a number, got "${OPTS.simulateDays}"`);
-    state.lastCommitDate = new Date(startOfLocalDay(now, tz) - days * DAY_MS).toISOString();
+    // days + 1: the day the commit landed in is not a missed one, so backdating
+    // by n days would simulate n - 1 missed. Off by one here would render a card
+    // that disagrees with the flag that asked for it.
+    state.lastCommitDate = new Date(startOfLocalDay(now, tz) - (days + 1) * DAY_MS).toISOString();
     source = 'simulated';
   } else if (OPTS.offline) {
-    days = daysBetween(state.lastCommitDate, now, tz);
+    days = daysMissed(state.lastCommitDate, now, tz);
     source = 'offline';
   } else {
     const username = resolveUsername({ user: OPTS.user, configUsername: cfg.github.username });
@@ -140,7 +146,7 @@ async function main() {
       console.warn('! no activity data returned — decaying from stored state only');
       source = 'frozen';
     }
-    days = daysBetween(state.lastCommitDate, now, tz);
+    days = daysMissed(state.lastCommitDate, now, tz);
     if (!apology && normalize(localHeadMessage()) === APOLOGY_NORM) apology = true;
 
     try { profile = await fetchProfileData(username); }
@@ -182,10 +188,10 @@ async function main() {
     state.hunger = hungerForDays(days);
     if (state.mood === 'deceased') {
       state.alive = false;
-      // Mood turns deceased once DEATH_THRESHOLD_DAYS full days have been missed,
-      // which happens the calendar day *after* that — see the grace day in
-      // lib/mood.js — so diedOn has to add the same extra day to land on the
-      // date that actually triggered it.
+      // The last commit's own day is not a missed one, so the day that finally
+      // pushes the count to DEATH_THRESHOLD_DAYS is DEATH_THRESHOLD_DAYS + 1
+      // after it. diedOn has to add that same extra day to land on the date that
+      // actually triggered the death rather than a day early.
       state.diedOn = addDays(localDate(state.lastCommitDate, tz), DEATH_THRESHOLD_DAYS + 1);
       state.hunger = 100;
     }

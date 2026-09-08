@@ -60,8 +60,12 @@ Previewing a mood needs somewhere to put the output:
 
 ```bash
 node scripts/update_pet.js --mood feral --outdir /tmp/preview --offline
-node scripts/update_pet.js --days 4 --outdir /tmp/preview
+node scripts/update_pet.js --days 3 --outdir /tmp/preview
 ```
+
+`--days` is in **missed days** — whole days that went by with nothing committed
+in them, the same unit the card prints and `lib/mood.js` judges on. `--days 3` is
+therefore feral, and `--days 5` is the tombstone.
 
 Prefer `--days` over `--mood`: `--mood` overrides the palette only and leaves the
 real day count, so a feral card comes out reading `0 DAYS SINCE COMMIT`. Both are
@@ -116,9 +120,9 @@ which silently drops `--days` and turns each preview into a real API run:
 
 ```bash
 node scripts/update_pet.js --days 0 --outdir preview/thriving
-node scripts/update_pet.js --days 2 --outdir preview/hungry
-node scripts/update_pet.js --days 4 --outdir preview/feral
-node scripts/update_pet.js --days 6 --outdir preview/deceased
+node scripts/update_pet.js --days 1 --outdir preview/hungry
+node scripts/update_pet.js --days 3 --outdir preview/feral
+node scripts/update_pet.js --days 5 --outdir preview/deceased
 ```
 
 `--days` never touches the network, so it needs no token — it themes the cards

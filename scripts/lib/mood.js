@@ -3,22 +3,23 @@
 const { DEATH_THRESHOLD_DAYS } = require('./constants');
 
 /**
- * `days` (from daysBetween) counts calendar-day boundaries crossed since the
- * last commit, in the tracked timezone. It ticks over to 1 the instant a new
- * local day begins — before there was any chance to commit on that new day.
- * That first day is a grace day, not a missed one, so mood/hunger are judged
- * on how many days have FULLY elapsed with no commit: `days - 1`.
+ * Mood and hunger, read off *missed* days — whole calendar days that came and
+ * went in the tracked timezone with nothing committed in them. `daysMissed` in
+ * lib/dates.js does the counting; the day the last commit landed in is not one
+ * of them, and neither is the day currently in progress.
+ *
+ * One number, one meaning: what these thresholds are read against is exactly
+ * what the card prints. 0 is up to date, 1 is one whole day gone by untouched,
+ * and DEATH_THRESHOLD_DAYS of them is fatal.
  */
-const missedDays = (days) => Math.max(0, days - 1);
-
-function moodForDays(days) {
-  const missed = missedDays(days);
+function moodForDays(missed) {
   if (missed >= DEATH_THRESHOLD_DAYS) return 'deceased';
   if (missed >= 3) return 'feral';
   if (missed >= 1) return 'hungry';
   return 'thriving';
 }
 
-const hungerForDays = (days) => Math.min(100, Math.round((missedDays(days) / DEATH_THRESHOLD_DAYS) * 100));
+const hungerForDays = (missed) =>
+  Math.min(100, Math.round((Math.max(0, missed) / DEATH_THRESHOLD_DAYS) * 100));
 
 module.exports = { moodForDays, hungerForDays };

@@ -22,7 +22,7 @@ It can only be brought back by pushing a commit whose message is exactly
 </p>
 
 <!-- pet:caption -->
-**thriving** · 1 day since the last commit · _Never died. Yet._
+**thriving** · 0 days since the last commit · _Never died. Yet._
 <!-- /pet:caption -->
 
 > The line above is rewritten by the Action on every run. Don't edit it by hand;
@@ -94,7 +94,7 @@ minutes, no build step, zero dependencies.
 
 ## How it works
 
-| Days since last commit | State | What you see |
+| Whole days missed | State | What you see |
 | --- | --- | --- |
 | 0 | `thriving` | Bright greens, bouncing idle animation, unbearable smugness |
 | 1–2 | `hungry` | Dimmer palette, slow drift, side-eye, passive aggression |
@@ -114,14 +114,14 @@ renders, animating, no cloning required. Watch the colour drain out.
 <table>
   <tr>
     <td align="center"><b>thriving</b> — day 0<br><sub>bouncing, bright, unbearable</sub></td>
-    <td align="center"><b>hungry</b> — day 2<br><sub>dimmer, slower, keeping notes</sub></td>
+    <td align="center"><b>hungry</b> — day 1<br><sub>dimmer, slower, keeping notes</sub></td>
   </tr>
   <tr>
     <td><img src="./docs/previews/pet-thriving.svg" width="420" alt="GRUB thriving"></td>
     <td><img src="./docs/previews/pet-hungry.svg" width="420" alt="GRUB hungry"></td>
   </tr>
   <tr>
-    <td align="center"><b>feral</b> — day 4<br><sub>tearing, twitching, ribs out</sub></td>
+    <td align="center"><b>feral</b> — day 3<br><sub>tearing, twitching, ribs out</sub></td>
     <td align="center"><b>deceased</b> — day 5+<br><sub>a tombstone with a date on it</sub></td>
   </tr>
   <tr>
