@@ -14,3 +14,5 @@ site/grub.browser.js
 # counter's data lives in Cloudflare; this is a throwaway SQLite file.
 counter/.wrangler
 counter/node_modules
+
+issues.md
