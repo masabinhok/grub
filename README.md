@@ -148,9 +148,9 @@ rains down, he chews, and **their** username is on the card for 24 hours:
 ### Whose day is it
 
 A day is a **calendar day in `timezone`** — `Asia/Kathmandu` out of the box — and
-the Action runs at **23:30 local**, near the end of it. Those two facts belong
-together: the job asks "was anything committed today?", so it has to ask while
-today is still happening.
+the Action runs at **00:00 local**, the moment one of those days ends. Those two
+facts belong together: the job asks "was anything committed in the day that just
+finished?", and midnight is the first instant that question has an answer.
 
 The upshot is the one you'd want. Commit at any point during a day and the count
 stays at 0 when the day closes. Let a whole day go by untouched and it reads 1.
@@ -158,6 +158,12 @@ A commit at half past midnight counts for the day that just started — under a 
 day boundary that same commit would have been filed five and three quarter hours
 back, in yesterday, and the pet would have gone hungry over a commit that
 happened.
+
+Midnight is also the one start time GitHub's scheduler cannot spoil. Cron there is
+best-effort and routinely runs late; every minute of that lateness still lands in
+the same local day, so the answer does not change. A run aimed at late evening has
+no such slack — half an hour of slippage carries it past midnight and it reports
+on the wrong day.
 
 Somewhere else in the world? Change `timezone` **and** the cron in
 `.github/workflows/pet.yml` together; there is a worked example in the comment

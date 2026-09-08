@@ -2,19 +2,21 @@ name: Tamagotchi of Shame
 
 on:
   schedule:
-    # 17:45 UTC = 23:30 in Kathmandu (UTC+5:45): the end of the day the creature
-    # actually lives in, which is what `timezone` in grub.config.json sets. The
-    # run has to land inside that local day — it is asking "did anything get
-    # committed today?", and asking after midnight asks about the wrong day.
+    # 18:15 UTC = 00:00 in Kathmandu (UTC+5:45): midnight in the zone the creature
+    # actually lives in, which is what `timezone` in grub.config.json sets.
     #
-    # Hence the half-hour of headroom rather than 23:59, and a time that is not
-    # on the hour: GitHub's scheduler is best-effort and runs latest when every
-    # other repo in the world has also asked for :00.
+    # The run reports on the day that has just *ended*, which is the only moment
+    # that day can be judged: at midnight it is finally known whether anything was
+    # committed in it. That is also why this is the one time of day GitHub's
+    # best-effort scheduler cannot spoil — every minute it runs late is still the
+    # same local day, so a delayed run gives the same answer. A late-evening run
+    # does not have that property: half an hour of slippage carries it over
+    # midnight and it answers about the wrong day.
     #
-    # Moving zones? Convert the local time you want to UTC and change both this
-    # line and `timezone` in the config. Getting one without the other is how the
-    # day boundary ends up somewhere nobody lives.
-    - cron: '45 17 * * *'
+    # Moving zones? Convert 00:00 local to UTC and change both this line and
+    # `timezone` in the config. Getting one without the other is how the day
+    # boundary ends up somewhere nobody lives.
+    - cron: '15 18 * * *'
   workflow_dispatch:
     inputs:
       simulate_days:
@@ -41,7 +43,9 @@ on:
 permissions:
   contents: write
 
-# Never let a manual run and the cron run fight over the same push.
+# Shared with feed.yml: both push to main, and two pushes racing is how a run ends
+# up rejected or, worse, clobbering the other's commit. Queued rather than
+# cancelled — dropping this one would lose a day of view history.
 concurrency:
   group: tamagotchi
   cancel-in-progress: false
@@ -56,13 +60,16 @@ jobs:
       - uses: actions/checkout@v4
 
       # Pull the Worker's live count into views.json *before* the cards are drawn,
-      # so the eye card shows this run's number rather than whatever the 04:25
-      # views.yml run happened to see. views.yml still runs on its own schedule —
-      # it is the backstop that keeps the history if this job ever stops.
+      # so the eye card shows this run's number rather than yesterday's. This used
+      # to be a second workflow (views.yml) on its own schedule, which meant two
+      # jobs racing for the same push and a card whose number was hours older than
+      # the run that drew it. One job, one push, one number.
       #
-      # Never fatal, and deliberately so: Cloudflare having a bad morning must not
-      # stop the creature from being updated. A failure here just means the card
-      # is drawn with the last committed count.
+      # Skipped rather than failed when VIEWS_URL is unset, so a fork that never
+      # deployed the Worker still gets its creature updated. And never fatal when
+      # it is set: Cloudflare having a bad night must not stop the creature from
+      # updating — a failure here just draws the card with the last committed
+      # count, and the next run picks up every day it missed (see merge_views.js).
       - name: Refresh the view count
         if: vars.VIEWS_URL != '' && github.event.inputs.dry_run != 'true'
         continue-on-error: true

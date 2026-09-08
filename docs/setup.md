@@ -168,29 +168,34 @@ In `grub.config.json`:
 Then the cron in `.github/workflows/pet.yml`, which is in **UTC**:
 
 ```yaml
-- cron: '45 17 * * *'   # 23:30 in Kathmandu (UTC+05:45)
+- cron: '15 18 * * *'   # 00:00 in Kathmandu (UTC+05:45)
 ```
 
-Aim for late evening in *your* zone, and not on the hour — GitHub's scheduler is
-best-effort and runs latest when every repo in the world has asked for `:00`.
+Aim for **midnight** in *your* zone.
 
 | You want | Your offset | UTC cron |
 | --- | --- | --- |
-| 23:30 Kathmandu | +05:45 | `45 17 * * *` |
-| 23:30 Lisbon (winter) | +00:00 | `30 23 * * *` |
-| 23:30 New York (winter) | −05:00 | `30 04 * * *` |
-| 23:30 Berlin (winter) | +01:00 | `30 22 * * *` |
-| 23:30 Tokyo | +09:00 | `30 14 * * *` |
+| 00:00 Kathmandu | +05:45 | `15 18 * * *` |
+| 00:00 Lisbon (winter) | +00:00 | `0 0 * * *` |
+| 00:00 New York (winter) | −05:00 | `0 5 * * *` |
+| 00:00 Berlin (winter) | +01:00 | `0 23 * * *` |
+| 00:00 Tokyo | +09:00 | `0 15 * * *` |
 
 Why both: the config decides which calendar day "days since the last commit" is
 counted in, and the cron decides when the question gets asked. The job asks *"was
-anything committed today?"*, so it has to ask while today is still happening.
-Change one without the other and your day boundary lands somewhere nobody lives —
-you commit at 9pm, the job has already run, and the creature starves over a
-commit that happened.
+anything committed in the day that just ended?"*, and midnight is the first
+instant that has an answer. Change one without the other and your day boundary
+lands somewhere nobody lives.
+
+Why midnight rather than late evening: GitHub's cron is best-effort and routinely
+runs late. Starting at the top of a local day means every minute of that lateness
+is still inside the same day, so a delayed run gives the same answer. A job aimed
+at 23:30 has no such slack — half an hour of slippage carries it past midnight and
+it reports on the wrong day.
 
 GitHub's cron does not observe daylight saving. If your zone shifts, the check
-drifts an hour twice a year. An hour of headroom before midnight absorbs it.
+drifts an hour twice a year — into the small hours of the right day, or the last
+hour of the previous one. If your zone does shift, adjust the cron when it does.
 
 ---
 

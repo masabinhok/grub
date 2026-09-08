@@ -227,27 +227,30 @@ reads `/stats.json` and folds it into `views.json` at the repo root — append-o
 per day, past days never rewritten downward. If the DO is ever wiped, the history
 is still in git and the total plateaus instead of falling off a cliff.
 
-It runs twice a day, on purpose:
+It runs once a day, inside **`pet.yml` at 18:15 UTC** (00:00 Kathmandu),
+immediately before the cards are drawn. Refreshing it in the same run is what
+makes the number on the eye card current as of the moment the card was rendered:
+the card is drawn from `views.json`, not from the Worker.
 
-- **`pet.yml`, at 17:45 UTC**, immediately before the cards are drawn. This is
-  the one that matters for the number you see: the eye card is rendered from
-  `views.json`, so refreshing it in the same run is what makes the count on the
-  card current as of midnight rather than as of the previous morning. The step is
-  `continue-on-error` — Cloudflare having a bad day must not stop the creature
-  from updating.
-- **`views.yml`, at 04:25 UTC**, on its own. This one is the backstop. It keeps
-  the history accumulating even if the pet job is disabled, failing, or the repo
-  has gone quiet, which is the whole reason the history lives in git.
+It used to be two jobs — this one plus a separate `views.yml` on its own
+schedule — and that was worse in both directions. The two raced for the same push
+to `main`, and whichever ran second drew a card whose number was hours older than
+the run that drew it. One job, one push, one number.
 
-Running it twice is free and idempotent: the merge only writes when a number
-actually moved, and only commits when the file changed.
+Nothing is lost by dropping to a single daily merge. Days are UTC buckets and the
+Worker keeps a full per-day map, so a late or skipped run picks up every day it
+missed; the current day's partial bucket is simply overwritten with the complete
+one on the next run. The step is `continue-on-error` — Cloudflare having a bad
+night must not stop the creature from updating.
 
 Set the Worker URL as a **repository variable** named `VIEWS_URL` (Settings →
 Secrets and variables → Actions → Variables). Not a secret — it is a public URL
-that is printed in the README anyway. Without it the workflow skips itself, so a
-fork that never deployed the Worker does not collect a red X every morning.
+that is printed in the README anyway. Without it the merge step skips itself and
+the rest of the job carries on, so a fork that never deployed the Worker still
+gets its creature updated.
 
-Run it by hand any time from the Actions tab, or locally:
+Run it by hand any time from the Actions tab (**Tamagotchi of Shame** → **Run
+workflow**), or locally:
 
 ```sh
 VIEWS_URL=https://grub-views.<your-subdomain>.workers.dev node scripts/merge_views.js
