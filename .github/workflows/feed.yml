@@ -67,6 +67,15 @@ jobs:
         if: steps.feed.outputs.result == 'fed'
         run: node scripts/update_pet.js --offline
 
+      # And the no-background set, which is what the *profile* README embeds.
+      # Without this the boxed cards in this repo credit the feeder while the
+      # profile still says FEED ME — same state, two sets, one of them stale.
+      # Mirrors the same step in pet.yml; --bare needs its own --outdir because
+      # update_pet.js treats it as a preview and will not touch assets/.
+      - name: Re-render the no-background set
+        if: steps.feed.outputs.result == 'fed'
+        run: node scripts/update_pet.js --offline --bare --outdir assets/bare
+
       - name: Commit if anything changed
         if: steps.feed.outputs.result == 'fed'
         run: |
