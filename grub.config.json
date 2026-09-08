@@ -53,7 +53,7 @@
     },
     "pet": {
       "hunger": "HUNGER",
-      "daysSinceCommit": "DAYS SINCE COMMIT",
+      "daysSinceCommit": "DAYS MISSED",
       "mood": "MOOD",
       "resurrections": "RESURRECTIONS",
       "feedMe": "FEED ME",

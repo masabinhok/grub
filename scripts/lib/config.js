@@ -106,7 +106,7 @@ const DEFAULTS = {
     },
     pet: {
       hunger: 'HUNGER',
-      daysSinceCommit: 'DAYS SINCE COMMIT',
+      daysSinceCommit: 'DAYS MISSED',
       mood: 'MOOD',
       resurrections: 'RESURRECTIONS',
       // The placard above his head: the plea, and what it says instead once
