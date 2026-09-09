@@ -29,8 +29,14 @@
     "upstream": "masabinhok/grub"
   },
   "copy": {
-    "replace": false,
-    "lines": {},
+    "replace": true,
+    "lines": {
+      "thriving": ["nice profile readme yo!"],
+      "hungry": ["nice profile readme yo!"],
+      "feral": ["nice profile readme yo!"],
+      "deceased": ["nice profile readme yo!"],
+      "revived": ["nice profile readme yo!"]
+    },
     "quotes": [],
     "snacks": []
   },
