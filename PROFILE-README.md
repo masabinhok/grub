@@ -42,34 +42,23 @@
   <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
 </p>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/streak.svg" width="420" alt="Commit streak">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/star.svg" width="420" alt="Stars earned">
-</p>
-
 <!--
-  The eye card is the only image here NOT served from raw.githubusercontent, and
-  that is the whole mechanism: it comes from the Cloudflare Worker in counter/,
-  which counts each fetch by GitHub's image proxy before passing the committed
-  card through — the bare one, matching everything else on this page. Point this
-  back at raw.githubusercontent and the card still renders, it just stops
-  counting anything.
+  The streak card is the only image here NOT served from raw.githubusercontent,
+  and that is the whole mechanism: it comes from the Cloudflare Worker in
+  counter/, which counts each fetch by GitHub's image proxy before passing the
+  committed card through — the bare one, matching everything else on this page.
+  The count is recorded, never drawn; read it from /stats.json on the Worker or
+  from views.json in the repo. Point this back at raw.githubusercontent and the
+  card still renders, it just stops counting anything.
 
   Adopting this repo? Deploy your own Worker (counter/README.md) and swap the
   host, or you are counting your profile's views onto somebody else's total.
 -->
 <p align="center">
-  <img src="https://grub-views.sifarish-less.workers.dev/eye.svg" width="420" alt="Profile views, and people who fed him">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/languages.svg" width="420" alt="Most used languages">
+  <img src="https://grub-views.sifarish-less.workers.dev/streak.svg" width="420" alt="Commit streak">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/star.svg" width="420" alt="Stars earned">
 </p>
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/marquee.svg" width="840" alt="Status ticker">
-</p>
 <p align="center">
   <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
 </p>

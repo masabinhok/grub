@@ -284,7 +284,7 @@ Two features want more than the Action's built-in `GITHUB_TOKEN`:
 
 | Feature | Needs |
 | --- | --- |
-| `eye.svg` (the view count) | The Worker in `counter/` deployed — see [counter/README.md](../counter/README.md) |
+| Counting profile views | The Worker in `counter/` deployed — see [counter/README.md](../counter/README.md) |
 | Private contributions | A token that can see `contributionsCollection` |
 
 Both are served by a single **classic PAT with `repo` scope**

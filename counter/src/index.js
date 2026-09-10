@@ -7,7 +7,7 @@ export { ViewCounter } from './counter.js';
  *
  * GitHub exposes no profile-page analytics — not in the UI, not in the API. The
  * traffic API covers repositories only. So this measures exactly one event: a
- * fetch of /badge.svg by GitHub's camo image proxy, which happens when somebody
+ * fetch of /streak.svg by GitHub's camo image proxy, which happens when somebody
  * renders the profile README in a browser. See counter/README.md before putting
  * a number from here in front of anyone.
  *
@@ -48,18 +48,18 @@ function badgeHeaders() {
 }
 
 /**
- * The eye card, as rendered by the daily workflow and committed to assets/.
+ * The streak card, as rendered by the daily workflow and committed to assets/.
  *
  * The Worker proxies it rather than drawing it: the art, the palette and the
- * mood machinery all live in scripts/generators/eye.js, and a second copy in
+ * mood machinery all live in scripts/generators/streak.js, and a second copy in
  * here would drift the first time somebody edited one of them. So there is one
  * renderer, and this is a turnstile in front of it.
  *
- * What that costs: the number drawn on the card is the committed total from
- * views.json, refreshed by the daily workflow, so the *display* lags by up to a
- * day. The *counting* does not — every camo fetch is recorded live and exactly.
- * Every other number on the profile is daily too, so the card is not the odd one
- * out.
+ * Why the streak card and not one that shows the count: the count is recorded,
+ * not displayed. Any card that is on the profile anyway works as the turnstile —
+ * every render of the README fetches it once — so the counter rides on one that
+ * was going to be there regardless. The number lives in /stats.json and
+ * views.json, and nowhere on the page.
  *
  * The upstream fetch is cached at the edge for five minutes. That saves a GitHub
  * round trip on a hot path; it cannot cache away a count, because the increment
@@ -75,11 +75,21 @@ async function fetchCard(env) {
     if (!res.ok) return null;
     return await res.text();
   } catch (_) {
-    // GitHub being down must not take the badge down with it — the caller falls
-    // back to the self-contained badge, which needs nothing but the count.
+    // GitHub being down must not take the image down with it — the caller falls
+    // back to a blank card of the same size.
     return null;
   }
 }
+
+/**
+ * What /streak.svg serves when the real card cannot be fetched: nothing, at the
+ * card's size. Not the badge — the count is recorded, never displayed, and an
+ * outage is no reason to start putting it on the profile. Empty rather than a
+ * broken-image icon, and if raw.githubusercontent is down this badly then every
+ * other card on the page is missing too, so a gap is what fits in.
+ */
+const BLANK_CARD =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" width="420" height="180"/>\n';
 
 export default {
   async fetch(request, env) {
@@ -90,9 +100,9 @@ export default {
     // thing: somebody's browser rendered the profile README. Only one of them is
     // ever embedded at a time, so there is nothing to double-count.
     //
-    //   /eye.svg    the real card, and what PROFILE-README.md points at
-    //   /badge.svg  a small self-contained alternative, and the fallback below
-    if (url.pathname === '/eye.svg' || url.pathname === '/badge.svg') {
+    //   /streak.svg  the real card, and what PROFILE-README.md points at
+    //   /badge.svg   a small self-contained alternative that draws the count
+    if (url.pathname === '/streak.svg' || url.pathname === '/badge.svg') {
       const ua = request.headers.get('user-agent') || '';
       // HEAD is excluded deliberately. Camo issues one on its own account when
       // it is sizing or revalidating an image, and no human is looking at
@@ -100,20 +110,18 @@ export default {
       const counted = request.method === 'GET' && CAMO.test(ua);
 
       // Both branches touch the DO: the rejected tally is the evidence for the
-      // counted one. The badge is served either way — an uncounted request is
+      // counted one. The image is served either way — an uncounted request is
       // still somebody looking at an image, and breaking it to make a point
       // about accuracy would just show a broken image on the profile.
       const stats = counted ? await stub.record() : await stub.reject();
 
       // Counting first, art second: whether the card renders has no bearing on
       // whether the view happened.
-      const card = url.pathname === '/eye.svg' ? await fetchCard(env) : null;
+      const body = url.pathname === '/streak.svg'
+        ? (await fetchCard(env)) || BLANK_CARD
+        : renderBadge(stats.total, counted);
 
-      // The fallback is the standalone badge. It is a different shape, so a
-      // profile using width="420" will stretch it — deliberately: a slightly
-      // wrong-looking card that still shows the right number beats a broken
-      // image icon on somebody's profile.
-      return new Response(card || renderBadge(stats.total, counted), {
+      return new Response(body, {
         status: 200,
         headers: badgeHeaders(),
       });

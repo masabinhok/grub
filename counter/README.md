@@ -1,12 +1,14 @@
 # Profile view counter
 
-A Cloudflare Worker that serves the eye card and counts how often GitHub's image
-proxy asks for it.
+A Cloudflare Worker that serves the streak card and counts how often GitHub's
+image proxy asks for it.
 
-The count is drawn on the eye card itself — the big number, no label. The Worker
-does not draw that card: `scripts/generators/eye.js` does, once a day, and the
-Worker is a turnstile in front of the committed result. One renderer, one copy
-of the art.
+The count is recorded, not displayed. Nothing on the profile shows it; it lives
+in `/stats.json` on the Worker and in `views.json` in the repo, folded in by the
+daily workflow. The streak card is just the turnstile — it was going to be on the
+profile anyway, and every render of the README fetches it once. The Worker does
+not draw it: `scripts/generators/streak.js` does, once a day, and the Worker
+passes the committed result through. One renderer, one copy of the art.
 
 It deploys on its own and is not part of the site build. `vercel.json` builds
 `site/` via `scripts/build_site.js` and never looks in this directory; nothing
@@ -25,7 +27,7 @@ could have called instead.
 
 So the counter measures exactly one event:
 
-> **how many times GitHub's camo image proxy fetched `/eye.svg`**
+> **how many times GitHub's camo image proxy fetched `/streak.svg`**
 
 which happens when somebody renders the profile README **in a browser**. That is
 a decent proxy for "someone looked at my profile", and it is not the same thing.
@@ -65,30 +67,27 @@ adopt this repo, please do not describe it as one.
 
 ## Endpoints
 
-### `GET /eye.svg` — the one that matters
+### `GET /streak.svg` — the one that matters
 
-Serves the eye card from `assets/eye.svg` in the repo (set by `CARD_URL` in
-`wrangler.toml`), counting the fetch on the way through. This is what
-`PROFILE-README.md` points at, and pointing it back at `raw.githubusercontent`
-is exactly how you turn the counter off without losing the card.
+Serves the streak card from `assets/bare/streak.svg` in the repo (set by
+`CARD_URL` in `wrangler.toml`), counting the fetch on the way through. This is
+what `PROFILE-README.md` points at, and pointing it back at
+`raw.githubusercontent` is exactly how you turn the counter off without losing
+the card.
 
 The upstream fetch is edge-cached for five minutes. That cannot cache away a
 count — the increment happens before the fetch, and the response you get is
-still `no-store`. If GitHub is unreachable the Worker falls back to the
-self-contained badge below: a different shape, stretched by the profile's
-`width="420"`, but a right number beats a broken image.
-
-**The number on the card lags by up to a day.** The counting is live and exact;
-the *drawing* happens in the daily workflow, which reads `views.json`. Every
-other number on the profile is daily too. If you want the figure to tick in real
-time, the Worker would have to render the card itself — which means a second
-copy of the eye art in `counter/`, and that is the trade this design refuses.
+still `no-store`. If GitHub is unreachable the Worker serves a blank card of the
+same size rather than the badge below: the count is not meant to be on the
+profile, and an outage is no reason to put it there. If raw.githubusercontent is
+down, every other card on the page is missing too, so a gap fits in.
 
 ### `GET /badge.svg`
 
-A small self-contained badge, drawn by the Worker with no upstream fetch. Not
-used by `PROFILE-README.md`; it exists as the fallback above, and as the way to
-exercise the counter without touching your profile.
+A small self-contained badge that *does* draw the count, rendered by the Worker
+with no upstream fetch. Not used by `PROFILE-README.md`; it is the way to
+exercise the counter without touching your profile, and the drop-in if you ever
+want the number back on show.
 
 Both image routes count into the same total — both mean "somebody rendered the
 profile README", and only one is ever embedded at a time.
@@ -184,10 +183,10 @@ That prints the URL, `https://grub-views.<your-subdomain>.workers.dev`. Check it
 curl -s https://grub-views.<your-subdomain>.workers.dev/stats.json
 ```
 
-Then point `PROFILE-README.md`'s eye card at your Worker (the line is already
+Then point `PROFILE-README.md`'s streak card at your Worker (the line is already
 there, with a comment explaining why it is the one image not served from
 `raw.githubusercontent`), and set `CARD_URL` in `wrangler.toml` to your own
-fork's `assets/eye.svg` before deploying.
+fork's `assets/bare/streak.svg` before deploying.
 
 ### Custom domain (optional)
 
@@ -228,9 +227,9 @@ per day, past days never rewritten downward. If the DO is ever wiped, the histor
 is still in git and the total plateaus instead of falling off a cliff.
 
 It runs once a day, inside **`pet.yml` at 18:15 UTC** (00:00 Kathmandu),
-immediately before the cards are drawn. Refreshing it in the same run is what
-makes the number on the eye card current as of the moment the card was rendered:
-the card is drawn from `views.json`, not from the Worker.
+immediately before the cards are drawn. Nothing on the profile displays the
+count any more, but `views.json` is still the durable record — and the eye card
+still draws from it for anyone who embeds that card.
 
 It used to be two jobs — this one plus a separate `views.yml` on its own
 schedule — and that was worse in both directions. The two raced for the same push
@@ -270,10 +269,10 @@ Runs the real Durable Object against local SQLite. The verification suite:
 ```sh
 B=http://127.0.0.1:8787
 
-curl -s -A 'github-camo (abc123)' -D - -o /dev/null $B/eye.svg     # counts
-curl -s -D - -o /dev/null $B/eye.svg                               # served, not counted
-curl -s -I -A 'github-camo (abc123)' $B/eye.svg                    # HEAD, not counted
-seq 1 50 | xargs -P 50 -I{} curl -s -o /dev/null -A 'github-camo (x)' $B/eye.svg
+curl -s -A 'github-camo (abc123)' -D - -o /dev/null $B/streak.svg  # counts
+curl -s -D - -o /dev/null $B/streak.svg                            # served, not counted
+curl -s -I -A 'github-camo (abc123)' $B/streak.svg                 # HEAD, not counted
+seq 1 50 | xargs -P 50 -I{} curl -s -o /dev/null -A 'github-camo (x)' $B/streak.svg
 curl -s $B/stats.json
 ```
 
@@ -281,7 +280,7 @@ To exercise the upstream-failure fallback:
 
 ```sh
 npx wrangler dev --var CARD_URL:https://example.invalid/nope.svg
-curl -s -A 'github-camo (x)' $B/eye.svg | head -c 60   # the badge, still counted
+curl -s -A 'github-camo (x)' $B/streak.svg | head -c 60   # a blank card, still counted
 ```
 
 `total` should be up by exactly 51, `rejected` by 2, and `total` should equal the
