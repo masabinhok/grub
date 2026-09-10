@@ -83,6 +83,9 @@ function merge(history, stats, today) {
   const worker = {
     total: Math.max(0, Math.floor(Number(stats.total) || 0)),
     rejected: Math.max(0, Math.floor(Number(stats.rejected) || 0)),
+    // Your own views, taken back by counter/self-view.user.js. Already excluded
+    // from `total` and from the day buckets; recorded here so it is visible.
+    self: Math.max(0, Math.floor(Number(stats.self) || 0)),
     since: stats.since || null,
   };
 

@@ -91,6 +91,22 @@ async function fetchCard(env) {
 const BLANK_CARD =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" width="420" height="180"/>\n';
 
+/**
+ * Whether `given` is the owner's key. Constant-time, so response timing cannot
+ * be used to guess it a character at a time. Both sides are hashed first
+ * because timingSafeEqual needs equal lengths, and comparing lengths directly
+ * would leak the one thing it is meant to hide.
+ */
+async function isOwnerKey(given, expected) {
+  if (!given || !expected) return false;
+  const enc = new TextEncoder();
+  const [a, b] = await Promise.all([
+    crypto.subtle.digest('SHA-256', enc.encode(given)),
+    crypto.subtle.digest('SHA-256', enc.encode(expected)),
+  ]);
+  return crypto.subtle.timingSafeEqual(a, b);
+}
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
@@ -124,6 +140,27 @@ export default {
       return new Response(body, {
         status: 200,
         headers: badgeHeaders(),
+      });
+    }
+
+    // "That was me." Sent by counter/self-view.user.js from the owner's browser
+    // when the counted image finishes loading on a page they are looking at. The
+    // Worker cannot tell the owner apart on its own — camo strips the cookie,
+    // the referrer, the browser and the IP before anything reaches us — so the
+    // owner's browser has to say so.
+    //
+    // Off unless SELF_KEY is set (`npx wrangler secret put SELF_KEY`). A leaked
+    // key can only take views away, one per request, never add them.
+    if (url.pathname === '/self') {
+      if (!env.SELF_KEY) return new Response('not found\n', { status: 404 });
+      if (request.method !== 'POST') return new Response('POST only\n', { status: 405 });
+      if (!(await isOwnerKey(request.headers.get('x-self-key'), env.SELF_KEY))) {
+        return new Response('forbidden\n', { status: 403 });
+      }
+      const result = await stub.claimSelf();
+      return new Response(JSON.stringify({ claimed: result.claimed, self: result.self }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       });
     }
 

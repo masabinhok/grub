@@ -126,7 +126,8 @@ site can chart it later. Reading it never moves a number.
   "today": 17,
   "days": { "2026-08-31": 17 },
   "since": "2026-08-31T03:54:24.711Z",
-  "rejected": 42
+  "rejected": 42,
+  "self": 9
 }
 ```
 
@@ -140,10 +141,69 @@ site can chart it later. Reading it never moves a number.
   hand", because the useful question is how much traffic the gate is filtering,
   not which reason it used. If this number is wildly larger than `total`,
   somebody is hammering the URL directly and the gate is doing its job.
+- `self` — your own views, taken back by the userscript below. Not in `total`
+  or in `days`.
 
 Days are UTC buckets, matching the `isoDate` convention in
 `scripts/lib/dates.js`: the badge is fetched from everywhere, and UTC is the
 only clock that does not need a timezone argument to be reproducible.
+
+### `POST /self` — "that was me"
+
+Takes back the most recent counted view from the last 20 seconds and files it
+under `self`. Needs the header `X-Self-Key: <SELF_KEY>`; a wrong or missing key
+is a `403`, and with no `SELF_KEY` set the route does not exist (`404`). Returns
+`{"claimed": true|false, "self": n}`. One request takes back at most one view,
+so a leaked key can hide views but never add any.
+
+Nothing calls this but `self-view.user.js`, described next.
+
+---
+
+## Not counting yourself
+
+The Worker has no way to recognise you. Camo fetches the image from GitHub's own
+servers, and by the time the request reaches the Worker the cookie, the referrer,
+the browser and the IP are all gone — every view, yours included, arrives from a
+GitHub address as `github-camo (<hash>)`. So your browser has to say so.
+
+[`self-view.user.js`](./self-view.user.js) is a userscript that watches for the
+counted card being fetched on any GitHub page and posts to `/self` each time.
+It triggers on the browser's Resource Timing feed rather than the image's `load`
+event: the feed only records fetches that went over the network, which are
+exactly the ones the Worker counted, whereas `load` also fires when the browser
+reuses the image from memory — and a ping with no view of yours behind it would
+take back a stranger's.
+
+**Set it up:**
+
+1. Make a key and give it to the Worker. Run from `counter/`, and keep the key —
+   the script needs it too:
+
+   ```sh
+   openssl rand -hex 32 | tee /dev/stderr | npx wrangler secret put SELF_KEY
+   ```
+
+2. Install [Tampermonkey](https://www.tampermonkey.net/) or
+   [Violentmonkey](https://violentmonkey.github.io/) in every browser you look at
+   your profile from.
+3. Create a new script, paste in `self-view.user.js`, and replace
+   `PASTE-YOUR-SELF_KEY-HERE` with the key. Save. Do not commit the edited file.
+4. Check it: open your profile, then `/stats.json` — `self` should have gone up
+   by one and `total` should not have moved. The browser console on the profile
+   also logs `[grub-views] not me: 200 {"claimed":true,...}`.
+
+**What it does not cover.** Anywhere the script is not installed: your phone,
+the GitHub mobile app, a browser you forgot. Those still count as views. And a
+stranger whose view lands in the same 20 seconds as one of yours can be taken
+back instead of yours — at a few views a day, rare, and the reason a ping only
+ever claims one.
+
+**The history can keep the odd one.** The daily merge snapshots the current UTC
+day and later takes `max(committed, fetched)` for past days, so a view of yours
+that was counted just before the snapshot and taken back just after it stays in
+`views.json`. It needs your visit to straddle the daily run to within twenty
+seconds.
 
 ---
 
