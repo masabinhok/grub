@@ -36,6 +36,45 @@ function flamePath(x, y, w, h) {
     `C${(x + w * 0.42).toFixed(1)} ${(y - h * 0.54).toFixed(1)} ${(x + hw).toFixed(1)} ${(y - h * 0.26).toFixed(1)} ${(x + hw).toFixed(1)} ${y}Z`;
 }
 
+// Milestones the HUD gauge fills toward, and whose count earns a chevron.
+const MILESTONES = [7, 14, 30, 50, 100, 150, 200, 365, 500, 730, 1000];
+const GAUGE = { cx: 96, cy: 84, r: 60, segs: 48 };
+
+/**
+ * The streak as a tactical gauge (palettes with `hud`): a segmented ring filling
+ * toward the next milestone, one chevron per milestone already passed, and a
+ * sweep marker running the rim. Replaces the fire; the numbers column is shared.
+ */
+function gauge(current, lit, pal, gold) {
+  const { cx, cy, r, segs } = GAUGE;
+  const next = MILESTONES.find((m) => m > current) || current + 1;
+  const passed = MILESTONES.filter((m) => m <= current).length;
+  const on = lit ? Math.round(segs * Math.min(1, current / next)) : 0;
+  const seg = (i) => {
+    const a0 = (i / segs) * 2 * Math.PI - Math.PI / 2 + 0.02, a1 = ((i + 1) / segs) * 2 * Math.PI - Math.PI / 2 - 0.02;
+    const pt = (a, rr) => `${(cx + rr * Math.cos(a)).toFixed(1)} ${(cy + rr * Math.sin(a)).toFixed(1)}`;
+    return `M${pt(a0, r)}A${r} ${r} 0 0 1 ${pt(a1, r)}L${pt(a1, r - 9)}A${r - 9} ${r - 9} 0 0 0 ${pt(a0, r - 9)}Z`;
+  };
+  const ring = Array.from({ length: segs }, (_, i) => (i < on
+    ? `<path class="sg" style="animation-delay:${(i * 0.02).toFixed(2)}s" d="${seg(i)}" fill="${gold}"/>`
+    : `<path d="${seg(i)}" fill="${pal.dim}" opacity="0.14"/>`)).join('');
+  const ticks = `<circle cx="${cx}" cy="${cy}" r="${r + 7}" fill="none" stroke="${pal.dim}" stroke-opacity="0.35" stroke-width="3" stroke-dasharray="1 ${((2 * Math.PI * (r + 7)) / 72 - 1).toFixed(2)}"/>`;
+  const sweep = lit
+    ? `<g class="sw"><path d="M${cx} ${cy - r - 11}l-3 -6h6z" fill="${pal.ink}"/></g>`
+    : '';
+  // Chevrons stack upward from the centre, at most five; the rest are implied.
+  const n = Math.min(5, passed);
+  const chevrons = Array.from({ length: n }, (_, i) => {
+    const y = cy + 12 + ((n - 1) / 2) * 9 - i * 9;
+    return `<path d="M${cx - 20} ${y}l20 -10l20 10v5l-20 -10l-20 10z" fill="${lit ? 'url(#stkMetal)' : pal.dim}" opacity="${lit ? 1 : 0.4}"/>`;
+  }).join('') || `<circle cx="${cx}" cy="${cy}" r="4" fill="${pal.dim}" opacity="0.5"/>`;
+  return '<defs><linearGradient id="stkMetal" x1="0" y1="0" x2="0" y2="1">' +
+    `<stop offset="0" stop-color="${pal.w || pal.ink}"/><stop offset="0.45" stop-color="${gold}"/><stop offset="1" stop-color="${pal.d || gold}"/></linearGradient></defs>` +
+    ticks + ring + sweep + `<circle cx="${cx}" cy="${cy}" r="${r - 14}" fill="${pal.bg1}" opacity="${pal.bare ? 1 : 0.6}" stroke="${pal.accent}" stroke-opacity="0.25"/>` +
+    chevrons +
+    `<text class="mono lbl" x="${cx}" y="172" text-anchor="middle">next ${next}</text>`;
+}
+
 module.exports = function renderStreak(state, ctx) {
   const pal = ctx.palettes[state.mood];
   const dead = state.mood === 'deceased';
@@ -95,8 +134,14 @@ module.exports = function renderStreak(state, ctx) {
   const numY = 96 - GLYPH_H * scale;
   const numW = textWidth(num, scale);
 
+  const hud = Boolean(pal.hud);
   const style = `${baseStyle(pal, dead)}
     .fnum{font-size:11px;fill:${pal.dim}}
+    ${hud && lit ? `
+    .sg{animation:seg .4s ease-out both}
+    .sw{animation:sweep 6s linear infinite;transform-origin:${GAUGE.cx}px ${GAUGE.cy}px}
+    @keyframes seg{from{opacity:0}to{opacity:1}}
+    @keyframes sweep{to{transform:rotate(360deg)}}` : ''}
     ${lit ? `
     .f1{animation:fl1 1.15s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
     .f2{animation:fl2 0.87s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
@@ -110,7 +155,7 @@ module.exports = function renderStreak(state, ctx) {
     @keyframes coal{0%,100%{opacity:.5}50%{opacity:1}}` : ''}`;
 
   const body =
-    glow + hearth + fire + embers + coalBed +
+    (hud ? gauge(current, lit, pal, pal.accent) : glow + hearth + fire + embers + coalBed) +
     `<text class="mono lbl" x="${COL_X}" y="42">${esc(lbl.current)}</text>` +
     glyphRects(num, { x: COL_X, y: numY, scale, fill: lit ? (pal.hot || gold) : pal.dim }) +
     `<text class="mono fnum" x="${COL_X + numW + 8}" y="94">${esc(lbl.days)}</text>` +

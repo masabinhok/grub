@@ -81,14 +81,36 @@ function baseStyle(pal, dead) {
  * background is the only reason the light-coloured type is legible, and GitHub
  * renders READMEs on white as readily as on black.
  */
+/**
+ * Tactical HUD dressing for a palette carrying `hud: true`: corner brackets on
+ * every card, and on boxed cards a faint scanline texture with a slow sweep
+ * line. The sweep stops when the pet is dead (sat 0), like every other motion.
+ */
+function hudChrome(w, h, id, pal) {
+  const L = 14, i = 5;
+  const brackets = `<path d="M${i} ${i + L}V${i}H${i + L}M${w - i - L} ${i}H${w - i}V${i + L}` +
+    `M${w - i} ${h - i - L}V${h - i}H${w - i - L}M${i + L} ${h - i}H${i}V${h - i - L}" ` +
+    `fill="none" stroke="${pal.accent}" stroke-width="1.5" stroke-opacity="0.8"/>`;
+  if (pal.bare) return brackets;
+  const sweep = pal.sat > 0
+    ? `<rect x="0" y="0" width="${w}" height="1.5" fill="${pal.accent}" opacity="0.18">` +
+      `<animate attributeName="y" values="0;${h};${h}" keyTimes="0;0.6;1" dur="7s" repeatCount="indefinite"/></rect>`
+    : '';
+  return `<defs><pattern id="${id}scan" width="4" height="3" patternUnits="userSpaceOnUse">` +
+    '<rect width="4" height="1" fill="#ffffff" opacity="0.025"/></pattern></defs>' +
+    `<rect width="${w}" height="${h}" rx="4" fill="url(#${id}scan)"/>` + sweep + brackets;
+}
+
 function svgDoc({ w, h, pal, id, title, desc, style, body }) {
   // The newline between the two rects is load-bearing: without it every card in
   // assets/ re-serialises differently and the next scheduled run commits eleven
   // files of pure whitespace churn. Bare mode leaves a blank line here instead,
   // which costs one byte and changes nothing.
-  const chrome = pal.bare ? '' :
-    `<rect width="${w}" height="${h}" rx="14" fill="url(#${id}bg)"/>\n` +
-    `<rect x="0.75" y="0.75" width="${w - 1.5}" height="${h - 1.5}" rx="13.5" fill="none" stroke="${pal.accent}" stroke-opacity="0.35"/>`;
+  const rx = pal.hud ? 4 : 14;
+  const chrome = (pal.bare ? '' :
+    `<rect width="${w}" height="${h}" rx="${rx}" fill="url(#${id}bg)"/>\n` +
+    `<rect x="0.75" y="0.75" width="${w - 1.5}" height="${h - 1.5}" rx="${rx - 0.5}" fill="none" stroke="${pal.accent}" stroke-opacity="0.35"/>`) +
+    (pal.hud ? hudChrome(w, h, id, pal) : '');
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" role="img" aria-labelledby="${id}t ${id}d">
 <title id="${id}t">${esc(title)}</title>
 <desc id="${id}d">${esc(desc)}</desc>
@@ -103,4 +125,14 @@ ${body}
 `;
 }
 
-module.exports = { CELL, FONT, esc, pixelRects, wrap, baseStyle, svgDoc };
+/**
+ * Lowercase every run of text in a finished SVG. Tags and attributes are left
+ * alone, and so is <style>: animation names and url(#id) references in CSS are
+ * case-sensitive.
+ */
+const lowercaseText = (svg) => svg
+  .split(/(<style>[\s\S]*?<\/style>)/)
+  .map((part, i) => (i % 2 ? part : part.replace(/>([^<]+)</g, (_, t) => `>${t.toLowerCase()}<`)))
+  .join('');
+
+module.exports = { CELL, FONT, esc, pixelRects, wrap, baseStyle, svgDoc, lowercaseText };

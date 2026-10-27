@@ -1,62 +1,53 @@
 <!--
-  Ready-to-paste profile README for github.com/masabinhok/masabinhok
+  ready-to-paste profile readme for github.com/masabinhok/masabinhok
 
-  Every image is generated daily by this repo and themed by GRUB's mood, so the
-  whole page desaturates and stops animating if the streak breaks.
+  every image is regenerated daily by masabinhok/grub and themed by sierra's
+  status, so the whole page greys out and stops moving if the streak breaks.
+  these are the no-background cards (assets/bare/); swap for assets/ to get the
+  boxed ones.
 
-  These are the no-background cards (assets/bare/), rendered by the same daily
-  run as assets/ but with no panel or border, so the art sits directly on the
-  page. Their palette is retinted to stay legible on GitHub's light theme as
-  well as dark — see barePalette() in scripts/lib/palette.js. Swap `assets/bare/`
-  for `assets/` in the URLs below to go back to the boxed cards.
-
-  Keep what you like, delete the rest — the components are independent.
-
-  Adopted this? Every URL below is absolute and points at the repo the cards are
-  built in — leave them and you are embedding somebody else's profile under your
-  own name. `node scripts/adopt.js` rewrites the lot. See docs/setup.md.
+  adopted this? `node scripts/adopt.js` rewrites every url below to your repo.
 -->
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/banner.svg" alt="Profile banner" width="840">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/name.svg" alt="sabin shrestha" width="840">
 </p>
 
+<p align="center">
+  <a href="https://www.linkedin.com/in/sabinshresthaa"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/linkedin.svg" alt="linkedin" width="26"></a>
+  &nbsp;&nbsp;
+  <a href="mailto:sabin.shrestha.er@gmail.com"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/email.svg" alt="email" width="26"></a>
+</p>
 
-
-
+<p align="center">
+  currently going deeper into database internals and distributed systems (replication, consensus, storage engines), and using agentic ai where it earns its place.
+</p>
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
 </p>
 
-
-
 <p align="center">
-  <a href="https://github.com/masabinhok/grub/issues/new?title=feed%20GRUB%20%F0%9F%8D%93&body=%F0%9F%8D%93%20**A%20snack%20has%20been%20prepared%20for%20GRUB.**%0A%0A-%20**Ration%3A**%20one%20%281%29%20suspiciously%20ripe%20strawberry%0A-%20**Delivered%20by%3A**%20a%20passing%20stranger%20with%20good%20intentions%0A-%20**Nutritional%20value%3A**%20none%20%E2%80%94%20purely%20emotional%0A%0A%3C!--%20Submit%20this%20issue%20to%20feed%20the%20pet%20and%20your%20name%20will%20be%20displayed%20on%20his%20card.%20--%3E%0A%0A**Just%20press%20%60Submit%20new%20issue%60.**%20GRUB%20will%20chew%2C%20sparkle%20and%20wear%20*your%20username*%20on%20his%20card%20for%20the%20next%2024%20hours%2C%20then%20close%20this%20issue%20himself.%0A%0A_Snacks%20are%20cosmetic%20%E2%80%94%20they%20cannot%20keep%20him%20alive.%20Only%20commits%20do%20that%2C%20and%20that%20is%20my%20problem%2C%20not%20yours._">
-    <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/pet.svg" alt="GRUB, the tamagotchi of shame — click to feed him" width="540">
-  </a>
-</p>
-
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/pet.svg" alt="sierra, a recon drone that stays airborne only while i keep committing" width="540">
 </p>
 
 <!--
-  The streak card is the only image here NOT served from raw.githubusercontent,
-  and that is the whole mechanism: it comes from the Cloudflare Worker in
-  counter/, which counts each fetch by GitHub's image proxy before passing the
-  committed card through — the bare one, matching everything else on this page.
-  The count is recorded, never drawn; read it from /stats.json on the Worker or
-  from views.json in the repo. Point this back at raw.githubusercontent and the
-  card still renders, it just stops counting anything.
-
-  Adopting this repo? Deploy your own Worker (counter/README.md) and swap the
-  host, or you are counting your profile's views onto somebody else's total.
+  the streak card is served by the cloudflare worker in grub/counter/, which
+  counts each render before passing the committed card through. that count is
+  what the skyline below draws. point it back at raw.githubusercontent and the
+  card still renders, it just stops counting.
 -->
 <p align="center">
-  <img src="https://grub-views.sifarish-less.workers.dev/streak.svg" width="420" alt="Commit streak">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/star.svg" width="420" alt="Stars earned">
+  <img src="https://grub-views.sifarish-less.workers.dev/streak.svg" width="420" alt="commit streak">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/star.svg" width="420" alt="stars earned">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/skyline.svg" width="840" alt="activity over the last 30 days, drawn as a skyline">
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/stack.svg" width="840" alt="stack: typescript, python, go, nestjs, fastapi, postgresql, docker, langgraph and more">
 </p>
 
 <p align="center">
@@ -64,7 +55,7 @@
 </p>
 
 <p align="center">
-  <sub>Everything above regenerates daily from
+  <sub>everything above regenerates daily from
   <a href="https://github.com/masabinhok/grub">masabinhok/grub</a>.
-  If it looks gray and still, I have some explaining to do.</sub>
+  if it is grey and still, i have some explaining to do.</sub>
 </p>

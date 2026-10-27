@@ -34,9 +34,8 @@ const COMPONENTS = require('./generators');
 
 const OUT_DIR = path.join(ROOT, 'docs', 'previews');
 
-// A Thursday, chosen and frozen. pickLine indexes on the weekday, so moving this
-// changes every caption; quoteOfTheDay indexes on the day number, so moving it
-// changes the marquee too.
+// A Thursday, chosen and frozen. pickLine and quoteOfTheDay both index on the
+// day number, so moving this changes every caption and the marquee.
 const NOW = new Date('2026-01-15T12:00:00.000Z');
 const DIED_ON = '2026-01-09';
 
@@ -81,7 +80,7 @@ function renderScene(scene, cfg) {
   const snacks = resolveSnacks(cfg);
   const ctx = {
     days: scene.days,
-    line: pickLine(scene.mood, state, NOW, linesFor(cfg)),
+    line: pickLine(scene.mood, state, NOW, linesFor(cfg), { streak: STREAK.current }),
     revived: false,
     streak: STREAK,
     profile: {},

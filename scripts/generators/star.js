@@ -34,6 +34,31 @@ function starPoints(cx, cy, outer, inner, n = 5) {
  * sparkles fire off the points. When GRUB dies the light goes out: grey metal,
  * no sweep, no rotation, nothing.
  */
+/**
+ * The stars as a service medal (palettes with `hud`): a striped ribbon, a
+ * notched gold disc with the star struck into it, and a glint crossing the
+ * face. It sways a little on its ribbon while the pet lives.
+ */
+function medal(pal, gold, deep, dead) {
+  const my = 112, mr = 40;
+  const stripe = (x, w, fill) => `<rect x="${x}" y="8" width="${w}" height="64" fill="${fill}"/>`;
+  const ribbon =
+    `<g clip-path="url(#ribClip)">` + stripe(CX - 26, 52, pal.bg2) +
+    stripe(CX - 20, 6, gold) + stripe(CX - 5, 10, pal.accent) + stripe(CX + 14, 6, gold) + '</g>' +
+    `<path d="M${CX - 26} 8h52v52l-26 14l-26 -14z" fill="none" stroke="${gold}" stroke-opacity="0.5"/>`;
+  const disc =
+    `<circle cx="${CX}" cy="${my}" r="${mr + 4}" fill="none" stroke="${gold}" stroke-width="3" stroke-dasharray="2.2 2.4" opacity="0.9"/>` +
+    `<circle cx="${CX}" cy="${my}" r="${mr}" fill="url(#starFill)"/>` +
+    `<circle cx="${CX}" cy="${my}" r="${mr - 8}" fill="${deep}" opacity="0.85"/>` +
+    `<polygon points="${starPoints(CX, my, mr - 13, (mr - 13) * 0.42)}" fill="${gold}" stroke="${pal.w || pal.ink}" stroke-opacity="0.6" stroke-linejoin="round"/>`;
+  const glint = dead ? '' :
+    `<g clip-path="url(#medClip)"><g transform="rotate(18 ${CX} ${my})">` +
+    `<rect class="glaze" x="${CX - 18}" y="${my - mr - 10}" width="36" height="${mr * 2 + 20}" fill="url(#starGlaze)"/></g></g>`;
+  return `<defs><clipPath id="ribClip"><path d="M${CX - 26} 8h52v52l-26 14l-26 -14z"/></clipPath>` +
+    `<clipPath id="medClip"><circle cx="${CX}" cy="${my}" r="${mr}"/></clipPath></defs>` +
+    `<g${dead ? '' : ' class="sway"'}>${ribbon}<rect x="${CX - 4}" y="70" width="8" height="6" fill="${gold}"/>${disc}${glint}</g>`;
+}
+
 module.exports = function renderStar(state, ctx) {
   const pal = ctx.palettes[state.mood];
   const dead = state.mood === 'deceased';
@@ -58,7 +83,9 @@ module.exports = function renderStar(state, ctx) {
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes halo{0%,100%{transform:scale(1);opacity:.28}50%{transform:scale(1.1);opacity:.06}}
     @keyframes glaze{0%{transform:translateX(-190px)}55%,100%{transform:translateX(190px)}}
-    @keyframes tw{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}`}`;
+    @keyframes tw{0%,100%{opacity:.15;transform:scale(.7)}50%{opacity:1;transform:scale(1)}}
+    .sway{animation:sway 5s ease-in-out infinite;transform-origin:${CX}px 8px}
+    @keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}`}`;
 
   // Behind the star: slow rays, so the whole thing sits in its own weather.
   const rays = dead ? '' :
@@ -77,6 +104,16 @@ module.exports = function renderStar(state, ctx) {
     `d="M0 ${-r * 2.2}Q${r * 0.35} ${-r * 0.35} ${r * 2.2} 0Q${r * 0.35} ${r * 0.35} 0 ${r * 2.2}Q${-r * 0.35} ${r * 0.35} ${-r * 2.2} 0Q${-r * 0.35} ${-r * 0.35} 0 ${-r * 2.2}Z" ` +
     `fill="${pal.w || pal.ink}"/></g>`).join('');
 
+  const starArt = rays +
+    (dead ? '' : `<polygon class="halo" points="${starPoints(CX, CY, R + 12, IR + 6)}" fill="none" stroke="${gold}" stroke-width="3" opacity="0.28"/>`) +
+    `<polygon points="${points}" fill="url(#starFill)"/>` +
+    (dead ? '' :
+      `<g clip-path="url(#starClip)"><g transform="rotate(18 ${CX} ${CY})">` +
+      `<rect class="glaze" x="${CX - 22}" y="${CY - R - 10}" width="44" height="${R * 2 + 20}" fill="url(#starGlaze)"/>` +
+      '</g></g>') +
+    `<polygon points="${points}" fill="none" stroke="${gold}" stroke-opacity="${dead ? 0.35 : 0.85}" stroke-width="2" stroke-linejoin="round"/>` +
+    sparkles;
+
   const body =
     '<defs>' +
     `<radialGradient id="starFill" cx="0.35" cy="0.3" r="0.8">` +
@@ -90,15 +127,7 @@ module.exports = function renderStar(state, ctx) {
     '</linearGradient>' +
     `<clipPath id="starClip"><polygon points="${points}"/></clipPath>` +
     '</defs>' +
-    rays +
-    (dead ? '' : `<polygon class="halo" points="${starPoints(CX, CY, R + 12, IR + 6)}" fill="none" stroke="${gold}" stroke-width="3" opacity="0.28"/>`) +
-    `<polygon points="${points}" fill="url(#starFill)"/>` +
-    (dead ? '' :
-      `<g clip-path="url(#starClip)"><g transform="rotate(18 ${CX} ${CY})">` +
-      `<rect class="glaze" x="${CX - 22}" y="${CY - R - 10}" width="44" height="${R * 2 + 20}" fill="url(#starGlaze)"/>` +
-      '</g></g>') +
-    `<polygon points="${points}" fill="none" stroke="${gold}" stroke-opacity="${dead ? 0.35 : 0.85}" stroke-width="2" stroke-linejoin="round"/>` +
-    sparkles +
+    (pal.hud ? medal(pal, gold, deep, dead) : starArt) +
     `<text class="mono lbl" x="${COL_X}" y="60">${esc(lbl.title)}</text>` +
     `<g${dead ? '' : ' class="pulse"'}>${glyphRects(stars, { x: COL_X, y: 108 - GLYPH_H * scale, scale, fill: pal.hot || gold })}</g>` +
     `<text class="mono lbl" x="${COL_X}" y="140">${esc(lbl.repos)}</text>` +

@@ -160,9 +160,16 @@ function quotesFor(cfg) {
   return merged.length ? merged : QUOTES;
 }
 
-function pickLine(tier, state, now, lines = LINES) {
+/**
+ * Today's line for this mood. Indexed by whole UTC days, like quoteOfTheDay, so it
+ * changes every midnight and only repeats once the pool runs out. `{streak}` in a
+ * line is filled from `vars.streak` when the caller has one.
+ */
+function pickLine(tier, state, now, lines = LINES, vars = {}) {
   const pool = (lines && lines[tier] && lines[tier].length) ? lines[tier] : LINES[tier];
-  return pool[(now.getUTCDay() + (state.resurrections || 0)) % pool.length];
+  const day = Math.floor(now.getTime() / 86400000) + (state.resurrections || 0);
+  const line = pool[((day % pool.length) + pool.length) % pool.length];
+  return vars.streak === undefined ? line : line.replace(/\{streak\}/g, String(vars.streak));
 }
 
 /** Today's quote. Indexed by whole UTC days, so it turns over at midnight. */

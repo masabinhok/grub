@@ -3,9 +3,10 @@
 const { CELL, FONT, esc, pixelRects, wrap, svgDoc } = require('../lib/svg');
 const { SPRITES, HEART, SPARKLE } = require('../lib/sprites');
 const { SNACKS } = require('../lib/snacks');
+const { droneArt } = require('../lib/drone');
 const { localDate } = require('../lib/dates');
 
-const W = 540, H = 300, SPRITE_X = 46, SPRITE_Y = 116;
+const W = 540, BASE_H = 300, SPRITE_X = 46, SPRITE_Y = 116;
 const SPRITE_MID = SPRITE_X + 8 * CELL;   // 118 — the creature's centre line
 
 // The placard above his head: the plea when nobody has fed him, the feeder's
@@ -20,6 +21,18 @@ const PLEA_X = 34, PLEA_Y = 52, PLEA_W = 168, PLEA_H = 48;
 const fitFont = (chars, width, max, min, tracking = 0) => {
   const n = Math.max(1, chars);
   return Math.max(min, Math.min(max, (width - tracking * (n - 1)) / (n * 0.62)));
+};
+
+/** As many `@name`s as fit in `chars` columns of mono, newest first. */
+const fitNames = (names, chars) => {
+  const out = [];
+  let used = 0;
+  for (const n of names.map(String)) {
+    if (used + n.length + 3 > chars) break;
+    out.push(n);
+    used += n.length + 3;
+  }
+  return out;
 };
 
 module.exports = function renderPet(state, ctx) {
@@ -95,11 +108,12 @@ module.exports = function renderPet(state, ctx) {
       `<rect class="lid" x="${10 * CELL}" y="${5 * CELL}" width="${3 * CELL}" height="${3 * CELL}" fill="${pal.x}"/>`
     : '';
 
+  const diedOn = state.diedOn || localDate(Date.now(), ctx.cfg.timezone);
   const tombText = dead
     ? '<text class="mono rip" x="72" y="52" text-anchor="middle">R.I.P.</text>' +
       `<line x1="30" y1="62" x2="114" y2="62" stroke="${pal.g}" stroke-opacity="0.6"/>` +
       `<text class="mono ripsub" x="72" y="80" text-anchor="middle">${esc(petName)}</text>` +
-      `<text class="mono ripsub" x="72" y="97" text-anchor="middle">${esc(state.diedOn || localDate(Date.now(), ctx.cfg.timezone))}</text>` +
+      `<text class="mono ripsub" x="72" y="97" text-anchor="middle">${esc(diedOn)}</text>` +
       '<text class="mono ripsub" x="72" y="112" text-anchor="middle">STARVED</text>'
     : '';
 
@@ -123,12 +137,17 @@ module.exports = function renderPet(state, ctx) {
       '<rect class="flash" x="-60" y="-60" width="264" height="264" fill="#ffffff" opacity="0"/>'
     : '';
 
+  const drone = (ctx.cfg.pet || {}).style === 'drone';
+  const figure = drone
+    ? droneArt(mood, pal, { name: petName, date: diedOn })
+    : pixelRects(SPRITES[mood], pal) + eyeLids + tombText;
+
   // The chew lives on its own wrapper: the inner group already carries the idle
   // animateTransform, and a CSS transform on the same element would replace it.
   const spriteGroup =
     `<g transform="translate(${SPRITE_X} ${SPRITE_Y})"><g${mood === 'feral' ? ' class="shell"' : ''}>` +
     `<g${fed ? ' class="munch"' : ''}><g>` +
-    spriteAnim + rays + pixelRects(SPRITES[mood], pal) + eyeLids + tombText + glitch + sparks +
+    spriteAnim + rays + figure + glitch + (drone ? '' : sparks) +
     '</g></g></g></g>';
 
   // --- the feeding theatre ------------------------------------------------
@@ -146,7 +165,7 @@ module.exports = function renderPet(state, ctx) {
   // Each scrap is placed where it lands, and the animation lifts it back up to
   // fall again — so the frame a non-animating renderer draws is three crumbs on
   // the ground rather than three snacks stuck in mid-air over his face.
-  const food = fed
+  const food = fed && (state.lastAction || 'feed') === 'feed'
     ? at(64, 248, 'crumb', 0, scrap) +
       at(112, 250, 'crumb', 0.55, scrap) +
       at(164, 246, 'crumb', 1.15, scrap)
@@ -181,9 +200,9 @@ module.exports = function renderPet(state, ctx) {
     const shown = feeder.length > 26 ? `${feeder.slice(0, 25)}…` : feeder;
     const fs = fitFont(shown.length + 1, PLEA_W - 24, 15, 8);
     placard = placardBox(
-      `<text class="mono callsub" x="${SPRITE_MID}" y="${PLEA_Y + 20}" text-anchor="middle">${esc(lbl.fedBy)}</text>` +
+      `<text class="mono callsub" x="${SPRITE_MID}" y="${PLEA_Y + 20}" text-anchor="middle">${esc({ salute: lbl.salutedBy, pat: lbl.pattedBy }[state.lastAction] || lbl.fedBy)}</text>` +
       `<text class="mono who" x="${SPRITE_MID}" y="${PLEA_Y + 38}" text-anchor="middle" font-size="${fs.toFixed(1)}">@${esc(shown)}</text>`);
-  } else if (!dead) {
+  } else if (!dead && lbl.feedMe) {
     const call = String(lbl.feedMe);
     const sub = String(lbl.feedMeSub);
     placard = placardBox(
@@ -220,12 +239,24 @@ module.exports = function renderPet(state, ctx) {
     `<text class="mono stat" x="${MX}" y="${STAT_Y + i * 19}">${esc(k)}</text>` +
     `<text class="mono val" x="${MX + 180}" y="${STAT_Y + i * 19}">${esc(v)}</text>`).join('');
 
+  // The latest visitors, newest first, and what everyone has done in total. Only
+  // drawn once somebody has visited, so a fresh card keeps its original height.
+  const squad = lbl.squad && Array.isArray(state.feeders) ? state.feeders.slice(-5).reverse() : [];
+  const H = squad.length ? BASE_H + 26 : BASE_H;
+  const acts = Object.assign({ salute: 0, pat: 0, feed: 0 }, state.actions);
+  const roster = squad.length
+    ? `<line x1="26" y1="${BASE_H - 4}" x2="${W - 26}" y2="${BASE_H - 4}" stroke="${pal.accent}" stroke-opacity="0.2"/>` +
+      `<text class="mono stat" x="26" y="${BASE_H + 13}"><tspan class="val">${esc(lbl.squad)}</tspan>  ` +
+      fitNames(squad, 52 - String(lbl.squad).length).map((f) => `@${esc(f)}`).join('  ') + '</text>' +
+      `<text class="mono stat" x="${W - 26}" y="${BASE_H + 13}" text-anchor="end">SAL ${acts.salute} · PAT ${acts.pat} · SUP ${acts.feed}</text>`
+    : '';
+
   const body =
     `<text class="mono brand" x="26" y="32">${esc(petName)}</text>` +
     `<text class="mono sub" x="${26 + petName.length * 13}" y="32">${esc(ctx.cfg.tagline)}</text>` +
     `<line x1="26" y1="44" x2="${W - 26}" y2="44" stroke="${pal.accent}" stroke-opacity="0.28"/>` +
     `<rect x="30" y="262" width="176" height="4" rx="2" fill="${pal.ground}"/>` +
-    placard + spriteGroup + food + burst + hearts + bubble + meter + statBlock;
+    placard + spriteGroup + food + burst + hearts + bubble + meter + statBlock + roster;
 
   return svgDoc({
     w: W, h: H, pal, id: 'pet', style,

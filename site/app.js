@@ -106,7 +106,7 @@
     var snacks = GRUB.snacks.resolveSnacks(cfg);
     var ctx = {
       days: days,
-      line: GRUB.copy.pickLine(mood, petState, NOW, GRUB.copy.linesFor(cfg)),
+      line: GRUB.copy.pickLine(mood, petState, NOW, GRUB.copy.linesFor(cfg), { streak: SAMPLE_STREAK.current }),
       revived: false,
       streak: SAMPLE_STREAK,
       profile: state.profile,

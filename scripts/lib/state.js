@@ -24,6 +24,9 @@ function defaultState(now) {
     // What they handed him — an id from lib/snacks.js. The only thing linking
     // the reply the feeder got to the food the card actually draws.
     lastSnack: null,
+    // 'feed', 'salute' or 'pat' — what the last visitor did, and running totals.
+    lastAction: null,
+    actions: { salute: 0, pat: 0, feed: 0 },
     // login -> UTC date of that login's last pet, for the one-a-day limit.
     feedLog: {},
     // Repo-wide pets today, for the global cap.

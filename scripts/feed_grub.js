@@ -51,7 +51,10 @@ const { MAX_PETS_PER_DAY, LOGIN_RE } = require('./lib/constants');
  * `if:` because GitHub Actions expressions cannot lowercase a string, so a YAML
  * startsWith would quietly miss "Pet GRUB".
  */
-const PET_REQUEST_RE = /^\s*(pet|feed)\b/i;
+const PET_REQUEST_RE = /^\s*(pet|pat|feed|salute)\b/i;
+
+/** The first word of the title, as one of the three things a visitor can do. */
+const ACTIONS = { pet: 'pat', pat: 'pat', feed: 'feed', salute: 'salute' };
 
 // Petting these is not allowed, ever. Checked before and after the mutation.
 const PROTECTED = ['lastCommitDate', 'hunger', 'mood', 'alive', 'diedOn', 'resurrections'];
@@ -132,9 +135,9 @@ function main() {
       pets: state.pets || 0,
       feeders: state.feeders.length,
       message:
-        `You already fed ${petName} today, @${actor}. He is flattered and unmoved.\n\n` +
-        'One snack per person per day. Come back tomorrow, or write some code — ' +
-        'that is the only thing that actually keeps him alive.',
+        `You already checked in with ${petName} today, @${actor}. Noted, and unmoved.\n\n` +
+        'One visit per person per day. Come back tomorrow, or write some code — ' +
+        `that is the only thing that actually keeps ${petName} alive.`,
     });
     return;
   }
@@ -146,8 +149,8 @@ function main() {
       pets: state.pets || 0,
       feeders: state.feeders.length,
       message:
-        `${petName} has been fed ${MAX_PETS_PER_DAY} times today and is now ` +
-        'visibly bloated. He is done for the day.\n\nTry again tomorrow.',
+        `${petName} has had ${MAX_PETS_PER_DAY} visitors today and is done for the day.` +
+        '\n\nTry again tomorrow.',
     });
     return;
   }
@@ -158,6 +161,10 @@ function main() {
   // whole handshake.
   const snack = pickSnack(resolveSnacks(cfg), `${actor}:${today}`);
 
+  // Labelled issues and dispatches carry no title to read, and were always feeds.
+  const word = (PET_REQUEST_RE.exec(OPTS.title) || [])[1];
+  const action = ACTIONS[String(word || 'feed').toLowerCase()];
+
   const firstTime = !state.feeders.includes(actor);
   state.pets = (state.pets || 0) + 1;
   state.feedLog[actor] = today;
@@ -167,7 +174,11 @@ function main() {
   // re-validated by the renderer before it is drawn.
   state.lastFedBy = actor;
   state.lastSnack = snack.id;
-  if (firstTime) state.feeders.push(actor);
+  state.lastAction = action;
+  state.actions = Object.assign({ salute: 0, pat: 0, feed: 0 }, state.actions);
+  state.actions[action] += 1;
+  // Most recent last, each login once: the card's roster reads the tail.
+  state.feeders = state.feeders.filter((f) => f !== actor).concat(actor);
 
   // The whole point of this script is what it does *not* change.
   if (pick(state, PROTECTED) !== before) {
@@ -182,22 +193,24 @@ function main() {
     : '';
 
   const dead = state.alive === false;
+  const did = {
+    feed: `resupplied ${petName} with ${snack.name}`,
+    salute: `saluted ${petName}`,
+    pat: `gave ${petName} a pat`,
+  }[action];
+  const tally = `Salutes **${state.actions.salute}** · pats **${state.actions.pat}** · ` +
+    `resupplies **${state.actions.feed}** · visitors on record: **${state.feeders.length}**`;
   const message = dead
-    ? `@${actor} offers ${petName} ${snack.name}. ${petName} is dead, so nothing happens.\n\n` +
-      'Snacks are cosmetic — they have never fed him properly and they cannot ' +
-      'raise him. That takes a commit whose message is exactly `i\'m sorry`, ' +
-      'pushed by the person who let him starve.\n\n' +
-      `Feed count: **${state.pets}** · people who have tried: **${state.feeders.length}**`
-    : `@${actor} fed ${petName} ${snack.name}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
-      `${snack.response}\n\n` +
-      'He is chewing about it on the card right now, and your name is on it for ' +
-      `the next 24 hours.${cardLink}\n\n` +
-      `He is still **${state.mood}**, because a snack is not a meal — only commits ` +
-      'actually feed him. He did enjoy it, allegedly.\n\n' +
-      `Feed count: **${state.pets}** · people who have fed him: **${state.feeders.length}**`;
+    ? `@${actor} ${did}. ${petName} is offline, so nothing happens.\n\n` +
+      'Visitors are cosmetic — they cannot bring it back. That takes a commit ' +
+      "whose message is exactly `i'm sorry`, pushed by the person who let it go dark.\n\n" + tally
+    : `@${actor} ${did}.${firstTime ? ' First time — you are on the record now.' : ''}\n\n` +
+      (action === 'feed' ? `${snack.response}\n\n` : '') +
+      `Your name is on the card for the next 24 hours.${cardLink}\n\n` +
+      `Status is still **${state.mood}** — only commits keep ${petName} flying.\n\n` + tally;
 
   console.log(
-    `${petName}: fed ${snack.name} by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
+    `${petName}: ${action} (${snack.name}) by @${actor}${firstTime ? ' (new feeder)' : ''} — ` +
     `pets=${state.pets} feeders=${state.feeders.length} today=${state.feedDay.count}/${MAX_PETS_PER_DAY} ` +
     `mood=${state.mood} (unchanged)`);
 
@@ -213,7 +226,7 @@ function main() {
     console.log('\n-- dry run, nothing written --');
     console.log(JSON.stringify({
       pets: state.pets, feeders: state.feeders, lastFedBy: state.lastFedBy,
-      lastSnack: state.lastSnack, lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
+      lastSnack: state.lastSnack, lastAction: state.lastAction, actions: state.actions, lastPettedAt: state.lastPettedAt, feedDay: state.feedDay,
     }, null, 2));
     emit(outputs);
     return;

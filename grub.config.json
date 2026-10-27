@@ -1,6 +1,6 @@
 {
-  "petName": "GRUB",
-  "tagline": "// THE TAMAGOTCHI OF SHAME",
+  "petName": "SIERRA",
+  "tagline": "// RECON UNIT · ON STATION",
   "timezone": "Asia/Kathmandu",
   "github": {
     "username": null,
@@ -18,7 +18,12 @@
     "languages": true,
     "divider": true,
     "marquee": true,
-    "inventory": true
+    "inventory": true,
+    "skyline": true,
+    "stack": true,
+    "name": true,
+    "linkedin": true,
+    "email": true
   },
   "marquee": {
     "text": null,
@@ -31,26 +36,95 @@
   "copy": {
     "replace": true,
     "lines": {
-      "thriving": ["i love that streak😋"],
-      "hungry": ["i love that streak😋"],
-      "feral": ["i love that streak😋"],
-      "deceased": ["i love that streak😋"],
-      "revived": ["i love that streak😋"]
+      "thriving": [
+        "Day {streak}. Nobody told me to stop, so I didn't.",
+        "{streak} days. Requested a medal. Denied. Continuing.",
+        "Streak status: classified. Fine. It's {streak}.",
+        "{streak} straight days on the grid. Command is nervous.",
+        "Hostiles spotted: zero. Commits spotted: {streak} days running.",
+        "I don't take days off. Neither does the operator. {streak} and counting.",
+        "Day {streak}. The contribution graph is just a wall of green now.",
+        "Reminder: {streak} days ago this was optional. Now it's doctrine.",
+        "Ammo full. Morale full. Streak: {streak}. Send recruiters.",
+        "{streak} days without missing. Even the cron job is impressed.",
+        "Overwatch report: operator shipped again. {streak} for {streak}.",
+        "Somebody bet against the streak on day 3. Day {streak}. Pay up.",
+        "{streak} days. At this point the streak keeps me alive, not food.",
+        "Mission log, day {streak}: pushed code, held the line, had snacks.",
+        "Still airborne. Still green. Still {streak}.",
+        "Bold of you to visit on day {streak} and not hire anyone.",
+        "{streak} days in. My battery runs on git push now.",
+        "Weekend? Never heard of it. Day {streak}.",
+        "Target acquired: tomorrow. Streak: {streak}. Engaging.",
+        "I ran the numbers. {streak} days. The numbers ran away.",
+        "Every green square is a confirmed kill. {streak} confirmed.",
+        "They said it couldn't be done. They said it {streak} times. Wrong every time.",
+        "Daily briefing: commit, survive, repeat. Day {streak} complete.",
+        "The streak is {streak}. My standards are higher than your coffee intake.",
+        "Holding position. Holding streak. {streak} days, zero retreats.",
+        "Radio check: still committing. {streak} days. Over.",
+        "If consistency had a rank, this would be general. Day {streak}.",
+        "Achievement unlocked: {streak}-day killstreak. Calling in a deploy.",
+        "{streak} days. I'm not a pet anymore. I'm a witness.",
+        "Day {streak}. Still haven't seen this operator log off."
+      ],
+      "hungry": [
+        "One day dark. The streak is on life support, operator.",
+        "Comms silent for 24h. I'm not worried. I'm logging it.",
+        "Ammo low. Excuses high. Push something.",
+        "Missed a day. The enemy is called 'tomorrow'.",
+        "Radio check. Radio check. Is anyone pushing code out there?",
+        "Hovering on reserve power. A commit would help. A lot."
+      ],
+      "feral": [
+        "THREE DAYS DARK. I am now targeting the README.",
+        "Signal lost. Morale lost. Streak lost. Send help or a commit.",
+        "Red alert. The contribution graph has gone grey.",
+        "I've started reading your commit history out loud. It's short.",
+        "Tell your recruiter I said hi. I'll be the one with the red light.",
+        "Mayday. Mayday. The operator has gone AWOL."
+      ],
+      "deceased": [
+        "Unit down. Cause: 'I'll commit tomorrow.'",
+        "SIERRA is offline. Redeploy with a commit that says: i'm sorry.",
+        "Grounded. Lens dark. No excuses left.",
+        "Killed in action by an empty commit log.",
+        "The black box recorded everything. It's mostly silence."
+      ],
+      "revived": [
+        "Redeployed. The apology is on the permanent record.",
+        "Back online. Keeping receipts.",
+        "Respawned. Slightly angrier. Considerably more armed.",
+        "Second deployment authorised. There is a counter now.",
+        "I remember going down. I remember whose fault it was."
+      ]
     },
     "quotes": [],
     "snacks": []
   },
   "inventory": {
     "slots": [
-      { "slot": "Primary", "item": "NestJS" },
-      { "slot": "Database", "item": "Postgres" },
-      { "slot": "Language", "item": "TypeScript" },
-      { "slot": "Companion", "item": "GRUB" }
+      {
+        "slot": "Primary",
+        "item": "NestJS"
+      },
+      {
+        "slot": "Secondary",
+        "item": "FastAPI"
+      },
+      {
+        "slot": "Lethal",
+        "item": "Postgres"
+      },
+      {
+        "slot": "Tactical",
+        "item": "LangGraph"
+      }
     ]
   },
   "labels": {
     "banner": {
-      "status": "PET STATUS"
+      "status": "UNIT STATUS"
     },
     "cta": {
       "title": "ADOPT ONE OF THESE",
@@ -58,25 +132,28 @@
       "button": "USE THIS TEMPLATE"
     },
     "pet": {
-      "hunger": "HUNGER",
-      "daysSinceCommit": "DAYS MISSED",
-      "mood": "MOOD",
-      "resurrections": "RESURRECTIONS",
-      "feedMe": "FEED ME",
-      "feedMeSub": "strangers only",
-      "fedBy": "FED BY"
+      "hunger": "AMMO SPENT",
+      "daysSinceCommit": "DAYS DARK",
+      "mood": "STATUS",
+      "resurrections": "REDEPLOYS",
+      "feedMe": "",
+      "feedMeSub": "",
+      "fedBy": "RESUPPLIED BY",
+      "squad": "",
+      "salutedBy": "SALUTED BY",
+      "pattedBy": "PATTED BY"
     },
     "streak": {
-      "current": "CURRENT STREAK",
+      "current": "ACTIVE DEPLOYMENT",
       "days": "days",
-      "longest": "LONGEST",
-      "activeDays": "ACTIVE DAYS"
+      "longest": "LONGEST TOUR",
+      "activeDays": "DAYS IN FIELD"
     },
     "eye": {
       "fed": "FED"
     },
     "star": {
-      "title": "STARS EARNED",
+      "title": "COMMENDATIONS",
       "repos": "REPOS"
     },
     "stats": {
@@ -95,9 +172,90 @@
       "dead": "SIGNAL LOST"
     },
     "inventory": {
-      "title": "EQUIPPED SKILLS"
+      "title": "LOADOUT"
     }
   },
-  "taglines": {},
-  "palette": {}
+  "taglines": {
+    "thriving": "backend · distributed systems · databases",
+    "hungry": "backend · distributed systems · databases",
+    "feral": "backend · distributed systems · databases",
+    "deceased": "backend · distributed systems · databases"
+  },
+  "palette": {
+    "thriving": {
+      "x": "#c9a65a",
+      "d": "#6b5a33",
+      "w": "#fff6dc",
+      "b": "#0a0c0a",
+      "m": "#ff5a4f",
+      "t": "#ffc94a",
+      "bg1": "#0a0c0b",
+      "bg2": "#1b211b",
+      "ink": "#ece6d4",
+      "dim": "#a39f86",
+      "accent": "#ffb000",
+      "ground": "#3a3829",
+      "hud": true
+    },
+    "hungry": {
+      "x": "#a68d5a",
+      "d": "#5a4d33",
+      "w": "#efe8d4",
+      "b": "#0c0d0b",
+      "m": "#b65249",
+      "t": "#cfa24a",
+      "bg1": "#0c0d0b",
+      "bg2": "#1a1b16",
+      "ink": "#d9d3c1",
+      "dim": "#908b77",
+      "accent": "#cf9a3a",
+      "ground": "#33312a",
+      "hud": true
+    },
+    "feral": {
+      "x": "#8a807c",
+      "d": "#5a3a36",
+      "w": "#f2e2de",
+      "b": "#ff3b30",
+      "m": "#ff3b30",
+      "t": "#ff6b3d",
+      "bg1": "#0e0909",
+      "bg2": "#1f1312",
+      "ink": "#e8d8d4",
+      "dim": "#a3827d",
+      "accent": "#ff3b30",
+      "ground": "#2e2220",
+      "hud": true
+    },
+    "deceased": {
+      "hud": true
+    }
+  },
+  "pet": {
+    "style": "drone"
+  },
+  "stack": [
+    "typescript",
+    "javascript",
+    "python",
+    "go",
+    "kotlin",
+    "node.js",
+    "nestjs",
+    "fastapi",
+    "next.js",
+    "react",
+    "postgresql",
+    "sqlite",
+    "mongodb",
+    "prisma",
+    "docker",
+    "langchain",
+    "langgraph",
+    "ollama",
+    "git",
+    "linux",
+    "github actions"
+  ],
+  "lowercase": true
 }

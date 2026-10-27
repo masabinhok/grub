@@ -49,7 +49,26 @@ const DEFAULTS = {
     divider: true,
     marquee: true,
     inventory: true,
+    skyline: true,
+    stack: true,
+    name: true,
+    linkedin: true,
+    email: true,
   },
+
+  // How the creature is drawn: "sprite" (the 16x16 pixel worm) or "drone"
+  // (a vector recon drone, see lib/drone.js).
+  pet: {
+    style: 'sprite',
+  },
+
+  // The stack card: tool names, each drawn with its mark from lib/icons.js.
+  // Empty falls back to the inventory items.
+  stack: [],
+
+  // Lowercase every word on every card. Applied to the finished SVG text, so
+  // labels, lines and names all follow without each generator knowing.
+  lowercase: false,
 
   // The scrolling CRT line. `text` accepts a string or an array of strings; null
   // runs the daily joke/quote/fact rotation from lib/copy.js instead.
@@ -112,8 +131,13 @@ const DEFAULTS = {
       // The placard above his head: the plea, and what it says instead once
       // somebody has fed him.
       feedMe: 'FEED ME',
+      // Empty hides the placard entirely.
       feedMeSub: 'strangers only',
       fedBy: 'FED BY',
+      salutedBy: 'SALUTED BY',
+      pattedBy: 'PATTED BY',
+      // Strip along the bottom naming the latest visitors. Empty hides it.
+      squad: 'REGULARS',
     },
     streak: {
       current: 'CURRENT STREAK',

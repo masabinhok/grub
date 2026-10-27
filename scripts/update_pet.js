@@ -69,6 +69,7 @@ const {
 } = require('./lib/github');
 const { mergeTraffic, trafficTotal, firstSampleDate } = require('./lib/traffic');
 const COMPONENTS = require('./generators');
+const { lowercaseText } = require('./lib/svg');
 
 /**
  * views.json, or zeroes. Deliberately forgiving: a fork that never deployed the
@@ -77,10 +78,10 @@ const COMPONENTS = require('./generators');
 function loadViews(viewsPath = VIEWS_PATH) {
   try {
     const raw = JSON.parse(fs.readFileSync(viewsPath, 'utf8'));
-    return { total: Math.max(0, Number(raw.total) || 0), since: raw.since || null };
+    return { total: Math.max(0, Number(raw.total) || 0), since: raw.since || null, days: raw.days || {} };
   } catch (err) {
     if (err.code !== 'ENOENT') console.warn(`! views.json unreadable (${err.message}) — drawing 0 profile views`);
-    return { total: 0, since: null };
+    return { total: 0, since: null, days: {} };
   }
 }
 
@@ -232,6 +233,8 @@ async function main() {
   const watchers = {
     profileViews: views.total,
     profileViewsSince: views.since ? String(views.since).slice(0, 10) : null,
+    // Per-UTC-day counts, drawn as the skyline's towers.
+    profileViewDays: views.days,
     lurkers: trafficTotal(daily),
     fed: (state.feeders || []).length,
     views: trafficTotal(dailyViews),
@@ -263,7 +266,7 @@ async function main() {
   // The bubble is the mood's, always. A snack shows up as the placard and the
   // reaction on the card; it does not get to interrupt what he was saying.
   const tier = revived ? 'revived' : renderState.mood;
-  const line = pickLine(tier, renderState, now, linesFor(cfg));
+  const line = pickLine(tier, renderState, now, linesFor(cfg), { streak: streak.current || 0 });
 
   // What he is chewing. feed_grub.js wrote the id when it replied to the issue,
   // so the card draws exactly what the reply promised. An id from a config that
@@ -288,7 +291,10 @@ async function main() {
 
   const names = OPTS.only ? [OPTS.only] : enabledComponents(cfg, COMPONENTS);
   for (const n of names) if (!COMPONENTS[n]) throw new Error(`unknown component "${n}" (have: ${Object.keys(COMPONENTS).join(', ')})`);
-  const rendered = names.map((n) => [n, COMPONENTS[n](renderState, ctx)]);
+  const rendered = names.map((n) => {
+    const svg = COMPONENTS[n](renderState, ctx);
+    return [n, cfg.lowercase ? lowercaseText(svg) : svg];
+  });
 
   console.log(
     `${petName}: mood=${renderState.mood} days=${days} hunger=${renderState.hunger} alive=${renderState.alive}` +

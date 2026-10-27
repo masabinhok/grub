@@ -21,4 +21,9 @@ module.exports = {
   divider: require('./divider'),
   marquee: require('./marquee'),
   inventory: require('./inventory'),
+  skyline: require('./skyline'),
+  stack: require('./stack'),
+  name: require('./name'),
+  linkedin: require('./contact')('linkedin'),
+  email: require('./contact')('email'),
 };
