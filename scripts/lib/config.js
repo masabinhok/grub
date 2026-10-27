@@ -52,6 +52,7 @@ const DEFAULTS = {
     skyline: true,
     stack: true,
     name: true,
+    profile: true,
     linkedin: true,
     email: true,
   },
@@ -65,6 +66,13 @@ const DEFAULTS = {
   // The stack card: tool names, each drawn with its mark from lib/icons.js.
   // Empty falls back to the inventory items.
   stack: [],
+
+  // The one-liner on the profile card. Up to three lines of about 60 characters.
+  bio: '',
+
+  // Small icon-and-text rows along the profile card's foot, e.g.
+  // [{ "icon": "game", "text": "codmw4" }]. Icons: game, tv, music.
+  status: [],
 
   // Lowercase every word on every card. Applied to the finished SVG text, so
   // labels, lines and names all follow without each generator knowing.

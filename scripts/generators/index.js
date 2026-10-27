@@ -24,6 +24,7 @@ module.exports = {
   skyline: require('./skyline'),
   stack: require('./stack'),
   name: require('./name'),
+  profile: require('./profile'),
   linkedin: require('./contact')('linkedin'),
   email: require('./contact')('email'),
 };

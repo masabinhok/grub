@@ -10,25 +10,14 @@
 -->
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/name.svg" alt="sabin shrestha" width="840">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/pet.svg" alt="sierra, a recon drone that stays airborne only while i keep committing" width="420">
+  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/profile.svg" alt="sabin shrestha: i build things. ai, databases." width="420">
 </p>
 
 <p align="center">
-  <a href="https://www.linkedin.com/in/sabinshresthaa"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/linkedin.svg" alt="linkedin" width="26"></a>
+  <a href="https://www.linkedin.com/in/sabinshresthaa"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/linkedin.svg" alt="linkedin" width="24"></a>
   &nbsp;&nbsp;
-  <a href="mailto:sabin.shrestha.er@gmail.com"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/email.svg" alt="email" width="26"></a>
-</p>
-
-<p align="center">
- i build things. ai, databases.
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/pet.svg" alt="sierra, a recon drone that stays airborne only while i keep committing" width="540">
+  <a href="mailto:sabin.shrestha.er@gmail.com"><img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/email.svg" alt="email" width="24"></a>
 </p>
 
 <!--

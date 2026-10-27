@@ -23,7 +23,8 @@
     "stack": true,
     "name": true,
     "linkedin": true,
-    "email": true
+    "email": true,
+    "profile": true
   },
   "marquee": {
     "text": null,
@@ -257,5 +258,20 @@
     "linux",
     "github actions"
   ],
-  "lowercase": true
+  "lowercase": true,
+  "bio": "i build things. ai, databases.",
+  "status": [
+    {
+      "icon": "game",
+      "text": "codmw4"
+    },
+    {
+      "icon": "tv",
+      "text": "bb · bcs"
+    },
+    {
+      "icon": "music",
+      "text": "frank sinatra"
+    }
+  ]
 }
