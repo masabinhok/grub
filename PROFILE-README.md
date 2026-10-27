@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-  currently going deeper into database internals and distributed systems (replication, consensus, storage engines), and using agentic ai where it earns its place.
+ i build things. ai, databases.
 </p>
 
 <p align="center">
@@ -54,8 +54,3 @@
   <img src="https://raw.githubusercontent.com/masabinhok/grub/main/assets/bare/divider.svg" width="840">
 </p>
 
-<p align="center">
-  <sub>everything above regenerates daily from
-  <a href="https://github.com/masabinhok/grub">masabinhok/grub</a>.
-  if it is grey and still, i have some explaining to do.</sub>
-</p>
