@@ -2,19 +2,19 @@
 <title id="stst">33 public repos, 23 stars, 18 followers</title>
 <desc id="stsd">profile statistics</desc>
 <defs><linearGradient id="stsbg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#1b211b"/><stop offset="1" stop-color="#0a0c0b"/>
+<stop offset="0" stop-color="#1a1b16"/><stop offset="1" stop-color="#0c0d0b"/>
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#918c6f}
-    .big{font-size:31px;font-weight:700;fill:#89763c}
-    .med{font-size:15px;font-weight:700;fill:#89763c}
-    .sm{font-size:11px;fill:#89763c}
-    .dim{font-size:11px;fill:#918c6f}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#908b78}
+    .big{font-size:31px;font-weight:700;fill:#837650}
+    .med{font-size:15px;font-weight:700;fill:#837650}
+    .sm{font-size:11px;fill:#837650}
+    .dim{font-size:11px;fill:#908b78}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
 </style>
-<path d="M5 19V5H19M401 5H415V19M415 161V175H401M19 175H5V161" fill="none" stroke="#ac7700" stroke-width="1.5" stroke-opacity="0.8"/>
-<text class="mono lbl" x="24" y="26">by the numbers</text><line x1="24" y1="36" x2="396" y2="36" stroke="#ac7700" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">public repos</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#89763c">33</text><text class="mono lbl" x="224" y="52">stars earned</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#89763c">23</text><text class="mono lbl" x="24" y="118">followers</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#89763c">18</text><text class="mono lbl" x="224" y="118">contributions</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#89763c">2278</text>
+<path d="M5 19V5H19M401 5H415V19M415 161V175H401M19 175H5V161" fill="none" stroke="#a67928" stroke-width="1.5" stroke-opacity="0.8"/>
+<text class="mono lbl" x="24" y="26">by the numbers</text><line x1="24" y1="36" x2="396" y2="36" stroke="#a67928" stroke-opacity="0.25"/><text class="mono lbl" x="24" y="52">public repos</text><text class="mono" x="24" y="76" font-size="26" font-weight="700" fill="#837650">33</text><text class="mono lbl" x="224" y="52">stars earned</text><text class="mono" x="224" y="76" font-size="26" font-weight="700" fill="#837650">23</text><text class="mono lbl" x="24" y="118">followers</text><text class="mono" x="24" y="142" font-size="26" font-weight="700" fill="#837650">18</text><text class="mono lbl" x="224" y="118">contributions</text><text class="mono" x="224" y="142" font-size="26" font-weight="700" fill="#837650">2278</text>
 </svg>
