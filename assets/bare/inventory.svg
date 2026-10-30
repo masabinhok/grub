@@ -2,19 +2,19 @@
 <title id="invt">equipped: primary: nestjs, secondary: fastapi, lethal: postgres, tactical: langgraph</title>
 <desc id="invd">tech stack as an rpg equipment screen</desc>
 <defs><linearGradient id="invbg" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0" stop-color="#1a1b16"/><stop offset="1" stop-color="#0c0d0b"/>
+<stop offset="0" stop-color="#1f1312"/><stop offset="1" stop-color="#0e0909"/>
 </linearGradient></defs>
 <style>
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace}
-    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#908b78}
-    .big{font-size:31px;font-weight:700;fill:#837650}
-    .med{font-size:15px;font-weight:700;fill:#837650}
-    .sm{font-size:11px;fill:#837650}
-    .dim{font-size:11px;fill:#908b78}
+    .lbl{font-size:9.5px;letter-spacing:1.6px;fill:#a5847f}
+    .big{font-size:31px;font-weight:700;fill:#a56758}
+    .med{font-size:15px;font-weight:700;fill:#a56758}
+    .sm{font-size:11px;fill:#a56758}
+    .dim{font-size:11px;fill:#a5847f}
     
     .pulse{animation:pulse 3.4s ease-in-out infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.62}}
 </style>
-<path d="M5 19V5H19M401 5H415V19M415 177V191H401M19 191H5V177" fill="none" stroke="#a67928" stroke-width="1.5" stroke-opacity="0.8"/>
-<text class="mono lbl" x="24" y="26">loadout</text><text class="mono lbl" x="396" y="26" text-anchor="end" opacity="0.7">4/4</text><line x1="24" y1="36" x2="396" y2="36" stroke="#a67928" stroke-opacity="0.25"/><rect x="24" y="49" width="9" height="9" fill="#908b78"/><text class="mono lbl" x="43" y="58">primary</text><text class="mono sm" x="196" y="58" font-weight="700">nestjs</text><text class="mono dim" x="396" y="58" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="67" x2="396" y2="67" stroke="#908b78" stroke-opacity="0.14"/><rect x="24" y="79" width="9" height="9" fill="#908b78"/><text class="mono lbl" x="43" y="88">secondary</text><text class="mono sm" x="196" y="88" font-weight="700">fastapi</text><text class="mono dim" x="396" y="88" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="97" x2="396" y2="97" stroke="#908b78" stroke-opacity="0.14"/><rect x="24" y="109" width="9" height="9" fill="#908b78"/><text class="mono lbl" x="43" y="118">lethal</text><text class="mono sm" x="196" y="118" font-weight="700">postgres</text><text class="mono dim" x="396" y="118" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="127" x2="396" y2="127" stroke="#908b78" stroke-opacity="0.14"/><rect x="24" y="139" width="9" height="9" fill="#908b78"/><text class="mono lbl" x="43" y="148">tactical</text><text class="mono sm" x="196" y="148" font-weight="700">langgraph</text><text class="mono dim" x="396" y="148" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="157" x2="396" y2="157" stroke="#908b78" stroke-opacity="0.14"/>
+<path d="M5 19V5H19M401 5H415V19M415 177V191H401M19 191H5V177" fill="none" stroke="#ff190d" stroke-width="1.5" stroke-opacity="0.8"/>
+<text class="mono lbl" x="24" y="26">loadout</text><text class="mono lbl" x="396" y="26" text-anchor="end" opacity="0.7">4/4</text><line x1="24" y1="36" x2="396" y2="36" stroke="#ff190d" stroke-opacity="0.25"/><rect x="24" y="49" width="9" height="9" fill="#a5847f"/><text class="mono lbl" x="43" y="58">primary</text><text class="mono sm" x="196" y="58" font-weight="700">nestjs</text><text class="mono dim" x="396" y="58" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="67" x2="396" y2="67" stroke="#a5847f" stroke-opacity="0.14"/><rect x="24" y="79" width="9" height="9" fill="#a5847f"/><text class="mono lbl" x="43" y="88">secondary</text><text class="mono sm" x="196" y="88" font-weight="700">fastapi</text><text class="mono dim" x="396" y="88" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="97" x2="396" y2="97" stroke="#a5847f" stroke-opacity="0.14"/><rect x="24" y="109" width="9" height="9" fill="#a5847f"/><text class="mono lbl" x="43" y="118">lethal</text><text class="mono sm" x="196" y="118" font-weight="700">postgres</text><text class="mono dim" x="396" y="118" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="127" x2="396" y2="127" stroke="#a5847f" stroke-opacity="0.14"/><rect x="24" y="139" width="9" height="9" fill="#a5847f"/><text class="mono lbl" x="43" y="148">tactical</text><text class="mono sm" x="196" y="148" font-weight="700">langgraph</text><text class="mono dim" x="396" y="148" text-anchor="end" font-size="9" opacity="0.7">equipped</text><line x1="24" y1="157" x2="396" y2="157" stroke="#a5847f" stroke-opacity="0.14"/>
 </svg>

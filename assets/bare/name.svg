@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 104" width="840" height="104" role="img" aria-label="Sabin Shrestha">
 <defs><linearGradient id="nmFill" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="840" y2="0" gradientTransform="translate(-840 0)">
-<stop offset="0" stop-color="#a67928"/><stop offset="0.44" stop-color="#a67928"/>
-<stop offset="0.5" stop-color="#cfa24a"/>
-<stop offset="0.56" stop-color="#a67928"/><stop offset="1" stop-color="#a67928"/><animateTransform attributeName="gradientTransform" type="translate" values="-840 0;840 0;840 0" keyTimes="0;0.45;1" dur="7s" begin="1.6s" repeatCount="indefinite"/>
+<stop offset="0" stop-color="#ff190d"/><stop offset="0.44" stop-color="#ff190d"/>
+<stop offset="0.5" stop-color="#ff6b3d"/>
+<stop offset="0.56" stop-color="#ff190d"/><stop offset="1" stop-color="#ff190d"/><animateTransform attributeName="gradientTransform" type="translate" values="-840 0;840 0;840 0" keyTimes="0;0.45;1" dur="7s" begin="1.6s" repeatCount="indefinite"/>
 </linearGradient></defs>
 <style>
     .ch{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"DejaVu Sans Mono",monospace;font-size:50px;font-weight:300;fill:url(#nmFill)}
@@ -13,6 +13,6 @@
 </style>
 <title>sabin shrestha</title>
 <text class="ch" x="164.5" y="64" style="animation-delay:0.00s">s</text><text class="ch" x="201.5" y="64" style="animation-delay:0.06s">a</text><text class="ch" x="238.5" y="64" style="animation-delay:0.12s">b</text><text class="ch" x="275.5" y="64" style="animation-delay:0.18s">i</text><text class="ch" x="312.5" y="64" style="animation-delay:0.24s">n</text><text class="ch" x="386.5" y="64" style="animation-delay:0.36s">s</text><text class="ch" x="423.5" y="64" style="animation-delay:0.42s">h</text><text class="ch" x="460.5" y="64" style="animation-delay:0.48s">r</text><text class="ch" x="497.5" y="64" style="animation-delay:0.54s">e</text><text class="ch" x="534.5" y="64" style="animation-delay:0.60s">s</text><text class="ch" x="571.5" y="64" style="animation-delay:0.66s">t</text><text class="ch" x="608.5" y="64" style="animation-delay:0.72s">h</text><text class="ch" x="645.5" y="64" style="animation-delay:0.78s">a</text>
-<rect class="rule" x="270" y="84" width="300" height="1" fill="#a67928" opacity="0.5"/>
-<rect x="418" y="82.5" width="4" height="4" fill="#a67928" transform="rotate(45 420 84.5)"/>
+<rect class="rule" x="270" y="84" width="300" height="1" fill="#ff190d" opacity="0.5"/>
+<rect x="418" y="82.5" width="4" height="4" fill="#ff190d" transform="rotate(45 420 84.5)"/>
 </svg>

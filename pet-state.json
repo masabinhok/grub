@@ -1,8 +1,8 @@
 {
   "lastCommitDate": "2026-10-27T15:28:35Z",
-  "lastCheckedDate": "2026-10-29T22:41:53.782Z",
-  "hunger": 40,
-  "mood": "hungry",
+  "lastCheckedDate": "2026-10-30T22:14:48.332Z",
+  "hunger": 60,
+  "mood": "feral",
   "alive": true,
   "diedOn": null,
   "resurrections": 0,
