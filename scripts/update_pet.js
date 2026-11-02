@@ -64,7 +64,7 @@ const { pickLine, linesFor } = require('./lib/copy');
 const { resolveSnacks, snackById, pickSnack } = require('./lib/snacks');
 const { captionFor, updateReadmeCaption } = require('./lib/readme');
 const {
-  resolveUsername, resolveRepo, fetchActivity, fetchProfileData, fetchTraffic,
+  gh, resolveUsername, resolveRepo, fetchActivity, fetchProfileData, fetchTraffic,
   computeStreaks, normalize, APOLOGY_NORM, localHeadMessage,
 } = require('./lib/github');
 const { mergeTraffic, trafficTotal, firstSampleDate } = require('./lib/traffic');
@@ -133,6 +133,12 @@ async function main() {
   } else {
     const username = resolveUsername({ user: OPTS.user, configUsername: cfg.github.username });
     if (!username) throw new Error('cannot determine username — pass --user <login> or set PET_USERNAME');
+
+    // A rejected token 401s every call below and each one degrades quietly, so the
+    // pet would starve off stale state. Fail the run instead: GitHub emails on that.
+    await gh('/rate_limit').catch((err) => {
+      if (/ 401 /.test(err.message)) throw new Error(`token rejected (${err.message}) — rotate PET_TOKEN`);
+    });
 
     const includePrivate = OPTS.includePrivate || cfg.github.includePrivate === true;
     const activity = await fetchActivity(username, { includePrivate });
