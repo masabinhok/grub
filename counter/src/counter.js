@@ -135,6 +135,22 @@ export class ViewCounter extends DurableObject {
   }
 
   /**
+   * Takes today's count down to `keep`, filing the difference under `self`. For
+   * owner views that slipped past the userscript. Never raises a count.
+   */
+  keepToday(keep) {
+    const day = utcDay();
+    this.ctx.storage.transactionSync(() => {
+      const extra = (this.stats(day).today || 0) - keep;
+      if (extra <= 0) return;
+      this.sql.exec('UPDATE days SET count = ? WHERE date = ?', keep, day);
+      this.#bump('total', -extra);
+      this.#bump('self', extra);
+    });
+    return this.stats(day);
+  }
+
+  /**
    * A badge request that was served but deliberately not counted — see the camo
    * gate in src/index.js. Tracked because the size of this number is the whole
    * argument that the counted number means something.

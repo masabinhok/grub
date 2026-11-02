@@ -157,6 +157,17 @@ export default {
       if (!(await isOwnerKey(request.headers.get('x-self-key'), env.SELF_KEY))) {
         return new Response('forbidden\n', { status: 403 });
       }
+      // ?keep=N: take today's count down to N, for views of yours that slipped past the script.
+      const keep = url.searchParams.get('keep');
+      if (keep !== null) {
+        const n = Number(keep);
+        if (!Number.isInteger(n) || n < 0) return new Response('keep must be a whole number\n', { status: 400 });
+        const stats = await stub.keepToday(n);
+        return new Response(JSON.stringify({ today: stats.today, self: stats.self }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        });
+      }
       const result = await stub.claimSelf();
       return new Response(JSON.stringify({ claimed: result.claimed, self: result.self }), {
         status: 200,
