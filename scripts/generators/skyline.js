@@ -5,19 +5,29 @@ const { esc, baseStyle, svgDoc } = require('../lib/svg');
 const W = 840, H = 152;
 const DAYS = 30;
 const GROUND = 140;          // street level
-const LEFT = 40;             // first tower's front-left corner
-const PITCH = 25;            // tower to tower
+const LEFT = 40;             // first building's front-left corner
+const PITCH = 25;            // building to building
 const FACE = 16;             // front face width
 const DX = 8, DY = 5;        // isometric depth offset of the side and roof
-const MAX_H = 112;           // tallest tower above the street
+const MAX_H = 112;           // tallest building above the street
 const STUB = 5;              // a quiet day is still a building, just a low one
 const WIN = 4, WIN_GAP = 3;  // window size and spacing on the front face
+const TWO_COLS = [3, 3 + WIN + WIN_GAP + 2];
+const ONE_COL = [(FACE - WIN) / 2];
 
 /**
- * A night city, one isometric tower per day for the last month. A tower's height
- * and its lit windows are that day's count from views.json — renders of the
- * profile README, though the card deliberately never says so. Days are UTC, the
- * same buckets the Worker counts in.
+ * Which building a day gets: the park for no views, then the remaining styles
+ * spread evenly up to the busiest day, so the bands follow the data rather than
+ * a fixed step and adding a style re-spreads them on its own.
+ */
+const band = (n, peak, styles) => (n === 0 ? 0 : Math.min(styles - 1, Math.ceil((n * (styles - 1)) / peak)));
+
+/**
+ * A night city, one isometric building per day for the last month. A building's
+ * height and its lit windows are that day's count from views.json — renders of
+ * the profile README, though the card deliberately never says so. Days are UTC,
+ * the same buckets the Worker counts in. The style climbs with the count: park,
+ * house, apartments, offices, tower.
  *
  * Height scales to the busiest day in the window, but never below 5, so a month
  * of zeros and ones reads as a low skyline rather than a row of towers maxed out.
@@ -37,38 +47,105 @@ module.exports = function renderSkyline(state, ctx) {
   const pane = (cls, x, y, delay) =>
     `<rect class="${cls}" x="${x}" y="${y}" width="${WIN}" height="${WIN}"${delay ? ` style="animation-delay:${delay}s"` : ''}/>`;
 
+  // An iso block: right side, roof, front — painter's order. `d` scales the depth
+  // so a setback can stand inside the roof below it.
+  const box = (x, bottom, top, face, roofOp, d = 1) =>
+    `<path d="M${x + face} ${bottom}V${top}l${DX * d} ${-DY * d}V${bottom - DY * d}Z" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.3"/>` +
+    `<path d="M${x} ${top}l${DX * d} ${-DY * d}h${face}l${-DX * d} ${DY * d}Z" fill="${pal.accent}" fill-opacity="${roofOp}" stroke="${pal.accent}" stroke-opacity="0.5"/>` +
+    `<rect x="${x}" y="${top}" width="${face}" height="${bottom - top}" fill="${pal.bg2}" stroke="${pal.accent}" stroke-opacity="0.4"/>`;
+
+  // Windows fill bottom-up, one lit per count. Whatever the wall is too short to
+  // hold simply is not drawn.
+  const windows = (x, h, n, i, cols) => {
+    const floors = Math.max(0, Math.floor((h - 6) / (WIN + WIN_GAP)));
+    let lit = n, out = '';
+    for (let f = 0; f < floors; f += 1) {
+      cols.forEach((ox, c) => {
+        const wy = GROUND - 6 - (f + 1) * (WIN + WIN_GAP) + WIN_GAP;
+        // A few lit windows flicker, offset per building, so the city looks lived in.
+        const on = lit > 0;
+        out += pane(on ? ((f + c + i) % 5 === 0 ? 'win on fl' : 'win on') : 'win', x + ox, wy, on ? ((i * 0.37 + f * 0.6) % 3).toFixed(2) : 0);
+        if (on) lit -= 1;
+      });
+    }
+    return out;
+  };
+
+  // Quiet to busy. Each returns its markup and `tip`, the y of its highest point
+  // above the roof's centre line, which is where today's beacon goes.
+  const BUILDINGS = [
+    // No views: nothing built, a park with one tree.
+    (x) => {
+      const cx = x + FACE / 2 + DX / 2, cy = GROUND - DY / 2;
+      return {
+        tip: cy - 12,
+        svg: `<path d="M${x} ${GROUND}l${DX} ${-DY}h${FACE}l${-DX} ${DY}Z" fill="${pal.accent}" fill-opacity="0.12" stroke="${pal.accent}" stroke-opacity="0.3"/>` +
+          `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 5}" stroke="${pal.dim}"/>` +
+          `<circle cx="${cx}" cy="${cy - 8}" r="4" fill="${pal.accent}" fill-opacity="0.35" stroke="${pal.accent}" stroke-opacity="0.6"/>`,
+      };
+    },
+    // A house: walls under a gable roof, one column of windows.
+    (x, h, n, i, roofOp) => {
+      const top = GROUND - h, eave = top + Math.min(7, Math.round(h * 0.4)), mid = x + FACE / 2;
+      const slope = `fill="${pal.accent}" fill-opacity="${roofOp}" stroke="${pal.accent}" stroke-opacity="0.5"`;
+      return {
+        tip: top - DY / 2,
+        svg: box(x, GROUND, eave, FACE, roofOp) +
+          `<path d="M${x} ${eave}L${mid} ${top}l${DX} ${-DY}L${x + DX} ${eave - DY}Z" ${slope}/>` +
+          `<path d="M${mid} ${top}L${x + FACE} ${eave}l${DX} ${-DY}L${mid + DX} ${top - DY}Z" ${slope}/>` +
+          `<path d="M${x} ${eave}L${mid} ${top}L${x + FACE} ${eave}Z" fill="${pal.bg2}" stroke="${pal.accent}" stroke-opacity="0.4"/>` +
+          windows(x, GROUND - eave, n, i, ONE_COL),
+      };
+    },
+    // Apartments: a flat roof with a water tank.
+    (x, h, n, i, roofOp) => {
+      const top = GROUND - h, cx = x + FACE / 2 + DX / 2, cy = top - DY / 2;
+      return {
+        tip: cy - 8,
+        svg: box(x, GROUND, top, FACE, roofOp) +
+          `<rect x="${cx - 3}" y="${cy - 7}" width="6" height="5" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.5"/>` +
+          `<ellipse cx="${cx}" cy="${cy - 7}" rx="3" ry="1.2" fill="${pal.accent}" fill-opacity="0.4"/>` +
+          windows(x, h, n, i, TWO_COLS),
+      };
+    },
+    // Offices: a narrower block set back on top of the base.
+    (x, h, n, i, roofOp) => {
+      const top = GROUND - h, base = top + Math.round(h * 0.3);
+      return {
+        tip: top - DY * 0.3,
+        svg: box(x, GROUND, base, FACE, roofOp) +
+          box(x + 3 + DX * 0.2, base - DY * 0.2, top, FACE - 6, roofOp, 0.6) +
+          windows(x, GROUND - base, n, i, TWO_COLS),
+      };
+    },
+    // A tower: a lit crown and a spire.
+    (x, h, n, i, roofOp) => {
+      const top = GROUND - h, cx = x + FACE / 2 + DX / 2, cy = top - DY / 2;
+      return {
+        tip: cy - 12,
+        svg: box(x, GROUND, top, FACE, roofOp) +
+          `<rect x="${x}" y="${top}" width="${FACE}" height="3" fill="${pal.accent}" fill-opacity="0.35"/>` +
+          `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 12}" stroke="${pal.accent}" stroke-opacity="0.7"/>` +
+          windows(x, h, n, i, TWO_COLS),
+      };
+    },
+  ];
+
   const towers = days.map((d, i) => {
     const x = LEFT + i * PITCH;
     const h = STUB + Math.round((d.n / peak) * (MAX_H - STUB));
-    const top = GROUND - h;
     const last = i === DAYS - 1;
-
-    // Windows fill bottom-up, two to a floor, one lit per count. Whatever the
-    // tower is too short to hold simply is not drawn.
-    const floors = Math.max(0, Math.floor((h - 6) / (WIN + WIN_GAP)));
-    let lit = d.n, wins = '';
-    for (let f = 0; f < floors; f += 1) {
-      for (let c = 0; c < 2; c += 1) {
-        const wx = x + 3 + c * (WIN + WIN_GAP + 2), wy = GROUND - 6 - (f + 1) * (WIN + WIN_GAP) + WIN_GAP;
-        // A few lit windows flicker, offset per tower, so the city looks lived in.
-        const on = lit > 0;
-        wins += pane(on ? ((f + c + i) % 5 === 0 ? 'win on fl' : 'win on') : 'win', wx, wy, on ? ((i * 0.37 + f * 0.6) % 3).toFixed(2) : 0);
-        if (on) lit -= 1;
-      }
-    }
+    const b = BUILDINGS[band(d.n, peak, BUILDINGS.length)](x, h, d.n, i, last ? 0.55 : 0.28);
+    const cx = x + FACE / 2 + DX / 2;
 
     const beacon = last && !dead
-      ? `<circle class="beacon" cx="${x + FACE / 2 + DX / 2}" cy="${top - DY / 2 - 5}" r="2.5" fill="${pal.m || pal.accent}"/>` +
-        `<line x1="${x + FACE / 2 + DX / 2}" y1="${top - DY / 2}" x2="${x + FACE / 2 + DX / 2}" y2="${top - DY / 2 - 4}" stroke="${pal.dim}"/>`
+      ? `<circle class="beacon" cx="${cx}" cy="${b.tip - 5}" r="2.5" fill="${pal.m || pal.accent}"/>` +
+        `<line x1="${cx}" y1="${b.tip}" x2="${cx}" y2="${b.tip - 4}" stroke="${pal.dim}"/>`
       : '';
 
     return `<g class="tw" style="animation-delay:${(i * 0.04).toFixed(2)}s">` +
       `<title>${esc(d.date)}: ${d.n}</title>` +
-      // right side, roof, front — painter's order
-      `<path d="M${x + FACE} ${GROUND}V${top}l${DX} ${-DY}V${GROUND - DY}Z" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.3"/>` +
-      `<path d="M${x} ${top}l${DX} ${-DY}h${FACE}l${-DX} ${DY}Z" fill="${pal.accent}" fill-opacity="${last ? 0.55 : 0.28}" stroke="${pal.accent}" stroke-opacity="0.5"/>` +
-      `<rect x="${x}" y="${top}" width="${FACE}" height="${h}" fill="${pal.bg2}" stroke="${pal.accent}" stroke-opacity="0.4"/>` +
-      wins + beacon + '</g>';
+      b.svg + beacon + '</g>';
   }).join('');
 
   // A searchlight from the street, sweeping the skyline while the pet lives.
@@ -100,3 +177,5 @@ module.exports = function renderSkyline(state, ctx) {
     body,
   });
 };
+
+module.exports.band = band;
