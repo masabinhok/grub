@@ -26,8 +26,8 @@ const band = (n, peak, styles) => (n === 0 ? 0 : Math.min(styles - 1, Math.ceil(
  * A night city, one isometric building per day for the last month. A building's
  * height and its lit windows are that day's count from views.json — renders of
  * the profile README, though the card deliberately never says so. Days are UTC,
- * the same buckets the Worker counts in. The style climbs with the count: park,
- * house, apartments, offices, tower.
+ * the same buckets the Worker counts in. The style climbs with the count, Tokyo
+ * at night: torii or sakura, izakaya, pencil building, billboard, skyscraper.
  *
  * Height scales to the busiest day in the window, but never below 5, so a month
  * of zeros and ones reads as a low skyline rather than a row of towers maxed out.
@@ -71,62 +71,72 @@ module.exports = function renderSkyline(state, ctx) {
     return out;
   };
 
-  // Quiet to busy. Each returns its markup and `tip`, the y of its highest point
-  // above the roof's centre line, which is where today's beacon goes.
+  const red = pal.m || pal.accent, glow = pal.t || pal.accent;
+
+  // Quiet to busy, Tokyo at night. Each returns its markup and `tip`, the y of its
+  // highest point above the roof's centre line, which is where today's beacon goes.
   const BUILDINGS = [
-    // No views: nothing built, a park with one tree.
-    (x) => {
-      const cx = x + FACE / 2 + DX / 2, cy = GROUND - DY / 2;
+    // No views: nothing built. A torii, or on alternate days a sakura tree.
+    (x, h, n, i) => {
+      const cx = x + FACE / 2 + DX / 2, gy = GROUND - DY / 2;
+      const plot = `<path d="M${x} ${GROUND}l${DX} ${-DY}h${FACE}l${-DX} ${DY}Z" fill="${pal.accent}" fill-opacity="0.1" stroke="${pal.accent}" stroke-opacity="0.25"/>`;
+      if (i % 2) {
+        return {
+          tip: gy - 13,
+          svg: plot + `<line x1="${cx}" y1="${gy}" x2="${cx}" y2="${gy - 5}" stroke="${pal.dim}"/>` +
+            `<circle cx="${cx}" cy="${gy - 8}" r="4.5" fill="${red}" fill-opacity="0.3" stroke="${red}" stroke-opacity="0.6"/>`,
+        };
+      }
       return {
-        tip: cy - 12,
-        svg: `<path d="M${x} ${GROUND}l${DX} ${-DY}h${FACE}l${-DX} ${DY}Z" fill="${pal.accent}" fill-opacity="0.12" stroke="${pal.accent}" stroke-opacity="0.3"/>` +
-          `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 5}" stroke="${pal.dim}"/>` +
-          `<circle cx="${cx}" cy="${cy - 8}" r="4" fill="${pal.accent}" fill-opacity="0.35" stroke="${pal.accent}" stroke-opacity="0.6"/>`,
+        tip: gy - 16,
+        svg: plot + `<g fill="${red}" fill-opacity="0.85">` +
+          `<rect x="${cx - 5}" y="${gy - 13}" width="1.5" height="13"/><rect x="${cx + 3.5}" y="${gy - 13}" width="1.5" height="13"/>` +
+          `<path d="M${cx - 8} ${gy - 15.5}Q${cx} ${gy - 13.5} ${cx + 8} ${gy - 15.5}V${gy - 13.5}Q${cx} ${gy - 12} ${cx - 8} ${gy - 13.5}Z"/>` +
+          `<rect x="${cx - 6}" y="${gy - 11}" width="12" height="1.2"/></g>`,
       };
     },
-    // A house: walls under a gable roof, one column of windows.
+    // An izakaya: a low shop with an awning and a red lantern by the door.
     (x, h, n, i, roofOp) => {
-      const top = GROUND - h, eave = top + Math.min(7, Math.round(h * 0.4)), mid = x + FACE / 2;
-      const slope = `fill="${pal.accent}" fill-opacity="${roofOp}" stroke="${pal.accent}" stroke-opacity="0.5"`;
+      const top = GROUND - h, aw = GROUND - Math.min(11, h - 3);
       return {
         tip: top - DY / 2,
-        svg: box(x, GROUND, eave, FACE, roofOp) +
-          `<path d="M${x} ${eave}L${mid} ${top}l${DX} ${-DY}L${x + DX} ${eave - DY}Z" ${slope}/>` +
-          `<path d="M${mid} ${top}L${x + FACE} ${eave}l${DX} ${-DY}L${mid + DX} ${top - DY}Z" ${slope}/>` +
-          `<path d="M${x} ${eave}L${mid} ${top}L${x + FACE} ${eave}Z" fill="${pal.bg2}" stroke="${pal.accent}" stroke-opacity="0.4"/>` +
-          windows(x, GROUND - eave, n, i, ONE_COL),
-      };
-    },
-    // Apartments: a flat roof with a water tank.
-    (x, h, n, i, roofOp) => {
-      const top = GROUND - h, cx = x + FACE / 2 + DX / 2, cy = top - DY / 2;
-      return {
-        tip: cy - 8,
         svg: box(x, GROUND, top, FACE, roofOp) +
-          `<rect x="${cx - 3}" y="${cy - 7}" width="6" height="5" fill="${pal.bg1}" stroke="${pal.accent}" stroke-opacity="0.5"/>` +
-          `<ellipse cx="${cx}" cy="${cy - 7}" rx="3" ry="1.2" fill="${pal.accent}" fill-opacity="0.4"/>` +
-          windows(x, h, n, i, TWO_COLS),
+          windows(x, GROUND - aw, n, i, ONE_COL) +
+          `<path d="M${x - 1} ${aw}h${FACE + 2}l-3 3h${-(FACE - 4)}Z" fill="${pal.accent}" fill-opacity="0.5" stroke="${pal.accent}" stroke-opacity="0.6"/>` +
+          `<circle cx="${x + 2.5}" cy="${aw + 6}" r="4" fill="${red}" fill-opacity="0.2"/>` +
+          `<ellipse cx="${x + 2.5}" cy="${aw + 6}" rx="1.6" ry="2" fill="${red}"/>`,
       };
     },
-    // Offices: a narrower block set back on top of the base.
+    // A pencil building with a vertical neon sign down its front edge.
     (x, h, n, i, roofOp) => {
-      const top = GROUND - h, base = top + Math.round(h * 0.3);
+      const top = GROUND - h, sh = Math.max(8, Math.round(h * 0.55));
       return {
-        tip: top - DY * 0.3,
-        svg: box(x, GROUND, base, FACE, roofOp) +
-          box(x + 3 + DX * 0.2, base - DY * 0.2, top, FACE - 6, roofOp, 0.6) +
-          windows(x, GROUND - base, n, i, TWO_COLS),
+        tip: top - DY / 2,
+        svg: box(x, GROUND, top, FACE, roofOp) + windows(x, h, n, i, TWO_COLS) +
+          `<rect class="${i % 3 ? '' : 'fl'}" x="${x - 3}" y="${top + 4}" width="3.5" height="${sh}" fill="${red}" fill-opacity="0.9" style="animation-delay:${(i * 0.53 % 3).toFixed(2)}s"/>` +
+          `<path d="${Array.from({ length: Math.floor(sh / 5) }, (_, k) => `M${x - 2.4} ${top + 6.5 + k * 5}h2.3`).join('')}" stroke="${pal.bg1}" stroke-opacity="0.8"/>`,
       };
     },
-    // A tower: a lit crown and a spire.
+    // A mid-rise with a lit billboard standing on the roof.
     (x, h, n, i, roofOp) => {
-      const top = GROUND - h, cx = x + FACE / 2 + DX / 2, cy = top - DY / 2;
+      const top = GROUND - h, bx = x + DX * 0.6, by = top - DY * 0.6 - 9;
       return {
-        tip: cy - 12,
-        svg: box(x, GROUND, top, FACE, roofOp) +
-          `<rect x="${x}" y="${top}" width="${FACE}" height="3" fill="${pal.accent}" fill-opacity="0.35"/>` +
-          `<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${cy - 12}" stroke="${pal.accent}" stroke-opacity="0.7"/>` +
-          windows(x, h, n, i, TWO_COLS),
+        tip: by - 1,
+        svg: box(x, GROUND, top, FACE, roofOp) + windows(x, h, n, i, TWO_COLS) +
+          `<path d="M${bx + 3} ${by + 7}V${top - DY * 0.6}M${bx + FACE - 3} ${by + 7}V${top - DY * 0.6}" stroke="${pal.dim}" stroke-opacity="0.8"/>` +
+          `<rect x="${bx}" y="${by}" width="${FACE}" height="7" fill="${glow}" fill-opacity="0.25" stroke="${glow}" stroke-opacity="0.9"/>` +
+          `<path d="M${bx + 3} ${by + 2.5}h${FACE - 6}M${bx + 3} ${by + 4.5}h${FACE - 9}" stroke="${glow}" stroke-opacity="0.8"/>`,
+      };
+    },
+    // A skyscraper: a lit crown and red aircraft-warning lights on its corners.
+    (x, h, n, i, roofOp) => {
+      const top = GROUND - h;
+      return {
+        tip: top - DY - 2,
+        svg: box(x, GROUND, top, FACE, roofOp) + windows(x, h, n, i, TWO_COLS) +
+          `<rect x="${x}" y="${top}" width="${FACE}" height="3" fill="${glow}" fill-opacity="0.3"/>` +
+          `<circle class="av" cx="${x + 1}" cy="${top - 1}" r="1.4" fill="${red}"/>` +
+          `<circle class="av" cx="${x + FACE + DX - 1}" cy="${top - DY - 1}" r="1.4" fill="${red}" style="animation-delay:.6s"/>`,
       };
     },
   ];
@@ -160,6 +170,7 @@ module.exports = function renderSkyline(state, ctx) {
     .tw{animation:rise 1.1s cubic-bezier(.2,.8,.2,1) both;transform-box:fill-box;transform-origin:50% 100%}
     .fl{animation:flick 3.2s steps(1) infinite}
     .beacon{animation:blinkb 1.3s ease-in-out infinite}
+    .av{animation:blinkb 2.4s ease-in-out infinite}
     @keyframes rise{from{transform:scaleY(0.02);opacity:0}to{transform:scaleY(1);opacity:1}}
     @keyframes flick{0%,70%{fill-opacity:.9}72%,78%{fill-opacity:.15}80%,100%{fill-opacity:.9}}
     @keyframes blinkb{0%,100%{opacity:1}50%{opacity:.1}}`}`;
