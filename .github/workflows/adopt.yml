@@ -34,7 +34,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Inputs go through the environment rather than being interpolated into
       # the script. `${{ }}` substitution happens before bash sees the line, so

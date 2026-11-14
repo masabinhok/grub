@@ -57,7 +57,7 @@ jobs:
     steps:
       # No actions/setup-node: ubuntu-latest ships Node 20+, and the script has
       # zero dependencies, so there is nothing to install. Keeps the job ~15s.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       # Pull the Worker's live count into views.json *before* the cards are drawn,
       # so the eye card shows this run's number rather than yesterday's. This used
