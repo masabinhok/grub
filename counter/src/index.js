@@ -168,6 +168,16 @@ export default {
           headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
         });
       }
+      // ?before=YYYY-MM-DD: forget every day before that date and start the count there.
+      const before = url.searchParams.get('before');
+      if (before !== null) {
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(before)) return new Response('before must be YYYY-MM-DD\n', { status: 400 });
+        const stats = await stub.dropBefore(before);
+        return new Response(JSON.stringify({ total: stats.total, days: Object.keys(stats.days).length }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+        });
+      }
       const result = await stub.claimSelf();
       return new Response(JSON.stringify({ claimed: result.claimed, self: result.self }), {
         status: 200,

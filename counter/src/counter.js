@@ -151,6 +151,31 @@ export class ViewCounter extends DurableObject {
   }
 
   /**
+   * Forgets every day before `date` (YYYY-MM-DD), for starting the count fresh.
+   * Total is recomputed from the surviving days so sum-of-days === total holds, and
+   * `since` moves to the start of `date`.
+   * Nothing is filed under `self`: these were real views, just not wanted.
+   */
+  dropBefore(date) {
+    this.ctx.storage.transactionSync(() => {
+      this.sql.exec('DELETE FROM days WHERE date < ?', date);
+      const sum = this.sql.exec('SELECT COALESCE(SUM(count), 0) AS n FROM days').toArray()[0].n;
+      this.sql.exec(
+        `INSERT INTO meta (key, value) VALUES ('total', ?)
+         ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+        String(sum),
+      );
+      // The count now starts at `date`, so say so.
+      this.sql.exec(
+        `INSERT INTO meta (key, value) VALUES ('since', ?)
+         ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
+        `${date}T00:00:00.000Z`,
+      );
+    });
+    return this.stats();
+  }
+
+  /**
    * A badge request that was served but deliberately not counted — see the camo
    * gate in src/index.js. Tracked because the size of this number is the whole
    * argument that the counted number means something.
